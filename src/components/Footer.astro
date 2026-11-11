@@ -1,0 +1,450 @@
+---
+import LogoMark from './LogoMark.astro';
+import { content, contact, localePath, alternatePath, type Locale } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = content[locale];
+const f = t.footer;
+---
+
+<footer class="footer on-dark">
+  <div class="container">
+    <div class="footer__cta">
+      <h2 class="footer__title" data-reveal>
+        {f.ctaBefore}<span class="footer__accent" lang="zh-Hans">{f.ctaAccent}</span>{f.ctaAfter}
+      </h2>
+      <a class="btn btn-primary" href={localePath(locale, '/contact/')} data-reveal style="--reveal-delay:120ms"
+        >{f.cta}</a
+      >
+    </div>
+
+    <div class="footer__grid">
+      <div class="footer__brand">
+        <LogoMark height={28} />
+        <p class="footer__brand-name" lang="en">{f.brand}</p>
+        <address class="footer__address">
+          {contact.street}<br />
+          {contact.city}<br />
+          <a href={contact.phoneHref}>{contact.phone}</a>
+        </address>
+      </div>
+
+      <nav class="footer__col footer__col--services" aria-labelledby="footer-services">
+        <h3 class="footer__heading" id="footer-services">{f.servicesHeading}</h3>
+        <ul>
+          {
+            t.nav.servicesMenu.map((item) => (
+              <li>
+                <a href={localePath(locale, item.href)}>{item.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav class="footer__col footer__col--company" aria-labelledby="footer-company">
+        <h3 class="footer__heading" id="footer-company">{f.companyHeading}</h3>
+        <ul>
+          {
+            f.company.map((item) => (
+              <li>
+                <a href={localePath(locale, item.href)}>{item.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <div class="footer__col footer__col--newsletter">
+        <h3 class="footer__heading" id="footer-newsletter">{f.newsletterHeading}</h3>
+        <form
+          class="newsletter"
+          novalidate
+          aria-labelledby="footer-newsletter"
+          data-newsletter
+          data-error={f.error}
+          data-success={f.success}
+          data-busy={f.subscribing}
+        >
+          <div class="newsletter__row">
+            <label class="visually-hidden" for="newsletter-email">{f.newsletterLabel}</label>
+            <input
+              class="newsletter__input"
+              id="newsletter-email"
+              name="email"
+              type="email"
+              autocomplete="email"
+              inputmode="email"
+              placeholder={f.newsletterPlaceholder}
+              aria-describedby="newsletter-status"
+              required
+            />
+            <button class="newsletter__button" type="submit">{f.subscribe}</button>
+          </div>
+          <p class="newsletter__status" id="newsletter-status" role="status" aria-live="polite"></p>
+        </form>
+      </div>
+    </div>
+
+    <div class="footer__bottom">
+      <p>{contact.license} · {f.sibling}</p>
+      <ul class="footer__legal">
+        {
+          f.legal.map((item) => (
+            <li>
+              <a href={localePath(locale, item.href)}>{item.label}</a>
+            </li>
+          ))
+        }
+        <li class="footer__lang">
+          <a
+            href={alternatePath(Astro.url.pathname, 'en')}
+            lang="en"
+            aria-current={locale === 'en' ? 'true' : undefined}>EN</a
+          >
+          <span aria-hidden="true">/</span>
+          <a
+            href={alternatePath(Astro.url.pathname, 'zh')}
+            lang="zh-Hans"
+            aria-current={locale === 'zh' ? 'true' : undefined}>中文</a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    --mark-a: var(--white);
+    --mark-o: var(--light-blue);
+    background: var(--ink);
+    color: var(--white);
+    padding: 96px 0 40px;
+  }
+
+  .footer a {
+    color: var(--footer-link);
+  }
+
+  .footer a:hover {
+    color: var(--white);
+  }
+
+  .footer__cta {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    padding-bottom: 64px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  }
+
+  .footer__cta .btn {
+    flex: none;
+    color: var(--white);
+  }
+
+  .footer__title {
+    max-width: 720px;
+    font: 400 clamp(32px, 4.07vw, 52px) / 1.12 'Noto Serif Display', 'Noto Serif SC', serif;
+  }
+
+  :lang(zh) .footer__title {
+    font-family: 'Noto Serif SC', serif;
+    font-size: clamp(28px, 3.6vw, 46px);
+    line-height: 1.38;
+  }
+
+  .footer__accent {
+    color: var(--light-blue);
+    font-family: 'Noto Serif SC', serif;
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 32px;
+    padding-top: 56px;
+    font: 400 15px/1.6 var(--sans);
+    color: var(--footer-link);
+  }
+
+  .footer__brand {
+    grid-column: 1 / span 3;
+  }
+
+  .footer__col--services {
+    grid-column: 5 / span 2;
+  }
+
+  .footer__col--company {
+    grid-column: 7 / span 2;
+  }
+
+  .footer__col--newsletter {
+    grid-column: 9 / -1;
+  }
+
+  .footer__brand-name {
+    margin-top: 16px;
+    font: 400 22px/1.2 'Noto Serif Display', serif;
+    color: var(--white);
+  }
+
+  .footer__address {
+    margin-top: 14px;
+    font-style: normal;
+  }
+
+  .footer__heading {
+    margin: 0 0 16px;
+    font: 700 12px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--white);
+  }
+
+  :lang(zh) .footer__heading {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .footer__col ul {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Newsletter */
+  .newsletter__row {
+    display: flex;
+    gap: 8px;
+  }
+
+  .newsletter__input {
+    flex: 1;
+    min-width: 0;
+    height: 50px;
+    padding: 0 16px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--white);
+    font: 400 15px/1 var(--sans);
+    transition: border-color 200ms ease;
+  }
+
+  .newsletter__input::placeholder {
+    color: var(--footer-meta);
+  }
+
+  .newsletter__input:hover {
+    border-color: rgba(255, 255, 255, 0.45);
+  }
+
+  .newsletter__input:focus-visible {
+    outline-offset: 2px;
+    border-color: rgba(255, 255, 255, 0.6);
+  }
+
+  .newsletter.is-error .newsletter__input {
+    border-color: var(--deep-red);
+  }
+
+  .newsletter__button {
+    height: 50px;
+    padding: 0 22px;
+    border: 0;
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--ink);
+    font: 700 15px/1 var(--sans);
+    cursor: pointer;
+    transition: background-color 200ms ease;
+  }
+
+  .newsletter__button:hover {
+    background: var(--pale-sky);
+  }
+
+  .newsletter__button[disabled] {
+    opacity: 0.7;
+    cursor: progress;
+  }
+
+  .newsletter__status {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 24px;
+    margin-top: 10px;
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  .newsletter__status:empty {
+    visibility: hidden;
+  }
+
+  /* Deep Red is too dark to read on Ink, so the message uses a lighter tint */
+  .newsletter.is-error .newsletter__status {
+    color: #ff8f91;
+  }
+
+  .newsletter.is-success .newsletter__status {
+    color: var(--light-blue);
+  }
+
+  .newsletter__status :global(svg) {
+    flex: none;
+  }
+
+  /* Bottom bar */
+  .footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 32px;
+    margin-top: 64px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    font: 400 13px/1.5 var(--sans);
+    color: var(--footer-meta);
+  }
+
+  .footer__legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .footer__legal li + li::before {
+    content: '·';
+    margin: 0 10px;
+  }
+
+  .footer__bottom a {
+    color: var(--footer-meta);
+  }
+
+  .footer__lang {
+    display: inline-flex;
+    gap: 6px;
+  }
+
+  .footer__lang a[aria-current] {
+    color: var(--white);
+    font-weight: 700;
+  }
+
+  @media (max-width: 1023px) {
+    .footer__brand {
+      grid-column: 1 / span 6;
+    }
+    .footer__col--newsletter {
+      grid-column: 7 / -1;
+    }
+    .footer__col--services {
+      grid-column: 1 / span 3;
+    }
+    .footer__col--company {
+      grid-column: 4 / span 3;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .footer {
+      padding: 64px 0 32px;
+    }
+    .footer__cta {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 28px;
+      padding-bottom: 48px;
+    }
+    .footer__cta .btn {
+      width: 100%;
+    }
+    .footer__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 40px 20px;
+      padding-top: 48px;
+    }
+    .footer__brand,
+    .footer__col--newsletter {
+      grid-column: 1 / -1;
+    }
+    .footer__col--services {
+      grid-column: 1;
+    }
+    .footer__col--company {
+      grid-column: 2;
+    }
+    .footer__col--newsletter {
+      order: -1;
+    }
+    .footer__brand {
+      order: -2;
+    }
+    .footer__bottom {
+      flex-direction: column;
+      margin-top: 48px;
+    }
+  }
+</style>
+
+<script>
+  const ICON_ERROR =
+    '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 4.5v4.25" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="8" cy="11.25" r="1" fill="currentColor"/></svg>';
+  const ICON_OK =
+    '<svg width="16" height="16" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="7.25" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="m4.75 8.25 2.25 2.25 4.25-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+  document.querySelectorAll<HTMLFormElement>('[data-newsletter]').forEach((form) => {
+    const input = form.querySelector<HTMLInputElement>('input[type="email"]')!;
+    const button = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
+    const status = form.querySelector<HTMLElement>('[role="status"]')!;
+    const label = button.textContent ?? '';
+
+    const show = (state: 'error' | 'success' | null, message = '') => {
+      form.classList.toggle('is-error', state === 'error');
+      form.classList.toggle('is-success', state === 'success');
+      input.setAttribute('aria-invalid', String(state === 'error'));
+      status.innerHTML = state ? `${state === 'error' ? ICON_ERROR : ICON_OK}<span></span>` : '';
+      const text = status.querySelector('span');
+      if (text) text.textContent = message;
+    };
+
+    input.addEventListener('input', () => {
+      if (form.classList.contains('is-error') && input.validity.valid) show(null);
+    });
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      if (!input.value.trim() || !input.validity.valid) {
+        show('error', form.dataset.error);
+        input.focus();
+        return;
+      }
+      button.disabled = true;
+      button.textContent = form.dataset.busy ?? label;
+
+      // TODO: no newsletter service is connected yet. Replace this delay
+      // with a request to the provider (Mailchimp, Buttondown, etc.).
+      await new Promise((resolve) => setTimeout(resolve, 700));
+
+      button.disabled = false;
+      button.textContent = label;
+      form.reset();
+      show('success', form.dataset.success);
+    });
+  });
+</script>

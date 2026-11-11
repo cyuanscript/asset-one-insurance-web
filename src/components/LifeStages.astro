@@ -1,0 +1,426 @@
+---
+import Photo from './Photo.astro';
+import SectionHeading from './SectionHeading.astro';
+import { content, localePath, type Locale, type PhotoKey } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = content[locale].stages;
+const total = String(t.items.length).padStart(2, '0');
+const approachHref = localePath(locale, '/insurance-and-you/');
+---
+
+<section class="stages" aria-labelledby="stages-title" id="main">
+  <div class="container">
+    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="stages-title" span={7} />
+
+    <div class="stages__selector" data-stages>
+      <div class="stages__tabs-wrap" data-reveal>
+        <div class="stages__tabs" role="tablist" aria-label={t.tablistLabel} data-tablist>
+          {
+            t.items.map((item, i) => (
+              <button
+                class="stages__tab"
+                type="button"
+                role="tab"
+                id={`stage-tab-${i}`}
+                aria-controls={`stage-panel-${i}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+                data-tab
+              >
+                {item.name}
+              </button>
+            ))
+          }
+        </div>
+      </div>
+
+      <div class="stages__panel" data-reveal style="--reveal-delay:100ms">
+        {
+          t.items.map((item, i) => (
+            <div
+              class:list={['stage', { 'is-active': i === 0 }]}
+              role="tabpanel"
+              id={`stage-panel-${i}`}
+              aria-labelledby={`stage-tab-${i}`}
+              tabindex="0"
+              data-panel
+            >
+              <div class="stage__photo">
+                <Photo photo={item.photo as PhotoKey} class="stage__photo-inner" />
+              </div>
+              <div class="stage__body">
+                <p class="stage__counter">
+                  {String(i + 1).padStart(2, '0')} / {total}
+                </p>
+                <h3 class="stage__name">{item.name}</h3>
+                <p class="stage__text">{item.body}</p>
+                <div class="stage__fits">
+                  <span class="stage__fits-label">{t.mayFit}</span>
+                  <ul class="stage__chips">
+                    {item.fits.map((fit) => (
+                      <li class="chip">{fit}</li>
+                    ))}
+                  </ul>
+                </div>
+                <a class="stage__link text-link" href={approachHref}>
+                  {t.approach}
+                </a>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .stages {
+    padding-top: var(--section-y);
+    scroll-margin-top: 64px;
+  }
+
+  .stages__selector {
+    margin-top: 48px;
+  }
+
+  /* Tabs */
+  .stages__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .stages__tab {
+    height: 50px;
+    padding: 0 22px;
+    border: 1.5px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--ink);
+    font: 700 15px/1 var(--sans);
+    white-space: nowrap;
+    cursor: pointer;
+    transition:
+      background-color 250ms ease,
+      border-color 250ms ease,
+      color 250ms ease,
+      transform 200ms var(--ease-out);
+  }
+
+  .stages__tab:hover {
+    border-color: #b9c8d4;
+  }
+
+  .stages__tab:active {
+    transform: translateY(1px);
+  }
+
+  .stages__tab[aria-selected='true'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--white);
+  }
+
+  /* Panel: all stages stacked in one cell so height never jumps */
+  .stages__panel {
+    display: grid;
+    margin-top: 24px;
+    min-height: 440px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .stage {
+    grid-area: 1 / 1;
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+    opacity: 0;
+    visibility: hidden;
+    transition:
+      opacity 300ms ease,
+      visibility 0s linear 300ms;
+  }
+
+  .stage.is-active {
+    opacity: 1;
+    visibility: visible;
+    transition:
+      opacity 300ms ease,
+      visibility 0s;
+  }
+
+  .stage:focus-visible {
+    outline-offset: -2px;
+  }
+
+  .stage__photo {
+    position: relative;
+    overflow: hidden;
+    min-height: 440px;
+  }
+
+  .stage__photo :global(.stage__photo-inner) {
+    position: absolute;
+    inset: 0;
+    transform: translateX(8px) scale(1.02);
+    transition: transform 700ms var(--ease-out);
+  }
+
+  .stage.is-active .stage__photo :global(.stage__photo-inner) {
+    transform: none;
+  }
+
+  .stage__body {
+    display: flex;
+    flex-direction: column;
+    padding: 56px 48px;
+  }
+
+  /* Text settles in just after the crossfade starts */
+  .stage__body > * {
+    transform: translateY(8px);
+    transition: transform 500ms var(--ease-out);
+  }
+
+  .stage.is-active .stage__body > * {
+    transform: none;
+  }
+
+  .stage.is-active .stage__body > :nth-child(2) {
+    transition-delay: 40ms;
+  }
+  .stage.is-active .stage__body > :nth-child(3) {
+    transition-delay: 80ms;
+  }
+  .stage.is-active .stage__body > :nth-child(4) {
+    transition-delay: 120ms;
+  }
+
+  .stage__counter {
+    font: 700 13px/1.4 'Lato', var(--sans);
+    letter-spacing: 0.12em;
+    color: var(--deep-sky);
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stage__name {
+    margin-top: 20px;
+    font: 400 40px/1.12 var(--serif);
+  }
+
+  :lang(zh) .stage__name {
+    font-size: 34px;
+    line-height: 1.38;
+  }
+
+  .stage__text {
+    margin-top: 18px;
+    font-size: 18px;
+    line-height: 1.65;
+    color: var(--slate);
+  }
+
+  :lang(zh) .stage__text {
+    font-size: 17px;
+    line-height: 1.75;
+  }
+
+  .stage__fits {
+    margin-top: 28px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 12px;
+  }
+
+  .stage__fits-label {
+    font: 700 12px/1 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  :lang(zh) .stage__fits-label {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .stage__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .chip {
+    display: inline-flex;
+    align-items: center;
+    height: 32px;
+    padding: 0 12px;
+    border-radius: var(--radius);
+    background: var(--pale-sky);
+    font: 400 14px/1 var(--sans);
+    color: var(--ink);
+  }
+
+  .stage__link {
+    margin-top: auto;
+    padding-top: 32px;
+    align-self: flex-start;
+  }
+
+  /* Tablet: even split */
+  @media (max-width: 1023px) {
+    .stage {
+      grid-template-columns: 1fr 1fr;
+    }
+    .stage__body {
+      padding: 40px 32px;
+    }
+    .stage__name {
+      font-size: 32px;
+    }
+  }
+
+  /* Mobile */
+  @media (max-width: 767px) {
+    .stages {
+      padding-top: 56px;
+      padding-bottom: 40px;
+    }
+
+    .stages__selector {
+      margin-top: 28px;
+    }
+
+    /* Tabs scroll sideways; the last one runs off the edge */
+    .stages__tabs-wrap {
+      margin-inline: calc(-1 * var(--gutter));
+    }
+
+    .stages__tabs {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      padding-inline: var(--gutter);
+      scroll-padding-inline: var(--gutter);
+      scrollbar-width: none;
+      /* room for focus outline */
+      padding-block: 6px;
+      margin-block: -6px;
+    }
+
+    .stages__tabs::-webkit-scrollbar {
+      display: none;
+    }
+
+    .stages__tab {
+      flex: none;
+      height: 46px;
+      padding: 0 16px;
+    }
+
+    .stages__panel {
+      margin-top: 16px;
+      min-height: 0;
+    }
+
+    .stage {
+      grid-template-columns: 1fr;
+      grid-template-rows: 180px auto;
+    }
+
+    .stage__photo {
+      min-height: 180px;
+    }
+
+    .stage__body {
+      padding: 24px;
+    }
+
+    .stage__counter {
+      font-size: 12px;
+    }
+
+    .stage__name {
+      margin-top: 12px;
+      font-size: 26px;
+      line-height: 1.15;
+    }
+
+    :lang(zh) .stage__name {
+      font-size: 24px;
+      line-height: 1.4;
+    }
+
+    .stage__text {
+      margin-top: 12px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .stage__fits {
+      margin-top: 20px;
+    }
+
+    .stage__link {
+      padding-top: 24px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-stages]').forEach((root) => {
+    const tablist = root.querySelector<HTMLElement>('[data-tablist]');
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+    let active = 0;
+
+    const select = (index: number, focus = false) => {
+      if (index === active) {
+        if (focus) tabs[index].focus();
+        return;
+      }
+      active = index;
+      tabs.forEach((tab, i) => {
+        const on = i === index;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+      });
+      panels.forEach((panel, i) => panel.classList.toggle('is-active', i === index));
+
+      const tab = tabs[index];
+      if (focus) tab.focus({ preventScroll: true });
+
+      // Keep the chosen tab visible in the sideways-scrolling mobile row
+      if (tablist && tablist.scrollWidth > tablist.clientWidth) {
+        const left = tab.offsetLeft - (tablist.clientWidth - tab.offsetWidth) / 2;
+        tablist.scrollTo({ left, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
+      }
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i));
+      tab.addEventListener('keydown', (e) => {
+        let next: number | null = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % tabs.length;
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + tabs.length) % tabs.length;
+        if (e.key === 'Home') next = 0;
+        if (e.key === 'End') next = tabs.length - 1;
+        if (next !== null) {
+          e.preventDefault();
+          select(next, true);
+        }
+      });
+    });
+  });
+</script>

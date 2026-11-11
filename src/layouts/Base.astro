@@ -1,0 +1,46 @@
+---
+import '../styles/global.css';
+import { content, alternatePath, type Locale } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+  title?: string;
+  description?: string;
+}
+const { locale, title, description } = Astro.props;
+const t = content[locale];
+const pathname = Astro.url.pathname;
+---
+
+<!doctype html>
+<html lang={t.htmlLang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title ?? t.meta.title}</title>
+    <meta name="description" content={description ?? t.meta.description} />
+    <meta name="theme-color" content="#141B22" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="alternate" hreflang="en" href={alternatePath(pathname, 'en')} />
+    <link rel="alternate" hreflang="zh-Hans" href={alternatePath(pathname, 'zh')} />
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Noto+Serif+Display:wght@400&family=Noto+Serif+SC:wght@400;600&family=Noto+Sans+SC:wght@400;700&display=swap"
+    />
+
+    <!-- Mark JS as available before first paint so scroll reveals don't flash -->
+    <script is:inline>
+      document.documentElement.classList.add('js');
+    </script>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">{t.skip}</a>
+    <slot />
+    <script>
+      import '../scripts/motion';
+    </script>
+  </body>
+</html>

@@ -1,0 +1,198 @@
+---
+import Photo from './Photo.astro';
+import SectionHeading from './SectionHeading.astro';
+import { content, localePath, type Locale, type PhotoKey } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = content[locale].products;
+---
+
+<section class="products" aria-labelledby="products-title">
+  <div class="container">
+    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="products-title" span={6} />
+
+    <ul class="products__grid">
+      {
+        t.items.map((item, i) => (
+          <li class="card" data-reveal style={`--reveal-delay:${i * 100}ms`}>
+            <div class="card__photo">
+              <Photo photo={item.photo as PhotoKey} class="card__photo-inner" />
+            </div>
+            <div class="card__body">
+              <h3 class="card__title">
+                <a class="card__link" href={localePath(locale, item.href)}>
+                  {item.name}
+                </a>
+              </h3>
+              <p class="card__text">{item.body}</p>
+              <span class="card__more text-link" aria-hidden="true">
+                {t.more}
+              </span>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .products {
+    padding-block: var(--section-y);
+  }
+
+  .products__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+    margin: 56px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  /* Once the reveal has finished, hover lifts the card 2px */
+  :global(html:not(.js)) .card,
+  :global(.js) .card.is-settled {
+    transition:
+      transform 500ms var(--ease-out),
+      box-shadow 500ms var(--ease-out);
+  }
+
+  .card:hover,
+  :global(.js) .card.is-revealed:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 2px 4px rgba(20, 27, 34, 0.06),
+      0 22px 48px rgba(20, 27, 34, 0.1);
+  }
+
+  .card__photo {
+    position: relative;
+    height: 240px;
+    overflow: hidden;
+  }
+
+  .card__photo :global(.card__photo-inner) {
+    position: absolute;
+    inset: 0;
+    transition: transform 600ms var(--ease-out);
+  }
+
+  .card:hover .card__photo :global(.card__photo-inner) {
+    transform: scale(1.03);
+  }
+
+  .card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 32px 32px 36px;
+  }
+
+  .card__title {
+    font: 400 32px/1.15 var(--serif);
+  }
+
+  :lang(zh) .card__title {
+    font-size: 28px;
+    line-height: 1.4;
+  }
+
+  /* The whole card is clickable via the title link */
+  .card__link {
+    color: var(--ink);
+  }
+
+  .card__link:hover {
+    color: var(--ink);
+  }
+
+  .card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    border-radius: var(--radius);
+  }
+
+  .card__link:focus-visible {
+    outline: none;
+  }
+
+  .card__link:focus-visible::after {
+    outline: 2px solid var(--deep-sky);
+    outline-offset: 3px;
+  }
+
+  .card__text {
+    margin-top: 14px;
+    font-size: 17px;
+    line-height: 1.6;
+    color: var(--slate);
+  }
+
+  :lang(zh) .card__text {
+    line-height: 1.75;
+  }
+
+  .card__more {
+    margin-top: auto;
+    padding-top: 24px;
+    transition: color 200ms ease;
+  }
+
+  .card:hover .card__more {
+    color: var(--deep-sky-hover);
+  }
+
+  @media (max-width: 1099px) {
+    .products__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 767px) {
+    .products__grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      margin-top: 32px;
+    }
+
+    .card__photo {
+      height: 160px;
+    }
+
+    .card__body {
+      padding: 24px;
+    }
+
+    .card__title {
+      font-size: 26px;
+    }
+
+    :lang(zh) .card__title {
+      font-size: 24px;
+    }
+
+    .card__text {
+      font-size: 16px;
+    }
+
+    .card__more {
+      padding-top: 18px;
+    }
+  }
+</style>

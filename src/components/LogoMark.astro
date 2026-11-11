@@ -1,0 +1,52 @@
+---
+/**
+ * The Asset One "AO" mark, redrawn as vectors from the supplied logo.
+ * The A takes `--mark-a` (defaults to currentColor) and the O takes
+ * `--mark-o` (defaults to Light Blue #7BC9FF), so it can sit on light,
+ * photo or ink grounds without separate files.
+ */
+interface Props {
+  height?: number;
+  class?: string;
+  title?: string;
+}
+const { height = 30, class: className, title } = Astro.props;
+const width = Math.round((height * 663) / 438 * 10) / 10;
+---
+
+<svg
+  class:list={['logo-mark', className]}
+  viewBox="177 0 663 438"
+  width={width}
+  height={height}
+  role={title ? 'img' : undefined}
+  aria-hidden={title ? undefined : 'true'}
+  focusable="false"
+>
+  {title && <title>{title}</title>}
+  <path
+    class="logo-mark__a"
+    d="M375 0 L427.38 114.29 A219 219 0 0 0 571.23 432 L412.4 432 L375 342 L337.6 432 L177 432 Z"
+  />
+  <path
+    class="logo-mark__o"
+    fill-rule="evenodd"
+    d="M427.38 114.29 A219 219 0 1 1 571.23 432 L573.2 432.44 Z M555.5 218.5 a64.5 69.5 0 1 0 129 0 a64.5 69.5 0 1 0 -129 0 Z"
+  />
+</svg>
+
+<style>
+  .logo-mark {
+    display: block;
+    flex: none;
+    overflow: visible;
+  }
+  .logo-mark__a {
+    fill: var(--mark-a, currentColor);
+    transition: fill 300ms ease;
+  }
+  .logo-mark__o {
+    fill: var(--mark-o, #7bc9ff);
+    transition: fill 300ms ease;
+  }
+</style>
