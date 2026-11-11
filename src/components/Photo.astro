@@ -16,13 +16,19 @@ interface Props {
 }
 
 const { photo, tone = 'light', alt = '', class: className, eager = false, showCaption = true } = Astro.props;
-const { src, caption } = photos[photo];
+const { src, caption, position } = photos[photo];
 ---
 
 <div class:list={['photo', `photo--${tone}`, className]}>
   {
     src ? (
-      <img src={src} alt={alt || caption} loading={eager ? 'eager' : 'lazy'} decoding="async" />
+      <img
+        src={src}
+        alt={alt || caption}
+        loading={eager ? 'eager' : 'lazy'}
+        decoding="async"
+        style={position ? `object-position: ${position}` : undefined}
+      />
     ) : (
       <div class="photo__placeholder" role="img" aria-label={`Photo placeholder: ${caption}`}>
         {showCaption && <span class="photo__caption">{caption}</span>}

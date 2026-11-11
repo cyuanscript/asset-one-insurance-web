@@ -29,20 +29,26 @@ export const contact = {
   license: '[PLACEHOLDER] License no.',
 };
 
-/** Photo slots. Drop files into /public/images and set `src` to use them. */
-export const photos = {
-  hero: { src: '', caption: 'Bellevue skyline across Lake Washington, golden hour' },
-  stageFamily: { src: '', caption: 'Family at home, natural light' },
-  stageEducation: { src: '', caption: 'Parent and child, Eastside park' },
-  stageRetirement: { src: '', caption: 'Couple walking the lakeshore' },
-  stageGrowth: { src: '', caption: 'Advisor conversation at a table' },
-  stageLegacy: { src: '', caption: 'Three generations, evergreen shoreline' },
-  productLife: { src: '', caption: 'Family on the shoreline' },
-  productHealth: { src: '', caption: 'Couple on an evergreen trail' },
-  productAnnuities: { src: '', caption: 'Advisor conversation, natural light' },
-} as const;
+/**
+ * Photo slots. Drop files into /public/images and set `src` to use them.
+ * `position` (optional) sets the crop focal point, e.g. '50% 40%'.
+ */
+type PhotoSlot = { src: string; caption: string; position?: string };
 
-export type PhotoKey = keyof typeof photos;
+const photoSlots = {
+  hero: { src: '/images/hero-lake-washington.jpg', caption: 'The I-90 floating bridge across Lake Washington, with Bellevue on the horizon' },
+  stageFamily: { src: '/images/family-drawing-living-room.jpg', caption: 'Parents and their young son drawing together on the living room floor' },
+  stageEducation: { src: '/images/mother-daughter-reading-park.jpg', caption: 'Mother and daughter reading a botany book together in a park' },
+  stageRetirement: { src: '/images/retired-couple-beach-picnic.jpg', caption: 'Retired couple sharing a tablet during a beach picnic', position: '50% 40%' },
+  stageGrowth: { src: '/images/advisor-office-lounge.jpg', caption: 'Advisor reviewing notes with a client in a bright office lounge' },
+  stageLegacy: { src: '/images/grandparents-grandchildren-music.jpg', caption: 'Grandparents playing ukulele and toys with their grandchildren at home', position: '50% 45%' },
+  productLife: { src: '/images/family-beach-shoreline.jpg', caption: 'Family standing arm in arm on the beach, looking out at the water', position: '50% 15%' },
+  productHealth: { src: '/images/couple-park-meditation.jpg', caption: 'Older couple doing a calm breathing exercise outdoors in a park', position: '50% 30%' },
+  productAnnuities: { src: '/images/advisor-client-financial-review.jpg', caption: 'Advisor walking a client through financial charts at a table', position: '50% 35%' },
+} satisfies Record<string, PhotoSlot>;
+
+export type PhotoKey = keyof typeof photoSlots;
+export const photos: Record<PhotoKey, PhotoSlot> = photoSlots;
 
 const en = {
   htmlLang: 'en',
