@@ -1,0 +1,362 @@
+---
+/**
+ * Coverage types: goal filter (V0) and four compact cards.
+ *
+ * Layout: the chips sit directly above a single row of four cards, so on a
+ * laptop the goals and every card are on screen together. Below 1100px the
+ * cards wrap, so cards that match the chosen goal move to the front (CSS
+ * `order`), right under the chips.
+ *
+ * Reusable pattern: "Goal chips that highlight cards". Any page with 3–6
+ * options can reuse the chip + data-coverage markup and the script below.
+ */
+import SectionHeading from '../SectionHeading.astro';
+import { lifeInsurance } from '../../i18n/life-insurance';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = lifeInsurance[locale].types;
+---
+
+<section class="section types" aria-labelledby="types-title" id="types">
+  <div class="container">
+    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="types-title" span={6} />
+
+    <div class="goals" data-goals data-reveal>
+      <p class="goals__label" id="goals-label">{t.goalsLabel}</p>
+      <div class="goals__chips" role="group" aria-labelledby="goals-label">
+        <button
+          type="button"
+          class="goal-chip"
+          aria-pressed="true"
+          data-goal="all"
+          data-highlights="term whole iul survivorship"
+          data-note={t.allNote}
+        >
+          {t.goalsAll}
+        </button>
+        {
+          t.goals.map((g) => (
+            <button
+              type="button"
+              class="goal-chip"
+              aria-pressed="false"
+              data-goal={g.key}
+              data-highlights={g.highlights.join(' ')}
+              data-note={g.note}
+              data-link-label={g.link?.label}
+              data-link-href={g.link?.href}
+            >
+              {g.label}
+            </button>
+          ))
+        }
+      </div>
+      <p class="goals__note" aria-live="polite">
+        <span data-goal-note-text>{t.allNote}</span>
+        <a class="text-link goals__note-link" data-goal-note-link hidden></a>
+      </p>
+    </div>
+
+    <ul class="type-cards">
+      {
+        t.cards.map((c, i) => (
+          <li class="type-card" data-coverage={c.id} data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <h3 class="type-card__name">{c.name}</h3>
+            <div class="type-card__intro">
+              <p class="type-card__summary">{c.summary}</p>
+              {c.bullets && (
+                <ul class="type-card__bullets">
+                  {c.bullets.map((b) => (
+                    <li>{b}</li>
+                  ))}
+                </ul>
+              )}
+              {c.note && <p class="type-card__note">{c.note}</p>}
+            </div>
+            <div class="type-card__fact">
+              <p class="type-card__label">{t.labels.mayFit}</p>
+              <p class="type-card__text">{c.mayFit}</p>
+            </div>
+            <div class="type-card__fact">
+              <p class="type-card__label">{t.labels.weigh}</p>
+              <p class="type-card__text">{c.weigh}</p>
+            </div>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  /* Basics sits directly above on the same ground: halve the gap */
+  .types {
+    padding-top: 0;
+  }
+
+  /* Goal filter: only shown when JS can run it */
+  .goals {
+    display: none;
+    margin-top: 40px;
+  }
+
+  :global(.js) .goals {
+    display: block;
+  }
+
+  .goals__label {
+    font: 700 13px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  :lang(zh) .goals__label {
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  .goals__chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .goal-chip {
+    min-height: 40px;
+    padding: 7px 16px;
+    border: 1.5px solid var(--hairline);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--ink);
+    font: 400 15px/1.3 var(--sans);
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .goal-chip:hover {
+    border-color: var(--sky);
+  }
+
+  .goal-chip[aria-pressed='true'] {
+    background: var(--deep-sky);
+    border-color: var(--deep-sky);
+    color: var(--white);
+  }
+
+  /* Fixed height so the cards below don't jump when the note changes length */
+  .goals__note {
+    min-height: 3.2em;
+    margin-top: 10px;
+    color: var(--slate);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  .goals__note-link {
+    margin-left: 6px;
+  }
+
+  /* Cards: one row of four */
+  .type-cards {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 16px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  :global(html:not(.js)) .type-cards {
+    margin-top: 40px;
+  }
+
+  /* Subgrid: each card spans four shared rows (name, intro, may fit,
+     worth weighing), so the labels line up across the row of cards */
+  .type-card {
+    display: grid;
+    grid-row: span 4;
+    grid-template-rows: subgrid;
+    row-gap: 0;
+    align-content: start;
+    padding: 20px 20px 22px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border-top: 3px solid transparent;
+    transition:
+      opacity 250ms ease,
+      border-color 250ms ease;
+  }
+
+  .type-card.is-match {
+    border-top-color: var(--sky);
+  }
+
+  .type-cards .type-card.is-dim {
+    opacity: 0.45;
+  }
+
+  .type-card__name {
+    font: 400 23px/1.2 var(--serif);
+  }
+
+  :lang(zh) .type-card__name {
+    font-size: 22px;
+    line-height: 1.4;
+  }
+
+  .type-card__summary {
+    margin-top: 8px;
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  .type-card__bullets {
+    margin: 8px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 4px;
+    font-size: 15px;
+    line-height: 1.4;
+  }
+
+  .type-card__bullets li {
+    position: relative;
+    padding-left: 16px;
+  }
+
+  .type-card__bullets li::before {
+    content: '';
+    position: absolute;
+    left: 2px;
+    top: 0.6em;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--sky);
+  }
+
+  .type-card__note {
+    margin-top: 8px;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--slate);
+  }
+
+  .type-card__fact {
+    padding-top: 12px;
+  }
+
+  .type-card__label {
+    font: 700 11px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--scarlet);
+  }
+
+  :lang(zh) .type-card__label {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  .type-card__text {
+    margin-top: 3px;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--slate);
+  }
+
+  /* Wide screens: notes fit on one line, so reserve one line */
+  @media (min-width: 1100px) {
+    .goals__note {
+      min-height: 1.6em;
+    }
+  }
+
+  /* Wrapped layouts: matching cards come first, right under the chips */
+  @media (max-width: 1099px) {
+    .type-cards {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .type-card.is-match {
+      order: -1;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .goals {
+      margin-top: 28px;
+    }
+
+    .goal-chip {
+      font-size: 14px;
+      padding: 7px 13px;
+    }
+
+    .goals__note {
+      min-height: 4.8em;
+    }
+
+    .type-cards {
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+
+    .type-card {
+      padding: 22px 20px;
+    }
+
+    .type-card__name {
+      font-size: 23px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-goals]').forEach((root) => {
+    const chips = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-goal]'));
+    const noteText = root.querySelector<HTMLElement>('[data-goal-note-text]');
+    const noteLink = root.querySelector<HTMLAnchorElement>('[data-goal-note-link]');
+    const section = root.closest('section');
+    const cards = Array.from(section?.querySelectorAll<HTMLElement>('[data-coverage]') ?? []);
+
+    const select = (chip: HTMLButtonElement) => {
+      const isAll = chip.dataset.goal === 'all';
+      const matches = (chip.dataset.highlights ?? '').split(' ');
+      chips.forEach((c) => c.setAttribute('aria-pressed', String(c === chip)));
+      cards.forEach((card) => {
+        const on = matches.includes(card.dataset.coverage ?? '');
+        card.classList.toggle('is-match', on && !isAll);
+        card.classList.toggle('is-dim', !on);
+      });
+      if (noteText) noteText.textContent = chip.dataset.note ?? '';
+      if (noteLink) {
+        const href = chip.dataset.linkHref;
+        noteLink.hidden = !href;
+        if (href) {
+          noteLink.href = href;
+          noteLink.textContent = chip.dataset.linkLabel ?? '';
+        }
+      }
+    };
+
+    chips.forEach((chip) => {
+      chip.addEventListener('click', () => {
+        // Pressing the active goal again returns to "All four"
+        const pressed = chip.getAttribute('aria-pressed') === 'true';
+        select(pressed && chip.dataset.goal !== 'all' ? chips[0] : chip);
+      });
+    });
+  });
+</script>

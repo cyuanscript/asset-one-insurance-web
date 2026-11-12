@@ -1,0 +1,139 @@
+---
+/**
+ * Where it fits: links into the homepage life-stage selector
+ * (/#stage-tab-N opens that stage).
+ */
+import SectionHeading from '../SectionHeading.astro';
+import Photo from '../Photo.astro';
+import { lifeInsurance } from '../../i18n/life-insurance';
+import { content, localePath, type Locale, type PhotoKey } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = lifeInsurance[locale].fits;
+const stages = content[locale].stages.items;
+---
+
+<section class="section section--white fits" aria-labelledby="fits-title">
+  <div class="container">
+    <div class="fits__stages">
+      <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="fits-title" span={6} />
+      <ul class="stage-links">
+        {
+          t.stageLinks.map((l, i) => {
+            const s = stages[l.stage];
+            return (
+              <li class="stage-link" data-reveal style={`--reveal-delay:${i * 90}ms`}>
+                <div class="stage-link__photo">
+                  <Photo photo={s.photo as PhotoKey} class="stage-link__photo-inner" />
+                </div>
+                <div class="stage-link__body">
+                  <h3 class="stage-link__name">
+                    <a href={localePath(locale, `/#stage-tab-${l.stage}`)}>{s.name}</a>
+                  </h3>
+                  <span class="text-link" aria-hidden="true">
+                    {l.label}
+                  </span>
+                </div>
+              </li>
+            );
+          })
+        }
+      </ul>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Stage links */
+  .stage-links {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin: 48px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .stage-link {
+    position: relative;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  .stage-link__photo {
+    position: relative;
+    height: 180px;
+  }
+
+  .stage-link__photo :global(.stage-link__photo-inner) {
+    position: absolute;
+    inset: 0;
+    transition: transform 600ms var(--ease-out);
+  }
+
+  .stage-link:hover .stage-link__photo :global(.stage-link__photo-inner) {
+    transform: scale(1.03);
+  }
+
+  .stage-link__body {
+    padding: 22px 24px 26px;
+  }
+
+  .stage-link__name {
+    font: 400 24px/1.25 var(--serif);
+    margin-bottom: 10px;
+  }
+
+  .stage-link__name a {
+    color: var(--ink);
+  }
+
+  /* Whole card clickable via the heading link */
+  .stage-link__name a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .stage-link__name a:focus-visible {
+    outline: none;
+  }
+
+  .stage-link__name a:focus-visible::after {
+    outline: 2px solid var(--deep-sky);
+    outline-offset: 3px;
+    border-radius: var(--radius);
+  }
+
+  @media (max-width: 899px) {
+    .stage-links {
+      grid-template-columns: 1fr;
+      gap: 16px;
+    }
+    .stage-link {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+    }
+    .stage-link__photo {
+      height: auto;
+      min-height: 110px;
+    }
+    .stage-link__body {
+      padding: 18px 20px;
+    }
+    .stage-link__name {
+      font-size: 21px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .stage-links {
+      margin-top: 28px;
+    }
+  }
+</style>

@@ -112,6 +112,11 @@ const approachHref = localePath(locale, '/insurance-and-you/');
       transform 200ms var(--ease-out);
   }
 
+  /* Deep-linked tabs land below the fixed header */
+  .stages__tab {
+    scroll-margin-top: 140px;
+  }
+
   .stages__tab:hover {
     border-color: #b9c8d4;
   }
@@ -407,6 +412,15 @@ const approachHref = localePath(locale, '/insurance-and-you/');
         tablist.scrollTo({ left, behavior: reduceMotion.matches ? 'auto' : 'smooth' });
       }
     };
+
+    // Deep links from other pages: /#stage-tab-2 opens that stage
+    const fromHash = () => {
+      const match = window.location.hash.match(/^#stage-tab-(\d+)$/);
+      const index = match ? Number(match[1]) : -1;
+      if (index >= 0 && index < tabs.length) select(index);
+    };
+    fromHash();
+    window.addEventListener('hashchange', fromHash);
 
     tabs.forEach((tab, i) => {
       tab.addEventListener('click', () => select(i));

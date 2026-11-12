@@ -45,6 +45,10 @@ const photoSlots = {
   productLife: { src: '/images/family-beach-shoreline.jpg', caption: 'Family standing arm in arm on the beach, looking out at the water', position: '50% 15%' },
   productHealth: { src: '/images/couple-park-meditation.jpg', caption: 'Older couple doing a calm breathing exercise outdoors in a park', position: '50% 30%' },
   productAnnuities: { src: '/images/advisor-client-financial-review.jpg', caption: 'Advisor walking a client through financial charts at a table', position: '50% 35%' },
+  // Life Insurance page hero. Fallback until the briefed shot exists (content-packs/services-life-insurance.md, Photo briefs)
+  lifeHero: { src: '/images/family-beach-shoreline.jpg', caption: 'Family standing arm in arm on the beach, looking out at the water', position: '50% 20%' },
+  // Life Insurance page, How We Work band (tinted background)
+  processConsult: { src: '/images/advisor-client-tablet-consultation.jpg', caption: 'Advisor smiling as he walks a client through a plan on a tablet at a bright office table', position: '60% 35%' },
 } satisfies Record<string, PhotoSlot>;
 
 export type PhotoKey = keyof typeof photoSlots;
@@ -195,7 +199,7 @@ const zh: typeof en = {
   nav: {
     services: '服务',
     servicesMenu: [
-      { label: '寿险', href: '/services/life-insurance/', note: '定期与终身保障' },
+      { label: '寿险', href: '/services/life-insurance/', note: '定期与永久保障' },
       { label: '健康险', href: '/services/health-insurance/', note: '个人、家庭与联邦医疗保险' },
       { label: '年金', href: '/services/annuities/', note: '稳定的退休收入' },
     ],
@@ -230,13 +234,13 @@ const zh: typeof en = {
       {
         name: '家庭保障',
         body: '如果家人依靠您的收入生活，寿险可以帮助他们守住家园、日常生活和你们共同的规划。',
-        fits: ['定期寿险', '终身寿险'],
+        fits: ['定期寿险', '永久寿险'],
         photo: 'stageFamily',
       },
       {
         name: '教育金规划',
         body: '有些保单会随时间累积现金价值，可能有助于支付孩子的教育费用。我们会把它与其他储蓄方式放在一起比较，讲清利弊。',
-        fits: ['终身寿险', '指数型万能寿险'],
+        fits: ['永久寿险', '指数型万能寿险'],
         photo: 'stageEducation',
       },
       {
@@ -254,7 +258,7 @@ const zh: typeof en = {
       {
         name: '传承规划',
         body: '寿险可以帮助您把一生的积累传给您关心的人和公益事业，并与您的会计师或遗产律师协同规划。',
-        fits: ['终身寿险', '第二身故寿险'],
+        fits: ['永久寿险', '第二身故寿险'],
         photo: 'stageLegacy',
       },
     ],
@@ -267,7 +271,7 @@ const zh: typeof en = {
     items: [
       {
         name: '寿险',
-        body: '定期与终身保障，帮助守护依靠您的家人。',
+        body: '定期与永久保障，帮助守护依靠您的家人。',
         href: '/services/life-insurance/',
         photo: 'productLife',
       },

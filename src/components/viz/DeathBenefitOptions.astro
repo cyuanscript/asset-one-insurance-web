@@ -1,0 +1,131 @@
+---
+/** V6 · Level vs increasing death benefit: two small stacked-column diagrams. */
+import { cashValueGuide } from '../../i18n/guides/cash-value';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = cashValueGuide[locale].iul.dbOptions;
+
+// [insurance amount, cash value] at three moments, in px of a 170px column
+const level = [
+  [140, 20],
+  [100, 60],
+  [50, 110],
+];
+const increasing = [
+  [100, 20],
+  [100, 60],
+  [100, 110],
+];
+const diagrams = [
+  { ...t.level, data: level },
+  { ...t.increasing, data: increasing },
+];
+const base = 226;
+---
+
+<figure class="viz dbo" aria-label={t.aria}>
+  <p class="viz__title">{t.title}</p>
+  <div class="dbo__grid">
+    {
+      diagrams.map((d) => (
+        <div class="dbo__item">
+          <p class="dbo__name">{d.title}</p>
+          <p class="dbo__sub">{d.sub}</p>
+          <svg viewBox="0 0 280 250" aria-hidden="true" font-size="13">
+            <line x1="0" y1={base} x2="280" y2={base} stroke="#d9e2ea" stroke-width="1.5" />
+            {d.data.map(([ins, cv], i) => {
+              const x = 18 + i * 92;
+              return (
+                <g>
+                  <rect x={x} y={base - cv} width="60" height={cv} fill="#1a6699" />
+                  <rect x={x + 0.75} y={base - cv - ins + 0.75} width="58.5" height={ins - 1.5} fill="#eaf5fc" stroke="#2c99d6" stroke-width="1.5" />
+                  <text x={x + 30} y={base + 20} text-anchor="middle" class="muted">
+                    {t.phases[i]}
+                  </text>
+                </g>
+              );
+            })}
+          </svg>
+        </div>
+      ))
+    }
+  </div>
+  <ul class="dbo__legend">
+    <li><span class="swatch swatch--ins"></span>{t.insurance}</li>
+    <li><span class="swatch swatch--cv"></span>{t.cashValue}</li>
+  </ul>
+</figure>
+
+<style>
+  .dbo {
+    margin: 8px 0 0;
+  }
+
+  .dbo__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 300px));
+    gap: 24px 48px;
+    margin-top: 16px;
+  }
+
+  .dbo__name {
+    font: 700 16px/1.3 var(--sans);
+    color: var(--ink);
+  }
+
+  .dbo__sub {
+    margin-top: 2px;
+    font-size: 14px;
+    color: var(--slate);
+  }
+
+  .dbo svg {
+    margin-top: 12px;
+  }
+
+  .dbo svg :global(.muted) {
+    fill: var(--slate);
+  }
+
+  .dbo__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 12px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+    color: var(--slate);
+  }
+
+  .dbo__legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+  }
+
+  .swatch--ins {
+    background: var(--pale-sky);
+    border: 1.5px solid var(--sky);
+  }
+
+  .swatch--cv {
+    background: var(--deep-sky);
+  }
+
+  @media (max-width: 640px) {
+    .dbo__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

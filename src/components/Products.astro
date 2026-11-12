@@ -5,18 +5,31 @@ import { content, localePath, type Locale, type PhotoKey } from '../i18n/content
 
 interface Props {
   locale: Locale;
+  /** Show only these product hrefs (e.g. related services on an inner page). */
+  only?: string[];
+  eyebrow?: string;
+  title?: string;
+  intro?: string;
+  id?: string;
 }
-const { locale } = Astro.props;
+const { locale, only, eyebrow, title, intro, id = 'products-title' } = Astro.props;
 const t = content[locale].products;
+const items = only ? t.items.filter((item) => only.includes(item.href)) : t.items;
 ---
 
-<section class="products" aria-labelledby="products-title">
+<section class:list={['products', { 'products--related': only }]} aria-labelledby={id}>
   <div class="container">
-    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="products-title" span={6} />
+    <SectionHeading
+      eyebrow={eyebrow ?? t.eyebrow}
+      title={title ?? t.title}
+      intro={intro ?? t.intro}
+      id={id}
+      span={6}
+    />
 
     <ul class="products__grid">
       {
-        t.items.map((item, i) => (
+        items.map((item, i) => (
           <li class="card" data-reveal style={`--reveal-delay:${i * 100}ms`}>
             <div class="card__photo">
               <Photo photo={item.photo as PhotoKey} class="card__photo-inner" />
@@ -156,6 +169,13 @@ const t = content[locale].products;
 
   .card:hover .card__more {
     color: var(--deep-sky-hover);
+  }
+
+  /* Related services: two cards side by side (one column on phones) */
+  @media (min-width: 768px) {
+    .products--related .products__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
   }
 
   @media (max-width: 1099px) {

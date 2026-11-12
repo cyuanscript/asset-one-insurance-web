@@ -1,0 +1,128 @@
+---
+/** V4 · Where each IUL premium goes: four connected steps, step 2 leaks monthly charges. */
+import { cashValueGuide } from '../../i18n/guides/cash-value';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = cashValueGuide[locale].iul.flow;
+---
+
+<figure class="viz flow" data-reveal aria-labelledby="flow-title">
+  <p class="viz__title" id="flow-title">{t.title}</p>
+  <p class="viz__takeaway">{t.takeaway}</p>
+  <ol class="flow__steps">
+    {
+      t.steps.map((s, i) => (
+        <li class:list={['flow__step', { 'flow__step--charge': i === 1 }]} style={`--i:${i}`}>
+          <span class="flow__num" aria-hidden="true">{i + 1}</span>
+          <span class="flow__text">{s}</span>
+          {i === 1 && (
+            <span class="flow__leak" aria-hidden="true">
+              <svg width="12" height="14" viewBox="0 0 12 14">
+                <path d="M6 1v11M1.5 8 6 12.5 10.5 8" fill="none" stroke="currentColor" stroke-width="1.6" />
+              </svg>
+              {t.leaves}
+            </span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</figure>
+
+<style>
+  .flow__steps {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px;
+    margin: 28px 0 0;
+    padding: 0 0 28px;
+    list-style: none;
+  }
+
+  .flow__step {
+    position: relative;
+    padding: 18px 18px 20px;
+    border: 1px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--white);
+    font-size: 15px;
+    line-height: 1.5;
+  }
+
+  /* Arrow between steps */
+  .flow__step + .flow__step::before {
+    content: '';
+    position: absolute;
+    left: -25px;
+    top: 50%;
+    width: 18px;
+    height: 10px;
+    margin-top: -5px;
+    background: no-repeat center / contain
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 18 10'%3E%3Cpath d='M0 5h16M12 1l4 4-4 4' fill='none' stroke='%234b5866' stroke-width='1.4'/%3E%3C/svg%3E");
+  }
+
+  .flow__step--charge {
+    background: var(--pale-sky);
+    border-color: #c9e3f3;
+  }
+
+  .flow__num {
+    display: block;
+    margin-bottom: 8px;
+    font: 400 28px/1 var(--serif);
+    color: var(--sky);
+  }
+
+  .flow__leak {
+    position: absolute;
+    left: 18px;
+    bottom: -26px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font: 700 12px/1 var(--sans);
+    color: var(--deep-sky);
+    white-space: nowrap;
+  }
+
+  /* Steps fade up in sequence on reveal */
+  :global(.js) .flow .flow__step {
+    opacity: 0;
+    transform: translateY(10px);
+    transition:
+      opacity 500ms var(--ease-out),
+      transform 500ms var(--ease-out);
+    transition-delay: calc(250ms + var(--i) * 110ms);
+  }
+
+  :global(.js) .flow.is-revealed .flow__step {
+    opacity: 1;
+    transform: none;
+  }
+
+  @media (max-width: 899px) {
+    .flow__steps {
+      grid-template-columns: 1fr;
+      gap: 26px;
+      padding-bottom: 0;
+    }
+
+    .flow__step + .flow__step::before {
+      left: 24px;
+      top: -20px;
+      margin-top: 0;
+      transform: rotate(90deg);
+    }
+
+    .flow__leak {
+      position: static;
+      display: flex;
+      margin-top: 10px;
+    }
+  }
+</style>

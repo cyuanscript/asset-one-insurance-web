@@ -1,0 +1,55 @@
+---
+import { lifeInsurance } from '../../i18n/life-insurance';
+import { contact, localePath, type Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = lifeInsurance[locale].cta;
+---
+
+<section class="section section--white cta" aria-labelledby="cta-title">
+  <div class="container">
+    <div class="cta__inner" data-reveal>
+      <h2 class="h2 cta__title" id="cta-title">{t.title}</h2>
+      <p class="lead-text cta__body">{t.body}</p>
+      <div class="cta__actions">
+        <a class="btn btn-primary" href={localePath(locale, '/contact/')}>{t.primary}</a>
+        <a class="btn btn-outline" href={contact.phoneHref}>{t.phone} {contact.phone}</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .cta__inner {
+    max-width: 760px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .cta__body {
+    margin-top: 20px;
+  }
+
+  .cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 36px;
+  }
+
+  @media (max-width: 640px) {
+    .cta__actions {
+      flex-direction: column;
+    }
+    .cta__actions .btn {
+      width: 100%;
+    }
+    .cta__body {
+      font-size: 16px;
+    }
+  }
+</style>

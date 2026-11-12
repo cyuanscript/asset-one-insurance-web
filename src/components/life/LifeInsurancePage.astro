@@ -1,0 +1,72 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import PageHero from '../PageHero.astro';
+import Products from '../Products.astro';
+import Basics from './Basics.astro';
+import CoverageTypes from './CoverageTypes.astro';
+import AtAGlance from './AtAGlance.astro';
+import Riders from './Riders.astro';
+import BusinessPlanning from './BusinessPlanning.astro';
+import Process from './Process.astro';
+import Faq from './Faq.astro';
+import WhereItFits from './WhereItFits.astro';
+import ClosingCta from './ClosingCta.astro';
+import Disclosures from './Disclosures.astro';
+import { lifeInsurance } from '../../i18n/life-insurance';
+import { localePath, type Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = lifeInsurance[locale];
+---
+
+<Base locale={locale} title={t.meta.title} description={t.meta.description}>
+  <Header locale={locale} />
+  <main class="life-page">
+    <PageHero
+      eyebrow={t.hero.eyebrow}
+      title={t.hero.title}
+      lead={t.hero.lead}
+      photo="lifeHero"
+      primary={{ label: t.hero.primary, href: localePath(locale, '/contact/') }}
+      secondary={{ label: t.hero.secondary, href: '#types' }}
+    />
+    <Basics locale={locale} />
+    <CoverageTypes locale={locale} />
+    <AtAGlance locale={locale} />
+    <Riders locale={locale} />
+    <Process locale={locale} />
+    <BusinessPlanning locale={locale} />
+    <Faq locale={locale} />
+    <WhereItFits locale={locale} />
+    <Products
+      locale={locale}
+      only={['/services/health-insurance/', '/services/annuities/']}
+      eyebrow={t.fits.relatedEyebrow}
+      title={t.fits.relatedTitle}
+      intro={t.fits.relatedIntro}
+      id="related-title"
+    />
+    <ClosingCta locale={locale} />
+    <Disclosures locale={locale} />
+  </main>
+  <Footer locale={locale} />
+</Base>
+
+<style>
+  /* Scarlet accent: a small dot before every section eyebrow on this page,
+     matching the dot in the page hero */
+  :global(.life-page .section .eyebrow::before),
+  :global(.life-page .products .eyebrow::before) {
+    content: '';
+    flex: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--scarlet);
+  }
+</style>

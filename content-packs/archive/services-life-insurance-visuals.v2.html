@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Life Insurance Visuals</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lato:wght@400;700&family=Noto+Serif+Display:wght@400&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --sky: #2c99d6; --deep-sky: #1a6699; --scarlet: #eb2f33; --cloud: #f8fafc; --white: #fff;
+    --ink: #141b22; --slate: #4b5866; --hairline: #d9e2ea; --pale-sky: #eaf5fc;
+    --serif: 'Noto Serif Display', Georgia, serif; --sans: 'Lato', system-ui, sans-serif;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1); --radius: 6px;
+    --shadow: 0 1px 2px rgba(20,27,34,.06), 0 16px 40px rgba(20,27,34,.07);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--cloud); color: var(--ink); font: 400 17px/1.6 var(--sans); }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 48px clamp(16px, 5vw, 48px) 96px; }
+  header.page { margin-bottom: 40px; }
+  header.page p { color: var(--slate); max-width: 62ch; margin: 8px 0 0; }
+  h1 { font: 400 clamp(32px, 5vw, 48px)/1.15 var(--serif); margin: 0; }
+  h2 { font: 400 clamp(24px, 3.4vw, 32px)/1.2 var(--serif); color: var(--sky); margin: 4px 0 6px; }
+  .eyebrow { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: var(--deep-sky); font-weight: 700; margin: 0; }
+  .eyebrow::before { content: ''; display: inline-block; width: 6px; height: 6px; border-radius: 50%; background: var(--scarlet); margin-right: 8px; vertical-align: middle; }
+  .takeaway { font-size: 19px; margin: 0 0 20px; max-width: 60ch; }
+  .caption { font-size: 13px; color: var(--slate); margin: 14px 0 0; }
+  section.viz { background: var(--white); border: 1px solid var(--hairline); border-radius: var(--radius); padding: clamp(20px, 4vw, 40px); margin: 0 0 32px; box-shadow: var(--shadow); }
+  .tag { display: inline-block; font-size: 11px; font-weight: 700; letter-spacing: .08em; color: var(--slate); background: var(--pale-sky); border-radius: 999px; padding: 2px 10px; margin-left: 8px; vertical-align: 3px; }
+  svg { display: block; width: 100%; height: auto; overflow: visible; }
+  svg text { font-family: var(--sans); fill: var(--ink); }
+
+  /* V0 goal filter */
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0 10px; }
+  .chip { font: 400 15px var(--sans); color: var(--ink); background: var(--white); border: 1px solid var(--hairline); border-radius: 999px; padding: 8px 16px; cursor: pointer; transition: background .2s, border-color .2s, color .2s; }
+  .chip:hover { border-color: var(--sky); }
+  .chip[aria-pressed="true"] { background: var(--deep-sky); border-color: var(--deep-sky); color: var(--white); }
+  .chip:focus-visible { outline: 2px solid var(--deep-sky); outline-offset: 2px; }
+  .goal-note { color: var(--slate); min-height: 3.2em; margin: 0 0 16px; max-width: 70ch; }
+  .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+  .card { border: 1px solid var(--hairline); border-top: 2px solid transparent; border-radius: var(--radius); padding: 18px; transition: opacity .2s, border-color .2s; background: var(--white); }
+  .card h3 { font: 400 20px/1.25 var(--serif); margin: 0 0 6px; }
+  .card p { margin: 0; font-size: 15px; color: var(--slate); }
+  .card.on { border-top-color: var(--sky); }
+  .card.off { opacity: .55; }
+  @media (max-width: 860px) { .cards { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 520px) { .cards { grid-template-columns: 1fr; } }
+
+  /* V2 meters table */
+  table.glance { width: 100%; border-collapse: collapse; font-size: 15px; }
+  table.glance caption { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  table.glance th, table.glance td { text-align: left; vertical-align: top; padding: 14px 12px; border-bottom: 1px solid var(--hairline); }
+  table.glance thead th { font: 400 19px var(--serif); color: var(--deep-sky); border-bottom: 2px solid var(--hairline); }
+  table.glance tbody th { font-weight: 700; color: var(--ink); width: 20%; }
+  .dots { display: inline-flex; gap: 4px; margin-right: 8px; vertical-align: 1px; }
+  .dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--hairline); display: block; transition: background .3s; }
+  .dots i.f { background: var(--deep-sky); }
+  .legend { font-size: 13px; color: var(--slate); margin-top: 12px; }
+  @media (max-width: 640px) {
+    table.glance thead { display: none; }
+    table.glance, table.glance tbody, table.glance tr, table.glance th, table.glance td { display: block; width: 100%; }
+    table.glance tr { padding: 12px 0; border-bottom: 1px solid var(--hairline); }
+    table.glance tbody th { padding: 0 0 6px; border: 0; width: 100%; }
+    table.glance td { padding: 4px 0; border: 0; }
+    table.glance td::before { content: attr(data-type); display: inline-block; min-width: 100px; font-weight: 700; color: var(--deep-sky); }
+  }
+
+  /* V4 flow */
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 28px; position: relative; }
+  .step { border: 1px solid var(--hairline); border-radius: var(--radius); padding: 16px; position: relative; background: var(--white); }
+  .step b { display: block; font: 400 26px var(--serif); color: var(--sky); line-height: 1; margin-bottom: 8px; }
+  .step + .step::before { content: '→'; position: absolute; left: -22px; top: 50%; transform: translateY(-50%); color: var(--slate); }
+  .step.charge { background: var(--pale-sky); }
+  .step.charge::after { content: '↓ leaves every month'; position: absolute; left: 16px; bottom: -24px; font-size: 12px; color: var(--deep-sky); font-weight: 700; }
+  @media (max-width: 720px) {
+    .flow { grid-template-columns: 1fr; gap: 28px; }
+    .step + .step::before { content: '↓'; left: 50%; top: -24px; transform: none; }
+    .step.charge::after { position: static; display: block; margin-top: 8px; }
+  }
+
+  /* V5 */
+  .bar-g { cursor: pointer; outline: none; }
+  .bar-g:focus-visible .hit { stroke: var(--deep-sky); stroke-width: 2; }
+  #v5-explain { font-weight: 700; color: var(--deep-sky); min-height: 1.6em; margin: 12px 0 0; }
+
+  /* V7 */
+  .risks { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 12px; }
+  .risks h3 { font: 400 22px var(--serif); margin: 0 0 6px; }
+  .risks p { margin: 0; color: var(--slate); }
+  .risks .r { text-align: right; }
+  @media (max-width: 640px) { .risks { grid-template-columns: 1fr; } .risks .r { text-align: left; } }
+
+  /* reveal + draw */
+  [data-reveal] { opacity: 0; transform: translateY(16px); transition: opacity .7s var(--ease-out), transform .7s var(--ease-out); }
+  [data-reveal].in { opacity: 1; transform: none; }
+  .grow-x { transform-box: fill-box; transform-origin: left center; transform: scaleX(0); transition: transform .6s var(--ease-out); }
+  .grow-y { transform-box: fill-box; transform-origin: center bottom; transform: scaleY(0); transition: transform .5s var(--ease-out); }
+  .grow-y.down { transform-origin: center top; }
+  .draw { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); transition: stroke-dashoffset .9s var(--ease-out); }
+  .in .grow-x, .in .grow-y { transform: none; }
+  .in .draw { stroke-dashoffset: 0; }
+  .fade-late { opacity: 0; transition: opacity .6s .7s; }
+  .in .fade-late { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    [data-reveal], .grow-x, .grow-y, .fade-late { opacity: 1 !important; transform: none !important; transition: none !important; }
+    .draw { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; transition: none !important; }
+    .chip, .card { transition: none; }
+  }
+  .dash { stroke-dasharray: 6 5; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="page">
+    <p class="eyebrow">Content pack v2 · Life Insurance</p>
+    <h1>Comparison visuals, rough preview</h1>
+    <p>Sketches of V0–V7 from <code>services-life-insurance.md</code>, drawn in the site's colours and fonts so you can judge them. Everything here is a schematic: no axis numbers, no projections. Resize the window to check mobile layouts.</p>
+  </header>
+
+  <!-- V0 -->
+  <section class="viz" data-reveal aria-labelledby="v0h">
+    <p class="eyebrow">V0 · Goal filter <span class="tag">Interactive</span></p>
+    <h2 id="v0h">What should the policy do?</h2>
+    <div class="chips" role="group" aria-label="Filter coverage types by goal" id="chips"></div>
+    <p class="goal-note" id="goal-note" aria-live="polite"></p>
+    <div class="cards" id="cards">
+      <article class="card" data-id="term"><h3>Term life</h3><p>Coverage for a set number of years, often 10, 20 or 30.</p></article>
+      <article class="card" data-id="whole"><h3>Whole life</h3><p>Lifelong coverage with a level premium and guaranteed cash value.</p></article>
+      <article class="card" data-id="iul"><h3>Indexed universal life</h3><p>Lifelong coverage with flexible premiums and index-linked growth.</p></article>
+      <article class="card" data-id="survivorship"><h3>Survivorship life</h3><p>One policy on two people that pays after the second death.</p></article>
+    </div>
+  </section>
+
+  <!-- V1 -->
+  <section class="viz" data-reveal aria-labelledby="v1h">
+    <p class="eyebrow">V1 · Coverage timeline</p>
+    <h2 id="v1h">How long each one lasts</h2>
+    <p class="takeaway">Term covers the busy middle years. Permanent coverage is designed to last for life.</p>
+    <svg viewBox="0 0 820 290" role="img" aria-label="Timeline: term coverage ends once children are grown and the mortgage is paid, and can often convert to permanent. Whole life lasts for life. Indexed universal life lasts for life if funded enough. Survivorship covers two people and pays after the second death.">
+      <defs>
+        <linearGradient id="fade" x1="0" x2="1"><stop offset="0.75" stop-color="#2c99d6"/><stop offset="1" stop-color="#2c99d6" stop-opacity="0.15"/></linearGradient>
+        <pattern id="hatch" width="8" height="8" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="8" height="8" fill="#eaf5fc"/><line x1="0" y1="0" x2="0" y2="8" stroke="#2c99d6" stroke-width="4"/></pattern>
+        <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0 L10 5 L0 10z" fill="#1a6699"/></marker>
+      </defs>
+      <!-- milestones -->
+      <g font-size="13" fill="#4b5866">
+        <line x1="170" y1="30" x2="170" y2="270" stroke="#d9e2ea"/><text x="170" y="18" text-anchor="middle" style="fill:#4b5866">Today</text>
+        <line x1="400" y1="30" x2="400" y2="270" stroke="#d9e2ea"/><text x="400" y="18" text-anchor="middle" style="fill:#4b5866">Children grown, mortgage paid</text>
+        <line x1="590" y1="30" x2="590" y2="270" stroke="#d9e2ea"/><text x="590" y="18" text-anchor="middle" style="fill:#4b5866">Retirement</text>
+        <line x1="760" y1="30" x2="760" y2="270" stroke="#d9e2ea"/><text x="760" y="18" text-anchor="middle" style="fill:#4b5866">Later life</text>
+      </g>
+      <g font-size="15" font-weight="700">
+        <text x="0" y="66">Term</text><text x="0" y="126">Whole life</text><text x="0" y="186">Indexed UL</text><text x="0" y="246">Survivorship</text>
+      </g>
+      <!-- term -->
+      <rect class="grow-x" x="170" y="56" width="240" height="12" rx="6" fill="url(#fade)"/>
+      <path class="draw fade-late" style="--len:120" d="M405 70 C 440 80, 440 100, 420 112" fill="none" stroke="#1a6699" stroke-width="1.5" stroke-dasharray="4 4" marker-end="url(#arr)"/>
+      <text class="fade-late" x="448" y="92" font-size="12" style="fill:#1a6699">Convert</text>
+      <text x="170" y="88" font-size="12" style="fill:#4b5866">Ends after the term</text>
+      <!-- whole -->
+      <rect class="grow-x" style="transition-delay:.08s" x="170" y="116" width="600" height="12" rx="6" fill="#1a6699"/>
+      <circle class="fade-late" cx="786" cy="122" r="6" fill="#fff" stroke="#1a6699" stroke-width="2"/>
+      <text x="170" y="148" font-size="12" style="fill:#4b5866">For life, as long as premiums are paid</text>
+      <!-- iul -->
+      <g class="grow-x" style="transition-delay:.16s"><rect x="170" y="176" width="420" height="12" rx="6" fill="#2c99d6"/><rect x="585" y="176" width="185" height="12" rx="6" fill="url(#hatch)" stroke="#2c99d6"/></g>
+      <text x="170" y="208" font-size="12" style="fill:#4b5866">For life, if the policy stays funded enough</text>
+      <!-- survivorship -->
+      <g class="grow-x" style="transition-delay:.24s"><line x1="170" y1="236" x2="620" y2="236" stroke="#2c99d6" stroke-width="3" stroke-linecap="round"/><line x1="170" y1="246" x2="740" y2="246" stroke="#2c99d6" stroke-width="3" stroke-linecap="round"/></g>
+      <circle class="fade-late" cx="620" cy="236" r="4" fill="#4b5866"/>
+      <g class="fade-late"><circle cx="740" cy="246" r="7" fill="#1a6699"/><text x="740" y="272" font-size="12" text-anchor="middle" font-weight="700" style="fill:#1a6699">Pays here</text></g>
+      <text x="170" y="272" font-size="12" style="fill:#4b5866">Two lives, one policy</text>
+    </svg>
+    <p class="caption">Simplified illustration, not to scale. (On phones the built version stacks the lanes with labels under each bar, per the spec; this sketch only scales down.)</p>
+  </section>
+
+  <!-- V2 -->
+  <section class="viz" data-reveal aria-labelledby="v2h">
+    <p class="eyebrow">V2 · At a glance</p>
+    <h2 id="v2h">At a glance</h2>
+    <p class="takeaway">More certainty usually costs more. More flexibility usually needs more attention.</p>
+    <table class="glance" id="glance">
+      <caption>Comparison of term, whole life and indexed universal life insurance</caption>
+      <thead><tr><td></td><th scope="col">Term</th><th scope="col">Whole life</th><th scope="col">Indexed UL</th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <p class="legend">Dots show general tendencies compared with the other two. Individual policies vary.</p>
+  </section>
+
+  <!-- V3 -->
+  <section class="viz" data-reveal aria-labelledby="v3h">
+    <p class="eyebrow">V3 · Whole life tab</p>
+    <h2 id="v3h">Premiums paid vs. cash value</h2>
+    <p class="takeaway">A slow start, then a steady build. Whole life rewards keeping the policy for the long term.</p>
+    <svg id="v3" viewBox="0 0 680 360" role="img" aria-label="Schematic chart. Total premiums paid rise in a straight line. Guaranteed cash value starts well below, then curves up and passes premiums paid in the middle years. With dividends, which are not guaranteed, cash value may pass premiums paid earlier. Both are designed to approach the death benefit late in life."></svg>
+    <p class="caption">Simplified illustration, not to scale and not an illustration of any policy. Dividends are not guaranteed.</p>
+  </section>
+
+  <!-- V4 -->
+  <section class="viz" data-reveal aria-labelledby="v4h">
+    <p class="eyebrow">V4 · IUL tab</p>
+    <h2 id="v4h">Where each premium goes</h2>
+    <p class="takeaway">Charges come out every month, even in years when no interest is credited.</p>
+    <div class="flow">
+      <div class="step"><b>1</b>You pay a premium</div>
+      <div class="step charge"><b>2</b>Monthly charges come out: the cost of insurance and policy fees</div>
+      <div class="step"><b>3</b>The rest goes to your cash value, split between index options and a fixed account</div>
+      <div class="step"><b>4</b>Each year, interest is credited based on the index, between the floor and the cap</div>
+    </div>
+  </section>
+
+  <!-- V5 -->
+  <section class="viz" data-reveal aria-labelledby="v5h">
+    <p class="eyebrow">V5 · IUL tab <span class="tag">Tap a year</span></p>
+    <h2 id="v5h">Cap and floor, year by year</h2>
+    <p class="takeaway">You give up the very best years in exchange for skipping the worst ones.</p>
+    <svg id="v5" viewBox="0 0 680 330" role="img" aria-label="Schematic of eight hypothetical years. In strong years the credited interest stops at the cap. In modest years it follows the index. In down years the index falls below zero but nothing is credited as a loss."></svg>
+    <p id="v5-explain" aria-live="polite">Tap or focus a year to see what happened.</p>
+    <p class="caption">Hypothetical pattern, not real index data or a projection. Caps, floors and participation rates vary by policy and can change. Policy charges still apply every year.</p>
+  </section>
+
+  <!-- V6 -->
+  <section class="viz" data-reveal aria-labelledby="v6h">
+    <p class="eyebrow">V6 · IUL "Go deeper"</p>
+    <h2 id="v6h">Level or increasing death benefit</h2>
+    <svg id="v6" viewBox="0 0 680 270" role="img" aria-label="Level death benefit: the total stays the same while cash value grows inside it. Increasing death benefit: the face amount stays the same and cash value is added on top, so the total grows."></svg>
+    <p class="caption">Simplified illustration, not to scale.</p>
+  </section>
+
+  <!-- V7 -->
+  <section class="viz" data-reveal aria-labelledby="v7h">
+    <p class="eyebrow">V7 · Where it fits</p>
+    <h2 id="v7h">Life insurance or an annuity?</h2>
+    <p class="takeaway">They protect against opposite risks, and many plans use both.</p>
+    <svg viewBox="0 0 680 70" role="img" aria-label="A lifetime line extending from today in both directions: shorter than planned on the left, longer than planned on the right.">
+      <line class="draw" style="--len:300" x1="340" y1="35" x2="40" y2="35" stroke="#1a6699" stroke-width="3" stroke-linecap="round"/>
+      <line class="draw" style="--len:300" x1="340" y1="35" x2="640" y2="35" stroke="#2c99d6" stroke-width="3" stroke-linecap="round"/>
+      <circle cx="340" cy="35" r="8" fill="#fff" stroke="#141b22" stroke-width="2"/>
+      <text x="340" y="66" text-anchor="middle" font-size="13" style="fill:#4b5866">Today</text>
+      <path class="fade-late" d="M30 22 l12 -5 l12 5 v10 c0 9 -6 14 -12 17 c-6 -3 -12 -8 -12 -17z" fill="#eaf5fc" stroke="#1a6699" stroke-width="2"/>
+      <path class="fade-late" d="M620 26 q10 -8 20 0 t20 0 M620 36 q10 -8 20 0 t20 0 M620 46 q10 -8 20 0 t20 0" fill="none" stroke="#2c99d6" stroke-width="2"/>
+    </svg>
+    <div class="risks">
+      <div><h3>If life is shorter than planned</h3><p>Life insurance pays the people you leave behind.</p></div>
+      <div class="r"><h3>If life is longer than planned</h3><p>An annuity can turn savings into income for a set period or for life.</p></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(() => {
+  const NS = 'http://www.w3.org/2000/svg';
+  const el = (tag, attrs = {}, parent) => { const n = document.createElementNS(NS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; };
+  const txt = (parent, x, y, s, attrs = {}) => { const t = el('text', { x, y, 'font-size': 13, ...attrs }, parent); t.textContent = s; return t; };
+
+  /* V0 goal filter */
+  const goals = [
+    { key: 'all', label: 'All four', hl: ['term','whole','iul','survivorship'], note: 'Choose a goal to see which types are usually worth comparing.' },
+    { key: 'income', label: "Protect my family's income", hl: ['term'], note: 'Term usually gives the most coverage for the premium during the years others rely on you. Some families pair it with a smaller permanent policy.' },
+    { key: 'certain', label: 'Lifelong coverage, predictable costs', hl: ['whole'], note: 'Whole life sets the premium, a minimum cash value and the death benefit in the policy from the start.' },
+    { key: 'flex', label: 'Lifelong coverage with room to grow', hl: ['iul'], note: 'Indexed universal life trades some certainty for flexibility and growth potential, and needs regular reviews.' },
+    { key: 'legacy', label: 'Leave an inheritance', hl: ['whole','iul','survivorship'], note: 'Couples planning an estate often compare one survivorship policy with a permanent policy on each person.' },
+    { key: 'business', label: 'Protect my business', hl: ['term','whole','iul'], note: 'Key person and buy-sell plans can use term or permanent coverage.' },
+    { key: 'child', label: 'A head start for a child or grandchild', hl: ['whole','iul'], note: 'A policy bought young is priced on a young age, and its cash value has decades to build. Worth comparing with a 529 plan.' },
+  ];
+  const chips = document.getElementById('chips'), note = document.getElementById('goal-note'), cards = [...document.querySelectorAll('.card')];
+  const select = (g) => {
+    chips.querySelectorAll('.chip').forEach(c => c.setAttribute('aria-pressed', c.dataset.key === g.key));
+    note.textContent = g.note;
+    cards.forEach(c => { const on = g.hl.includes(c.dataset.id); c.classList.toggle('on', on && g.key !== 'all'); c.classList.toggle('off', !on); });
+  };
+  goals.forEach(g => { const b = document.createElement('button'); b.type = 'button'; b.className = 'chip'; b.dataset.key = g.key; b.textContent = g.label;
+    b.addEventListener('click', () => select(b.getAttribute('aria-pressed') === 'true' && g.key !== 'all' ? goals[0] : g)); chips.appendChild(b); });
+  select(goals[0]);
+
+  /* V2 meters */
+  const rows = [
+    ['How long it lasts', null, ['A set period, often 10–30 years', 'For life, as long as premiums are paid', 'For life, if the policy stays funded enough']],
+    ['Premium', [1,3,2], ['Lowest to start', 'Highest, and fixed for life', 'Flexible, within limits']],
+    ['Cash value', null, ['None', 'Grows on a guaranteed schedule, plus possible dividends', 'Credited based on an index, within a cap and a floor']],
+    ['Predictability', [3,3,1], ['High during the term', 'High', 'Varies with index results and charges']],
+    ['Growth potential', [0,1,2], ['None', 'Steady, more modest', 'Higher, limited by a cap']],
+    ['Flexibility', [1,1,3], ['Can often convert', 'Set premiums', 'Adjust premiums and death benefit']],
+    ['Attention needed', [1,1,3], ['Low', 'Low', 'Review every year']],
+    ['Often used for', null, ['Income replacement, the mortgage, young families', 'Certainty, legacy, business planning', 'Lifelong coverage with growth potential']],
+  ];
+  const types = ['Term', 'Whole life', 'Indexed UL'];
+  const tb = document.querySelector('#glance tbody');
+  rows.forEach(([label, m, t]) => {
+    const tr = document.createElement('tr'); const th = document.createElement('th'); th.scope = 'row'; th.textContent = label; tr.appendChild(th);
+    t.forEach((s, i) => { const td = document.createElement('td'); td.dataset.type = types[i];
+      if (m) { const d = document.createElement('span'); d.className = 'dots'; d.setAttribute('aria-hidden', 'true'); for (let k = 0; k < 3; k++) { const dot = document.createElement('i'); if (k < m[i]) dot.className = 'f'; d.appendChild(dot); } td.appendChild(d); }
+      td.appendChild(document.createTextNode(s)); tr.appendChild(td); });
+    tb.appendChild(tr);
+  });
+
+  /* V3 whole life chart */
+  (() => {
+    const s = document.getElementById('v3'); const X0 = 70, X1 = 650, Y0 = 300, H = 250;
+    const X = t => X0 + t * (X1 - X0), Y = v => Y0 - v * H;
+    const path = f => { let d = ''; for (let i = 0; i <= 60; i++) { const t = i / 60; d += (i ? 'L' : 'M') + X(t).toFixed(1) + ' ' + Y(f(t)).toFixed(1); } return d; };
+    const prem = t => 0.72 * t, guar = t => 0.95 * Math.pow(t, 1.8), div = t => 0.95 * Math.pow(t, 1.45);
+    el('line', { x1: X0, y1: Y0, x2: X1, y2: Y0, stroke: '#d9e2ea', 'stroke-width': 1.5 }, s);
+    ['Early years', 'Middle years', 'Later years'].forEach((l, i) => txt(s, X(i / 3 + 1 / 6), Y0 + 24, l, { 'text-anchor': 'middle', style: 'fill:#4b5866' }));
+    // band between guaranteed and dividends
+    let band = path(div); for (let i = 60; i >= 0; i--) { const t = i / 60; band += 'L' + X(t).toFixed(1) + ' ' + Y(guar(t)).toFixed(1); }
+    el('path', { d: band + 'Z', fill: '#eaf5fc', class: 'fade-late' }, s);
+    // death benefit
+    el('line', { x1: X0, y1: Y(0.95), x2: X1, y2: Y(0.95), stroke: '#141b22', 'stroke-width': 1.5 }, s);
+    txt(s, X0, Y(0.95) - 8, 'Death benefit', { 'font-weight': 700 });
+    const line = (f, attrs) => { const p = el('path', { d: path(f), fill: 'none', 'stroke-width': 2.5, class: 'draw', ...attrs }, s); const L = p.getTotalLength ? p.getTotalLength() : 900; p.style.setProperty('--len', Math.ceil(L)); return p; };
+    line(prem, { stroke: '#4b5866', 'stroke-dasharray': '7 6', class: '' });
+    line(div, { stroke: '#2c99d6', 'stroke-width': 2, 'stroke-dasharray': '2 4', class: 'fade-late' });
+    line(guar, { stroke: '#1a6699' });
+    // labels
+    { const lx = X(0.8), ly = Y(prem(0.8)) + 18, ang = -Math.atan(0.72 * H / (X1 - X0)) * 180 / Math.PI;
+      txt(s, lx, ly, 'Total premiums paid', { style: 'fill:#4b5866', transform: `rotate(${ang.toFixed(1)} ${lx} ${ly})` }); }
+    txt(s, X(0.52), Y(guar(0.52)) + 22, 'Guaranteed cash value', { 'font-weight': 700, style: 'fill:#1a6699' });
+    txt(s, X(0.36), Y(div(0.36)) - 12, 'With dividends (not guaranteed)', { 'text-anchor': 'end', style: 'fill:#1a6699', class: 'fade-late' });
+    // crossing marker (guaranteed passes premiums)
+    const tc = Math.pow(0.72 / 0.95, 1 / 0.8);
+    el('circle', { cx: X(tc), cy: Y(prem(tc)), r: 6, fill: '#fff', stroke: '#1a6699', 'stroke-width': 2, class: 'fade-late' }, s);
+    const g = el('g', { class: 'fade-late' }, s);
+    el('line', { x1: X(tc), y1: Y(prem(tc)) - 8, x2: X(tc) - 40, y2: Y(prem(tc)) - 48, stroke: '#1a6699' }, g);
+    txt(g, X(tc) - 44, Y(prem(tc)) - 66, 'Cash value passes what you’ve paid.', { 'text-anchor': 'end', 'font-size': 12 });
+    txt(g, X(tc) - 44, Y(prem(tc)) - 51, 'Timing varies by policy.', { 'text-anchor': 'end', 'font-size': 12, style: 'fill:#4b5866' });
+    // early-years bracket
+    el('path', { d: `M${X(0.02)} ${Y0 + 40} v6 H${X(0.3)} v-6`, fill: 'none', stroke: '#4b5866' }, s);
+    txt(s, X(0.02), Y0 + 62, 'Surrendering here may return less than you paid.', { 'font-size': 12, style: 'fill:#4b5866' });
+  })();
+
+  /* V5 cap and floor */
+  (() => {
+    const s = document.getElementById('v5'); const base = 190, U = 130, cap = 0.5, x0 = 60, w = 72;
+    const years = [0.9, 0.3, -0.6, 0.7, 0.15, -0.3, 1.0, 0.42];
+    const ex = document.getElementById('v5-explain');
+    el('line', { x1: 40, y1: base, x2: 660, y2: base, stroke: '#141b22', 'stroke-width': 1.5 }, s);
+    txt(s, 662, base + 4, 'Floor', { 'font-weight': 700, 'font-size': 12 });
+    el('line', { x1: 40, y1: base - cap * U, x2: 660, y2: base - cap * U, stroke: '#1a6699', 'stroke-width': 1.5, 'stroke-dasharray': '6 5' }, s);
+    txt(s, 662, base - cap * U + 4, 'Cap', { 'font-weight': 700, 'font-size': 12, style: 'fill:#1a6699' });
+    years.forEach((v, i) => {
+      const cx = x0 + i * w + w / 2, g = el('g', { class: 'bar-g', tabindex: 0, role: 'button', 'aria-label': 'Year ' + (i + 1) }, s);
+      el('rect', { class: 'hit', x: cx - w / 2 + 4, y: 20, width: w - 8, height: 290, fill: 'transparent', rx: 4 }, g);
+      const h = Math.abs(v) * U;
+      el('rect', { class: 'grow-y' + (v < 0 ? ' down' : ''), style: `transition-delay:${i * 60}ms`, x: cx - 22, y: v >= 0 ? base - h : base, width: 20, height: h, fill: '#fff', stroke: '#9fb0bf', 'stroke-width': 1.5, rx: 2 }, g);
+      const c = Math.max(0, Math.min(cap, v));
+      if (c > 0) el('rect', { class: 'grow-y', style: `transition-delay:${500 + i * 60}ms`, x: cx + 2, y: base - c * U, width: 20, height: c * U, fill: '#2c99d6', rx: 2 }, g);
+      else txt(g, cx + 12, base - 6, '0', { 'text-anchor': 'middle', 'font-size': 12, 'font-weight': 700, style: 'fill:#1a6699' });
+      txt(g, cx, 318, 'Year ' + (i + 1), { 'text-anchor': 'middle', 'font-size': 12, style: 'fill:#4b5866' });
+      const msg = v > cap ? `Year ${i + 1}: a strong year. Interest is credited up to the cap, not the full gain.`
+        : v > 0 ? `Year ${i + 1}: a modest year. Interest follows the index.`
+        : `Year ${i + 1}: the index fell. The floor means no loss is credited, though charges still apply.`;
+      const show = () => { ex.textContent = msg; };
+      g.addEventListener('mouseenter', show); g.addEventListener('focus', show); g.addEventListener('click', show);
+    });
+    // legend
+    const lg = el('g', {}, s);
+    el('rect', { x: 60, y: 4, width: 14, height: 14, fill: '#fff', stroke: '#9fb0bf', 'stroke-width': 1.5 }, lg); txt(lg, 80, 16, 'Index change');
+    el('rect', { x: 190, y: 4, width: 14, height: 14, fill: '#2c99d6' }, lg); txt(lg, 210, 16, 'Credited to the policy');
+  })();
+
+  /* V6 level vs increasing */
+  (() => {
+    const s = document.getElementById('v6'); const base = 210, bw = 48;
+    const draw = (ox, title, sub, data) => {
+      txt(s, ox, 20, title, { 'font-weight': 700, 'font-size': 15 }); txt(s, ox, 40, sub, { 'font-size': 12, style: 'fill:#4b5866' });
+      data.forEach(([ins, cv], i) => {
+        const x = ox + 10 + i * 90;
+        el('rect', { x, y: base - cv, width: bw, height: cv, fill: '#1a6699' }, s);
+        el('rect', { x, y: base - cv - ins, width: bw, height: ins, fill: '#eaf5fc', stroke: '#2c99d6' }, s);
+        txt(s, x + bw / 2, base + 20, ['Early', 'Middle', 'Later'][i], { 'text-anchor': 'middle', 'font-size': 12, style: 'fill:#4b5866' });
+      });
+      el('line', { x1: ox, y1: base, x2: ox + 280, y2: base, stroke: '#d9e2ea' }, s);
+    };
+    draw(0, 'Level', 'Total stays the same; cash value grows inside it', [[130, 20], [90, 60], [45, 105]]);
+    draw(370, 'Increasing', 'Face amount plus cash value', [[100, 20], [100, 60], [100, 105]]);
+    const lg = el('g', {}, s);
+    el('rect', { x: 0, y: 248, width: 14, height: 14, fill: '#eaf5fc', stroke: '#2c99d6' }, lg); txt(lg, 20, 260, 'Insurance amount', { 'font-size': 12 });
+    el('rect', { x: 150, y: 248, width: 14, height: 14, fill: '#1a6699' }, lg); txt(lg, 170, 260, 'Cash value', { 'font-size': 12 });
+  })();
+
+  /* reveal */
+  const io = 'IntersectionObserver' in window ? new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { threshold: 0.2 }) : null;
+  document.querySelectorAll('[data-reveal]').forEach(n => io ? io.observe(n) : n.classList.add('in'));
+  document.querySelectorAll('.draw').forEach(p => { if (!p.style.getPropertyValue('--len') && p.getTotalLength) p.style.setProperty('--len', Math.ceil(p.getTotalLength())); });
+})();
+</script>
+</body>
+</html>

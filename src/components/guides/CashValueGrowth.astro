@@ -1,0 +1,447 @@
+---
+/**
+ * How the cash value grows: two tabs (Whole life | IUL).
+ * Was §6 of the Life Insurance page; parked here (not used on any page yet)
+ * for the planned Insurance & You guide. Copy: src/i18n/guides/cash-value.ts
+ * Each tab: lead, visual(s), three key points, closed "Go deeper" expander.
+ * Without JS both panels show one after the other.
+ * Links elsewhere on the page can open a tab via [data-grow-tab="whole|iul"].
+ */
+import SectionHeading from '../SectionHeading.astro';
+import WholeLifeChart from '../viz/WholeLifeChart.astro';
+import PremiumFlow from '../viz/PremiumFlow.astro';
+import CapFloorChart from '../viz/CapFloorChart.astro';
+import DeathBenefitOptions from '../viz/DeathBenefitOptions.astro';
+import { cashValueGuide } from '../../i18n/guides/cash-value';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = cashValueGuide[locale];
+const w = t.whole;
+const u = t.iul;
+const tabs = [
+  { key: 'whole', label: t.tabs.whole },
+  { key: 'iul', label: t.tabs.iul },
+] as const;
+---
+
+<section class="section grows" aria-labelledby="grows-title" id="how-it-grows" data-grows>
+  <div class="container">
+    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="grows-title" span={6} />
+
+    <div class="grows__tabs" role="tablist" aria-label={t.tabsLabel} data-reveal>
+      {
+        tabs.map((tab, i) => (
+          <button
+            type="button"
+            role="tab"
+            class="grows__tab"
+            id={`grows-tab-${tab.key}`}
+            aria-controls={`grows-panel-${tab.key}`}
+            aria-selected={i === 0 ? 'true' : 'false'}
+            tabindex={i === 0 ? 0 : -1}
+            data-tab={tab.key}
+          >
+            {tab.label}
+          </button>
+        ))
+      }
+    </div>
+
+    <!-- Whole life -->
+    <div class="grows__panel is-active" role="tabpanel" id="grows-panel-whole" aria-labelledby="grows-tab-whole" data-panel="whole">
+      <h3 class="grows__panel-title">{t.tabs.whole}</h3>
+      <p class="grows__lead">{w.lead}</p>
+
+      <div class="grows__card">
+        <WholeLifeChart locale={locale} />
+      </div>
+
+      <ul class="points">
+        {
+          w.points.map((p, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 90}ms`}>
+              <h4>{p.title}</h4>
+              <p>{p.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <details class="disclosure grows__deeper">
+        <summary>{t.deeperLabel}</summary>
+        <div class="disclosure__body deeper">
+          <div>
+            <h4 class="deeper__title">{w.dividendTitle}</h4>
+            <ol class="deeper__options">
+              {
+                w.dividendOptions.map((o) => (
+                  <li>
+                    <strong>{o.title}</strong> {o.body}
+                  </li>
+                ))
+              }
+            </ol>
+          </div>
+          <div>
+            <h4 class="deeper__title">{w.notesTitle}</h4>
+            <ul class="deeper__notes">
+              {
+                w.notes.map((n) => (
+                  <li>
+                    <strong>{n.title}</strong> {n.body}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+        </div>
+      </details>
+    </div>
+
+    <!-- Indexed universal life -->
+    <div class="grows__panel" role="tabpanel" id="grows-panel-iul" aria-labelledby="grows-tab-iul" data-panel="iul">
+      <h3 class="grows__panel-title">{t.tabs.iul}</h3>
+      <p class="grows__lead">{u.lead}</p>
+
+      <div class="grows__card">
+        <PremiumFlow locale={locale} />
+      </div>
+      <div class="grows__card">
+        <CapFloorChart locale={locale} />
+      </div>
+
+      <ul class="points">
+        {
+          u.points.map((p, i) => (
+            <li data-reveal style={`--reveal-delay:${i * 90}ms`}>
+              <h4>{p.title}</h4>
+              <p>{p.body}</p>
+            </li>
+          ))
+        }
+      </ul>
+
+      <details class="disclosure grows__deeper">
+        <summary>{t.deeperLabel}</summary>
+        <div class="disclosure__body deeper">
+          <div>
+            <h4 class="deeper__title">{u.termsTitle}</h4>
+            <dl class="deeper__terms">
+              {
+                u.terms.map((term) => (
+                  <div>
+                    <dt>{term.term}</dt>
+                    <dd>{term.meaning}</dd>
+                  </div>
+                ))
+              }
+            </dl>
+          </div>
+          <div>
+            <h4 class="deeper__title">{u.notesTitle}</h4>
+            <ul class="deeper__notes">
+              {
+                u.notes.map((n) => (
+                  <li>
+                    <strong>{n.title}</strong> {n.body}
+                  </li>
+                ))
+              }
+            </ul>
+          </div>
+          <div class="deeper__wide">
+            <DeathBenefitOptions locale={locale} />
+          </div>
+        </div>
+      </details>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Tabs only exist with JS; without it, both panels show in turn */
+  .grows__tabs {
+    display: none;
+    gap: 8px;
+    margin-top: 48px;
+  }
+
+  :global(.js) .grows__tabs {
+    display: flex;
+    flex-wrap: wrap;
+  }
+
+  .grows__tab {
+    height: 50px;
+    padding: 0 22px;
+    border: 1.5px solid var(--hairline);
+    border-radius: var(--radius);
+    background: var(--white);
+    color: var(--ink);
+    font: 700 15px/1 var(--sans);
+    cursor: pointer;
+    transition:
+      background-color 250ms ease,
+      border-color 250ms ease,
+      color 250ms ease;
+  }
+
+  .grows__tab:hover {
+    border-color: #b9c8d4;
+  }
+
+  .grows__tab[aria-selected='true'] {
+    background: var(--ink);
+    border-color: var(--ink);
+    color: var(--white);
+  }
+
+  .grows__panel {
+    margin-top: 48px;
+  }
+
+  :global(.js) .grows__panel {
+    margin-top: 28px;
+  }
+
+  :global(.js) .grows__panel:not(.is-active) {
+    display: none;
+  }
+
+  :global(.js) .grows__panel.is-active {
+    animation: grows-in 400ms var(--ease-out);
+  }
+
+  @keyframes grows-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .grows__panel-title {
+    font: 400 30px/1.2 var(--serif);
+    margin-bottom: 12px;
+  }
+
+  :global(.js) .grows__panel-title {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  .grows__lead {
+    max-width: 60ch;
+    font: 400 clamp(20px, 1.9vw, 24px) / 1.45 var(--serif);
+    color: var(--ink);
+  }
+
+  :lang(zh) .grows__lead {
+    line-height: 1.7;
+  }
+
+  .grows__card {
+    margin-top: 28px;
+    padding: clamp(24px, 4vw, 44px);
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .points {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 32px;
+    margin: 40px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .points li {
+    padding-top: 18px;
+    border-top: 2px solid var(--sky);
+  }
+
+  .points h4 {
+    font: 700 18px/1.35 var(--sans);
+  }
+
+  .points p {
+    margin-top: 8px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--slate);
+  }
+
+  .grows__deeper {
+    margin-top: 40px;
+  }
+
+  .deeper {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 32px 48px;
+    font-size: 16px;
+    line-height: 1.6;
+  }
+
+  .deeper__wide {
+    grid-column: 1 / -1;
+    padding-top: 8px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .deeper__title {
+    font: 700 13px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--deep-sky);
+  }
+
+  :lang(zh) .deeper__title {
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  .deeper__options,
+  .deeper__notes {
+    margin: 14px 0 0;
+    padding: 0;
+    list-style: none;
+    display: grid;
+    gap: 12px;
+  }
+
+  .deeper__options {
+    counter-reset: opt;
+  }
+
+  .deeper__options li {
+    position: relative;
+    padding-left: 34px;
+    counter-increment: opt;
+  }
+
+  .deeper__options li::before {
+    content: counter(opt);
+    position: absolute;
+    left: 0;
+    top: 1px;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--pale-sky);
+    color: var(--deep-sky);
+    font: 700 12px/22px var(--sans);
+    text-align: center;
+  }
+
+  .deeper strong {
+    color: var(--ink);
+  }
+
+  .deeper__terms {
+    margin: 14px 0 0;
+    display: grid;
+    gap: 12px;
+  }
+
+  .deeper__terms div {
+    display: grid;
+    grid-template-columns: 9.5em 1fr;
+    gap: 12px;
+  }
+
+  .deeper__terms dt {
+    font-weight: 700;
+    color: var(--ink);
+  }
+
+  .deeper__terms dd {
+    margin: 0;
+  }
+
+  @media (max-width: 899px) {
+    .points {
+      grid-template-columns: 1fr;
+      gap: 24px;
+    }
+    .deeper {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .grows__tabs {
+      margin-top: 28px;
+    }
+    .grows__tab {
+      flex: 1 1 auto;
+      height: 46px;
+      padding: 0 14px;
+      font-size: 14px;
+    }
+    .grows__card {
+      margin-top: 20px;
+      padding: 20px;
+    }
+    .points {
+      margin-top: 28px;
+    }
+    .deeper {
+      font-size: 15px;
+    }
+    .deeper__terms div {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-grows]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[data-tab]'));
+    const panels = Array.from(root.querySelectorAll<HTMLElement>('[data-panel]'));
+
+    const select = (key: string, focus = false) => {
+      tabs.forEach((tab) => {
+        const on = tab.dataset.tab === key;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+        if (on && focus) tab.focus();
+      });
+      panels.forEach((p) => p.classList.toggle('is-active', p.dataset.panel === key));
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(tab.dataset.tab ?? 'whole'));
+      tab.addEventListener('keydown', (e) => {
+        let next: number | null = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (i + 1) % tabs.length;
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (i - 1 + tabs.length) % tabs.length;
+        if (e.key === 'Home') next = 0;
+        if (e.key === 'End') next = tabs.length - 1;
+        if (next !== null) {
+          e.preventDefault();
+          select(tabs[next].dataset.tab ?? 'whole', true);
+        }
+      });
+    });
+
+    // "How it grows" links on the coverage cards open the matching tab
+    document.querySelectorAll<HTMLAnchorElement>('[data-grow-tab]').forEach((link) => {
+      link.addEventListener('click', () => select(link.dataset.growTab ?? 'whole'));
+    });
+  });
+</script>

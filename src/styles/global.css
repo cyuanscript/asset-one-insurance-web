@@ -291,3 +291,213 @@ button {
     transform: none;
   }
 }
+
+/* ---------- Inner pages: sections, visuals, disclosures ---------- */
+
+.section {
+  padding-block: var(--section-y);
+  scroll-margin-top: 72px;
+}
+
+.section--white {
+  background: var(--white);
+}
+
+.section--pale {
+  background: var(--pale-sky);
+}
+
+/* Visual (chart / diagram) blocks: a one-line takeaway in text above,
+   so the picture is never the only way to get the point */
+.viz__title {
+  font: 700 13px/1.4 var(--sans);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--slate);
+}
+
+:lang(zh) .viz__title {
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+
+.viz__takeaway {
+  margin-top: 10px;
+  max-width: 62ch;
+  font: 400 clamp(21px, 2.1vw, 26px) / 1.35 var(--serif);
+  color: var(--ink);
+}
+
+:lang(zh) .viz__takeaway {
+  line-height: 1.6;
+}
+
+.viz__caption {
+  margin-top: 16px;
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--slate);
+}
+
+figure.viz {
+  margin: 0;
+}
+
+.viz svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.viz svg text {
+  font-family: var(--sans);
+  fill: var(--ink);
+}
+
+/* Lines that draw in when their [data-reveal] parent is revealed.
+   Use pathLength="1" on the path so no measuring is needed. */
+.js [data-reveal] .draw {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+  transition: stroke-dashoffset 1100ms var(--ease-out);
+  transition-delay: var(--draw-delay, 200ms);
+}
+
+.js [data-reveal].is-revealed .draw {
+  stroke-dashoffset: 0;
+}
+
+.js [data-reveal] .fade-late {
+  opacity: 0;
+  transition: opacity 600ms ease;
+  transition-delay: var(--fade-delay, 900ms);
+}
+
+.js [data-reveal].is-revealed .fade-late {
+  opacity: 1;
+}
+
+.js [data-reveal] .grow-x,
+.js [data-reveal] .grow-y {
+  transition: transform 700ms var(--ease-out);
+  transition-delay: var(--grow-delay, 150ms);
+}
+
+.js [data-reveal] .grow-x {
+  transform-box: fill-box;
+  transform-origin: left center;
+  transform: scaleX(0);
+}
+
+.js [data-reveal] .grow-y {
+  transform-box: fill-box;
+  transform-origin: center bottom;
+  transform: scaleY(0);
+}
+
+.js [data-reveal] .grow-y--down {
+  transform-origin: center top;
+}
+
+.js [data-reveal].is-revealed .grow-x,
+.js [data-reveal].is-revealed .grow-y {
+  transform: none;
+}
+
+/* Wide/compact chart variants: same data, drawn twice so labels stay readable on phones */
+.viz__compact {
+  display: none !important;
+}
+
+@media (max-width: 640px) {
+  .viz__wide {
+    display: none !important;
+  }
+  .viz__compact {
+    display: block !important;
+  }
+}
+
+/* Disclosure (<details>) used for "Go deeper" and FAQ answers */
+.disclosure {
+  border-top: 1px solid var(--hairline);
+}
+
+.disclosure:last-of-type {
+  border-bottom: 1px solid var(--hairline);
+}
+
+.disclosure > summary {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px 44px 20px 0;
+  font: 700 17px/1.45 var(--sans);
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+
+.disclosure > summary::-webkit-details-marker {
+  display: none;
+}
+
+/* Plus that turns into a minus */
+.disclosure > summary::before,
+.disclosure > summary::after {
+  content: '';
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  width: 14px;
+  height: 2px;
+  margin-top: -1px;
+  border-radius: 1px;
+  background: var(--deep-sky);
+  transition: transform 300ms var(--ease-out);
+}
+
+.disclosure > summary::after {
+  transform: rotate(90deg);
+}
+
+.disclosure[open] > summary::after {
+  transform: rotate(0deg);
+}
+
+.disclosure > summary:hover {
+  color: var(--deep-sky);
+}
+
+.disclosure__body {
+  padding: 0 0 24px;
+  color: var(--slate);
+}
+
+.disclosure[open] .disclosure__body {
+  animation: disclosure-in 400ms var(--ease-out);
+}
+
+@keyframes disclosure-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Outline button for light grounds */
+.btn-outline {
+  border-color: var(--ink);
+  color: var(--ink);
+}
+
+.btn-outline:hover {
+  background: var(--ink);
+  color: var(--white);
+}

@@ -1,0 +1,261 @@
+---
+/**
+ * Inner-page hero: a shorter version of the homepage hero.
+ * Dark photo with scrim (so the transparent header stays legible),
+ * eyebrow, masked headline lines, lead and up to two actions.
+ * Reusable for every Services / About page.
+ */
+import Photo from './Photo.astro';
+import type { PhotoKey } from '../i18n/content';
+
+interface Action {
+  label: string;
+  href: string;
+}
+interface Props {
+  eyebrow: string;
+  title: string[];
+  lead: string;
+  photo: PhotoKey;
+  primary?: Action;
+  secondary?: Action;
+}
+const { eyebrow, title, lead, photo, primary, secondary } = Astro.props;
+---
+
+<section class="page-hero on-dark">
+  <div class="page-hero__media" data-parallax="0.12">
+    <div class="page-hero__zoom">
+      <Photo photo={photo} tone="dark" eager class="page-hero__photo" />
+    </div>
+  </div>
+  <div class="page-hero__scrim" aria-hidden="true"></div>
+
+  <div class="page-hero__content">
+    <div class="container">
+      <div class="page-hero__copy">
+        <p class="page-hero__eyebrow page-hero__in" style="--d:0">
+          <span class="page-hero__dot" aria-hidden="true"></span>
+          {eyebrow}
+        </p>
+        <h1 class="page-hero__title">
+          {
+            title.map((line, i) => (
+              <span class="page-hero__line">
+                <span class="page-hero__line-inner" style={`--d:${i + 1}`}>
+                  {line}
+                </span>
+              </span>
+            ))
+          }
+        </h1>
+        <p class="page-hero__lead page-hero__in" style={`--d:${title.length + 1}`}>{lead}</p>
+        {
+          (primary || secondary) && (
+            <div class="page-hero__actions page-hero__in" style={`--d:${title.length + 2}`}>
+              {primary && (
+                <a class="btn btn-primary" href={primary.href}>
+                  {primary.label}
+                </a>
+              )}
+              {secondary && (
+                <a class="btn btn-outline-light" href={secondary.href}>
+                  {secondary.label}
+                </a>
+              )}
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .page-hero {
+    position: relative;
+    height: 680px;
+    max-height: max(600px, 92svh);
+    overflow: hidden;
+    background: #2e4250;
+    color: var(--white);
+  }
+
+  .page-hero__media {
+    position: absolute;
+    inset: 0;
+    will-change: transform;
+  }
+
+  .page-hero__zoom {
+    position: absolute;
+    inset: 0;
+    animation: page-hero-settle 2400ms var(--ease-out) both;
+  }
+
+  .page-hero__zoom :global(.page-hero__photo) {
+    position: absolute;
+    inset: 0;
+  }
+
+  @keyframes page-hero-settle {
+    from {
+      transform: scale(1.04);
+    }
+    to {
+      transform: scale(1);
+    }
+  }
+
+  .page-hero__scrim {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      180deg,
+      rgba(14, 22, 29, 0.6) 0%,
+      rgba(14, 22, 29, 0.1) 24%,
+      rgba(14, 22, 29, 0.15) 45%,
+      rgba(14, 22, 29, 0.82) 100%
+    );
+  }
+
+  .page-hero__content {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 80px;
+  }
+
+  .page-hero__copy {
+    max-width: 780px;
+  }
+
+  .page-hero__eyebrow {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font: 700 13px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  :lang(zh) .page-hero__eyebrow {
+    font-size: 14px;
+    letter-spacing: 0.04em;
+  }
+
+  .page-hero__dot {
+    width: 9px;
+    height: 9px;
+    border-radius: 50%;
+    background: var(--scarlet);
+    flex: none;
+  }
+
+  .page-hero__title {
+    margin-top: 24px;
+    font: 400 clamp(42px, 5.6vw, 72px) / 1.06 var(--serif);
+    letter-spacing: -0.01em;
+  }
+
+  :lang(zh) .page-hero__title {
+    font-size: clamp(34px, 4.8vw, 60px);
+    line-height: 1.34;
+    letter-spacing: 0;
+  }
+
+  .page-hero__line {
+    display: block;
+    overflow: hidden;
+    padding-bottom: 0.08em;
+    margin-bottom: -0.08em;
+  }
+
+  .page-hero__line-inner {
+    display: block;
+    animation: page-hero-rise 1100ms var(--ease-out) both;
+    animation-delay: calc(200ms + var(--d) * 110ms);
+  }
+
+  .page-hero__in {
+    animation: page-hero-fade 1000ms var(--ease-out) both;
+    animation-delay: calc(200ms + var(--d) * 110ms);
+  }
+
+  @keyframes page-hero-rise {
+    from {
+      transform: translateY(105%);
+    }
+    to {
+      transform: none;
+    }
+  }
+
+  @keyframes page-hero-fade {
+    from {
+      opacity: 0;
+      transform: translateY(14px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .page-hero__lead {
+    margin-top: 24px;
+    max-width: 600px;
+    font: 400 20px/1.6 var(--sans);
+  }
+
+  :lang(zh) .page-hero__lead {
+    font-size: 19px;
+    line-height: 1.75;
+  }
+
+  .page-hero__actions {
+    margin-top: 36px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  @media (max-width: 767px) {
+    .page-hero {
+      height: 620px;
+      max-height: max(540px, 100svh);
+    }
+
+    .page-hero__content {
+      bottom: 36px;
+    }
+
+    .page-hero__eyebrow {
+      font-size: 11px;
+    }
+
+    .page-hero__title {
+      margin-top: 16px;
+    }
+
+    :lang(zh) .page-hero__title {
+      line-height: 1.38;
+    }
+
+    .page-hero__lead,
+    :lang(zh) .page-hero__lead {
+      margin-top: 16px;
+      font-size: 17px;
+    }
+
+    .page-hero__actions {
+      margin-top: 26px;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .page-hero__actions .btn {
+      width: 100%;
+    }
+  }
+</style>

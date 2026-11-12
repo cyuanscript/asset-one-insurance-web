@@ -1,0 +1,92 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import { lifeInsurance } from '../../i18n/life-insurance';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = lifeInsurance[locale].riders;
+---
+
+<section class="section riders" aria-labelledby="riders-title">
+  <div class="container">
+    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="riders-title" span={6} />
+    <ul class="riders__grid">
+      {
+        t.items.map((r, i) => (
+          <li class="rider" data-reveal style={`--reveal-delay:${(i % 3) * 90}ms`}>
+            <h3 class="rider__name">{r.name}</h3>
+            <p class="rider__body">{r.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+  </div>
+</section>
+
+<style>
+  .riders__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 20px;
+    margin: 48px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .rider {
+    padding: 28px 28px 30px;
+    background: var(--white);
+    border-radius: var(--radius);
+    border: 1px solid var(--hairline);
+  }
+
+  .rider__name {
+    font: 400 22px/1.3 var(--serif);
+  }
+
+  /* Scarlet accent: short rule above each rider name */
+  .rider__name::before {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 3px;
+    margin-bottom: 16px;
+    border-radius: 2px;
+    background: var(--scarlet);
+  }
+
+  :lang(zh) .rider__name {
+    font-size: 20px;
+    line-height: 1.5;
+  }
+
+  .rider__body {
+    margin-top: 10px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--slate);
+  }
+
+  @media (max-width: 1023px) {
+    .riders__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .riders__grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 28px;
+    }
+    .rider {
+      padding: 22px;
+    }
+    .rider__body {
+      font-size: 15px;
+    }
+  }
+</style>

@@ -1,0 +1,256 @@
+---
+/**
+ * V2 · At a glance: term vs whole life vs IUL.
+ *
+ * Reusable pattern: "Level comparison table". A real <table> on desktop
+ * that restyles into row groups on phones (no sideways scroll). Rows with
+ * a level show a 3-step bar and a Low/Medium/High word on their own line,
+ * so every cell's text starts at the same left edge. The bar is decorative;
+ * the word is what screen readers announce.
+ */
+import SectionHeading from '../SectionHeading.astro';
+import { lifeInsurance } from '../../i18n/life-insurance';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = lifeInsurance[locale].compare;
+---
+
+<section class="section section--white glance" aria-labelledby="glance-title">
+  <div class="container">
+    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.takeaway} id="glance-title" span={6} />
+
+    <div class="glance__wrap" data-reveal>
+      <table class="glance__table">
+        <caption class="visually-hidden">{t.caption}</caption>
+        <thead>
+          <tr>
+            <td></td>
+            {t.columns.map((c) => <th scope="col">{c}</th>)}
+          </tr>
+        </thead>
+        <tbody>
+          {
+            t.rows.map((row) => (
+              <tr>
+                <th scope="row">{row.label}</th>
+                {row.cells.map((cell, ci) => (
+                  <td data-col={t.columns[ci]}>
+                    <div class="glance__cell">
+                      {cell.level !== undefined && (
+                        <span class:list={['level', `level--${cell.level}`]}>
+                          <span class="level__bar" aria-hidden="true">
+                            {[0, 1, 2].map((k) => (
+                              <i class:list={{ on: k < (cell.level ?? 0) }} style={`--k:${k}`} />
+                            ))}
+                          </span>
+                          <span class="level__word">{t.levels[cell.level]}</span>
+                          <span class="visually-hidden">: </span>
+                        </span>
+                      )}
+                      <span class="glance__text">{cell.text}</span>
+                    </div>
+                  </td>
+                ))}
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <p class="glance__legend">{t.legend}</p>
+      <p class="glance__foot">{t.footnote}</p>
+    </div>
+  </div>
+</section>
+
+<style>
+  .glance__wrap {
+    margin-top: 48px;
+  }
+
+  .glance__table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .glance__table th,
+  .glance__table td {
+    padding: 18px 16px;
+    text-align: left;
+    vertical-align: top;
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  .glance__table thead th {
+    position: sticky;
+    top: 76px;
+    z-index: 1;
+    background: var(--white);
+    font: 400 24px/1.25 var(--serif);
+    color: var(--deep-sky);
+    border-bottom: 2px solid var(--hairline);
+  }
+
+  /* Scarlet accent: short tick under each column name */
+  .glance__table thead th::after {
+    content: '';
+    display: block;
+    width: 28px;
+    height: 2px;
+    margin-top: 10px;
+    background: var(--scarlet);
+  }
+
+  :lang(zh) .glance__table thead th {
+    font-size: 21px;
+    line-height: 1.4;
+  }
+
+  .glance__table thead td {
+    border-bottom: 2px solid var(--hairline);
+  }
+
+  .glance__table tbody th {
+    width: 22%;
+    font-weight: 700;
+    padding-left: 0;
+  }
+
+  .glance__table td {
+    width: 26%;
+    color: var(--slate);
+  }
+
+  /* Level: bar + word on their own line, above the text */
+  .level {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 6px;
+  }
+
+  .level__bar {
+    display: inline-flex;
+    gap: 3px;
+  }
+
+  .level__bar i {
+    display: block;
+    width: 16px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--hairline);
+  }
+
+  .level__bar i.on {
+    background: var(--deep-sky);
+  }
+
+  .level__word {
+    font: 700 11px/1 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--deep-sky);
+  }
+
+  :lang(zh) .level__word {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  .level--0 .level__word {
+    color: var(--slate);
+  }
+
+  /* Segments fill one by one when the table is revealed */
+  :global(.js) .glance__wrap .level__bar i.on {
+    background: var(--hairline);
+    transition: background-color 300ms ease;
+    transition-delay: calc(400ms + var(--k) * 90ms);
+  }
+
+  :global(.js) .glance__wrap.is-revealed .level__bar i.on {
+    background: var(--deep-sky);
+  }
+
+  .glance__legend,
+  .glance__foot {
+    margin-top: 16px;
+    font-size: 14px;
+    color: var(--slate);
+  }
+
+  .glance__foot {
+    margin-top: 6px;
+  }
+
+  @media (max-width: 1023px) {
+    .glance__table thead th {
+      top: 64px;
+    }
+  }
+
+  /* Phones: each row becomes a group of three labelled lines */
+  @media (max-width: 640px) {
+    .glance__wrap {
+      margin-top: 28px;
+    }
+
+    .glance__table thead {
+      display: none;
+    }
+
+    .glance__table,
+    .glance__table tbody,
+    .glance__table tr,
+    .glance__table th,
+    .glance__table td {
+      display: block;
+      width: 100%;
+    }
+
+    .glance__table tr {
+      padding: 16px 0;
+      border-bottom: 1px solid var(--hairline);
+    }
+
+    .glance__table tbody th,
+    .glance__table td {
+      border: 0;
+      padding: 0;
+    }
+
+    .glance__table tbody th {
+      width: 100%;
+      margin-bottom: 8px;
+      font-size: 16px;
+    }
+
+    .glance__table td {
+      display: grid;
+      grid-template-columns: 112px 1fr;
+      align-items: baseline;
+      padding: 6px 0;
+      font-size: 15px;
+    }
+
+    :lang(zh) .glance__table td {
+      grid-template-columns: 116px 1fr;
+    }
+
+    .glance__table td::before {
+      content: attr(data-col);
+      font-weight: 700;
+      color: var(--deep-sky);
+    }
+
+    .level {
+      margin-bottom: 4px;
+    }
+  }
+</style>

@@ -19,10 +19,15 @@ Requires Node 18.14 or newer.
 | Path | What it is |
 |---|---|
 | `src/i18n/content.ts` | All copy (EN + 中文), contact details, and photo slots |
+| `content-packs/` | Page copy decks (EN + 中文) for inner pages, ready to move into `content.ts` |
 | `src/styles/global.css` | Design tokens (colours, type, spacing, motion), buttons, reveal animation |
-| `src/components/` | Header, Hero, LifeStages (selector), Products, Footer, LogoMark, Photo |
+| `src/components/` | Header, Hero, PageHero (inner pages), LifeStages (selector), Products, Footer, LogoMark, Photo |
+| `src/components/life/` | Sections of the Life Insurance page (`LifeInsurancePage.astro` assembles them) |
+| `src/components/viz/`, `src/components/guides/` | Charts and a tabbed section for a future Insurance & You guide on cash value (copy in `src/i18n/guides/cash-value.ts`). Not on any page yet |
+| `src/i18n/life-insurance.ts` | Life Insurance page copy (EN + 中文), from `content-packs/services-life-insurance.md` |
 | `src/scripts/motion.ts` | Scroll reveals and hero parallax |
-| `src/pages/index.astro`, `src/pages/zh/index.astro` | English and Chinese routes |
+| `src/pages/index.astro`, `src/pages/zh/index.astro` | English and Chinese homepage routes |
+| `src/pages/services/life-insurance.astro` (+ `zh/`) | Life Insurance page, `/services/life-insurance/` and `/zh/services/life-insurance/` |
 | `public/brand/` | Logo: original PNG plus vector mark (`asset-one-mark.svg`, `-reversed.svg` for dark grounds) |
 
 ## Adding photos
@@ -52,5 +57,5 @@ describing the intended shot.
 - Final body copy from the content packs; native review of the draft Chinese.
 - Newsletter: the form validates and shows success/error states but is **not
   connected to a mailing service yet** (see the TODO in `Footer.astro`).
-- Inner pages (Services, Insurance & You, About, News, Contact, legal pages):
-  nav links point to their future URLs and currently 404.
+- Inner pages: Life Insurance is built. Health Insurance, Annuities, Services overview,
+  Insurance & You, About, News, Contact and the legal pages still 404.

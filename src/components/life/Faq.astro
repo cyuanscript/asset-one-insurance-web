@@ -1,0 +1,90 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import { lifeInsurance } from '../../i18n/life-insurance';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = lifeInsurance[locale].faq;
+---
+
+<section class="section faq" aria-labelledby="faq-title">
+  <div class="container faq__grid">
+    <div class="faq__head">
+      <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="faq-title" span={7} />
+    </div>
+    <div class="faq__list" data-reveal>
+      {
+        t.items.map((item) => (
+          <details class="disclosure faq__item">
+            <summary>{item.q}</summary>
+            <div class="disclosure__body">
+              <p>{item.a}</p>
+            </div>
+          </details>
+        ))
+      }
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Scarlet accent: the plus / minus on each question */
+  .faq__item.disclosure > summary::before,
+  .faq__item.disclosure > summary::after {
+    background: var(--scarlet);
+  }
+
+  .faq__grid {
+    display: grid;
+    grid-template-columns: 4fr 7fr;
+    gap: clamp(32px, 6vw, 88px);
+    align-items: start;
+  }
+
+  /* SectionHeading stacks here: it's in a narrow column */
+  .faq__head :global(.section-heading__title),
+  .faq__head :global(.section-heading__intro) {
+    grid-column: 1 / -1;
+  }
+
+  .faq__head {
+    position: sticky;
+    top: 110px;
+  }
+
+  .faq__item :global(summary) {
+    font-size: 18px;
+  }
+
+  :lang(zh) .faq__item :global(summary) {
+    font-size: 17px;
+  }
+
+  .faq__item p {
+    max-width: 68ch;
+    font-size: 16px;
+    line-height: 1.65;
+  }
+
+  @media (max-width: 1023px) {
+    .faq__grid {
+      grid-template-columns: 1fr;
+    }
+    .faq__head {
+      position: static;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .faq__item :global(summary),
+    :lang(zh) .faq__item :global(summary) {
+      font-size: 16px;
+    }
+    .faq__item p {
+      font-size: 15px;
+    }
+  }
+</style>

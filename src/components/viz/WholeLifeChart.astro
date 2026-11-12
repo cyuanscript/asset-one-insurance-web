@@ -1,0 +1,168 @@
+---
+/**
+ * V3 · Whole life: premiums paid vs. cash value over time.
+ * A schematic, not a projection: no axis numbers. Curves are simple
+ * power functions chosen to show the shape (slow start, steady build).
+ * Drawn twice (wide + compact) so in-chart labels stay readable on phones.
+ */
+import { cashValueGuide } from '../../i18n/guides/cash-value';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const g = cashValueGuide[locale];
+const t = g.whole.chart;
+
+// Shapes, as a share of the death benefit line (0..1) over time t (0..1)
+const DB = 0.95;
+const premiums = (x: number) => 0.72 * x;
+const guaranteed = (x: number) => DB * Math.pow(x, 1.8);
+const dividends = (x: number) => DB * Math.pow(x, 1.45);
+const crossT = Math.pow(0.72 / DB, 1 / 0.8); // where guaranteed passes premiums
+
+/** Break a sentence into two lines at the word nearest its middle (compact chart). */
+const splitHalf = (text: string) => {
+  const words = text.split(' ');
+  let best = 1;
+  for (let i = 1; i < words.length; i++) {
+    const left = words.slice(0, i).join(' ').length;
+    if (Math.abs(left - text.length / 2) < Math.abs(words.slice(0, best).join(' ').length - text.length / 2)) best = i;
+  }
+  return [words.slice(0, best).join(' '), words.slice(best).join(' ')];
+};
+
+const variants = [
+  { key: 'wide', w: 720, h: 400, x0: 24, x1: 700, y0: 300, span: 250, fs: 14, compact: false },
+  { key: 'compact', w: 340, h: 380, x0: 4, x1: 336, y0: 262, span: 200, fs: 15, compact: true },
+].map((v) => {
+  const X = (x: number) => v.x0 + x * (v.x1 - v.x0);
+  const Y = (y: number) => v.y0 - y * v.span;
+  const path = (f: (x: number) => number) =>
+    Array.from({ length: 61 }, (_, i) => {
+      const x = i / 60;
+      return `${i ? 'L' : 'M'}${X(x).toFixed(1)} ${Y(f(x)).toFixed(1)}`;
+    }).join(' ');
+  let band = path(dividends);
+  for (let i = 60; i >= 0; i--) band += ` L${X(i / 60).toFixed(1)} ${Y(guaranteed(i / 60)).toFixed(1)}`;
+  band += ' Z';
+  const angle = (-Math.atan((0.72 * v.span) / (v.x1 - v.x0)) * 180) / Math.PI;
+  const premT = v.compact ? 0.985 : 0.8;
+  const cross = { x: X(crossT), y: Y(premiums(crossT)) };
+  return {
+    ...v,
+    X,
+    Y,
+    band,
+    lines: { premiums: path(premiums), guaranteed: path(guaranteed), dividends: path(dividends) },
+    premLabel: { x: X(premT), y: Y(premiums(premT)) + (v.compact ? 26 : 20), angle, anchor: v.compact ? 'end' : 'start' },
+    guarLabel: { x: X(v.compact ? 0.48 : 0.52), y: Y(guaranteed(v.compact ? 0.48 : 0.52)) + (v.compact ? 22 : 26) },
+    divLabel: { x: X(v.compact ? 0.34 : 0.36), y: Y(dividends(v.compact ? 0.34 : 0.36)) - (v.compact ? 10 : 14) },
+    cross,
+    callout: v.compact
+      ? { x: v.x0, y: cross.y - 60, anchor: 'start', lx: cross.x - 60 }
+      : { x: cross.x - 48, y: cross.y - 70, anchor: 'end', lx: cross.x - 44 },
+    early: v.compact && t.early.includes(' ') ? splitHalf(t.early) : [t.early],
+  };
+});
+---
+
+<figure class="viz whole-chart" data-reveal aria-labelledby="whole-chart-title">
+  <p class="viz__title" id="whole-chart-title">{t.title}</p>
+  <p class="viz__takeaway">{t.takeaway}</p>
+
+  {
+    variants.map((v) => (
+      <svg
+        class:list={['whole-chart__svg', v.compact ? 'viz__compact' : 'viz__wide']}
+        viewBox={`0 0 ${v.w} ${v.h}`}
+        role="img"
+        aria-label={t.aria}
+        font-size={v.fs}
+      >
+        {/* Baseline and phases */}
+        <line x1={v.x0} y1={v.y0} x2={v.x1} y2={v.y0} stroke="#d9e2ea" stroke-width="1.5" />
+        {t.phases.map((p, i) => (
+          <text x={v.X(i / 3 + 1 / 6)} y={v.y0 + 26} text-anchor="middle" class="muted">
+            {p}
+          </text>
+        ))}
+
+        {/* Dividend band (not guaranteed) */}
+        <path d={v.band} fill="#eaf5fc" class="fade-late" />
+
+        {/* Death benefit */}
+        <line x1={v.x0} y1={v.Y(DB)} x2={v.x1} y2={v.Y(DB)} stroke="#141b22" stroke-width="1.5" />
+        <text x={v.x0} y={v.Y(DB) - 10} font-weight="700">
+          {t.deathBenefit}
+        </text>
+
+        {/* Premiums paid: dashed, no draw-in */}
+        <path d={v.lines.premiums} fill="none" stroke="#4b5866" stroke-width="2.25" stroke-dasharray="7 6" />
+        <text
+          x={v.premLabel.x}
+          y={v.premLabel.y}
+          text-anchor={v.premLabel.anchor}
+          class="muted"
+          transform={`rotate(${v.premLabel.angle.toFixed(1)} ${v.premLabel.x.toFixed(1)} ${v.premLabel.y.toFixed(1)})`}
+        >
+          {v.compact ? t.premiumsShort : t.premiums}
+        </text>
+
+        {/* With dividends: dotted */}
+        <path d={v.lines.dividends} fill="none" stroke="#2c99d6" stroke-width="2" stroke-dasharray="2 4" class="fade-late" />
+        <text x={v.divLabel.x} y={v.divLabel.y} text-anchor="end" class="fade-late blue">
+          {v.compact ? t.dividendsShort : t.dividends}
+        </text>
+
+        {/* Guaranteed cash value: draws in */}
+        <path d={v.lines.guaranteed} fill="none" stroke="#1a6699" stroke-width="3" pathLength="1" class="draw" />
+        <text x={v.guarLabel.x} y={v.guarLabel.y} font-weight="700" class="blue">
+          {v.compact ? t.guaranteedShort : t.guaranteed}
+        </text>
+
+        {/* Where guaranteed value passes premiums paid */}
+        <g class="fade-late">
+          <line x1={v.cross.x - 5} y1={v.cross.y - 6} x2={v.callout.lx} y2={v.callout.y + 26} stroke="#1a6699" />
+          <circle cx={v.cross.x} cy={v.cross.y} r="6.5" fill="#fff" stroke="#1a6699" stroke-width="2.25" />
+          <text x={v.callout.x} y={v.callout.y} text-anchor={v.callout.anchor}>
+            {t.crossing[0]}
+          </text>
+          <text x={v.callout.x} y={v.callout.y + 18} text-anchor={v.callout.anchor} class="muted">
+            {t.crossing[1]}
+          </text>
+        </g>
+
+        {/* Early-years bracket */}
+        <path
+          d={`M${v.X(0.01)} ${v.y0 + 44} v7 H${v.X(0.3)} v-7`}
+          fill="none"
+          stroke="#4b5866"
+          stroke-width="1.25"
+        />
+        {v.early.map((line, i) => (
+          <text x={v.X(0.01)} y={v.y0 + 72 + i * 18} class="muted" font-size={v.fs - 1}>
+            {line}
+          </text>
+        ))}
+      </svg>
+    ))
+  }
+
+  <figcaption class="viz__caption">{g.caption} {t.note}</figcaption>
+</figure>
+
+<style>
+  .whole-chart__svg {
+    margin-top: 28px;
+  }
+
+  .whole-chart__svg :global(.muted) {
+    fill: var(--slate);
+  }
+
+  .whole-chart__svg :global(.blue) {
+    fill: var(--deep-sky);
+  }
+</style>

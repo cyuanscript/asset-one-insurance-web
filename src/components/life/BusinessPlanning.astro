@@ -1,0 +1,93 @@
+---
+import SectionHeading from '../SectionHeading.astro';
+import { lifeInsurance } from '../../i18n/life-insurance';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = lifeInsurance[locale].business;
+---
+
+<section class="section section--pale business" aria-labelledby="business-title" id="business">
+  <div class="container">
+    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="business-title" span={6} />
+    <ul class="business__grid">
+      {
+        t.items.map((item, i) => (
+          <li class="business__item" data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <h3>{item.title}</h3>
+            <p>{item.body}</p>
+          </li>
+        ))
+      }
+    </ul>
+    <p class="business__note" data-reveal>
+      <strong>{t.financingTitle}</strong>
+      {t.financing}
+    </p>
+  </div>
+</section>
+
+<style>
+  .business__grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 20px;
+    margin: 48px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .business__item {
+    padding: 26px 24px 28px;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: 0 1px 2px rgba(20, 27, 34, 0.05);
+  }
+
+  .business__item h3 {
+    font: 400 21px/1.3 var(--serif);
+  }
+
+  :lang(zh) .business__item h3 {
+    font-size: 20px;
+    line-height: 1.5;
+  }
+
+  .business__item p {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--slate);
+  }
+
+  .business__note {
+    margin-top: 28px;
+    max-width: 88ch;
+    padding-left: 18px;
+    border-left: 3px solid var(--scarlet);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--slate);
+  }
+
+  .business__note strong {
+    color: var(--ink);
+  }
+
+  @media (max-width: 1099px) {
+    .business__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .business__grid {
+      grid-template-columns: 1fr;
+      gap: 12px;
+      margin-top: 28px;
+    }
+  }
+</style>

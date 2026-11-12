@@ -1,0 +1,317 @@
+---
+/**
+ * How we work: five steps, then two "zoom-in" panels tied to steps 2 and 4:
+ * how much coverage is enough (needs review) and what to expect when you
+ * apply (underwriting). Replaces the separate Coverage Amount section.
+ *
+ * The heading and steps sit on a full-bleed photo band with a deep blue
+ * tint; the two detail panels overlap the bottom edge of the band.
+ */
+import Photo from '../Photo.astro';
+import SectionHeading from '../SectionHeading.astro';
+import { lifeInsurance } from '../../i18n/life-insurance';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = lifeInsurance[locale].process;
+const stepLabel = (n: number) => t.stepLabel.replace('{n}', String(n));
+const detailSteps = [t.amount.step, t.apply.step];
+---
+
+<section class="section section--white process" aria-labelledby="process-title">
+  <div class="process__band on-dark">
+    <div class="process__media" aria-hidden="true">
+      <Photo photo="processConsult" tone="dark" class="process__photo" />
+    </div>
+    <div class="process__tint" aria-hidden="true"></div>
+
+    <div class="container process__band-inner">
+      <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="process-title" span={6} />
+
+      <ol class="steps">
+        {
+          t.steps.map((s, i) => (
+            <li class:list={['step', { 'step--detail': detailSteps.includes(i + 1) }]} data-reveal style={`--reveal-delay:${i * 90}ms`}>
+              <span class="step__num" aria-hidden="true">
+                {String(i + 1).padStart(2, '0')}
+              </span>
+              <h3 class="step__title">{s.title}</h3>
+              <p class="step__body">{s.body}</p>
+            </li>
+          ))
+        }
+      </ol>
+    </div>
+  </div>
+
+  <div class="container">
+    <div class="details">
+      <section class="detail" aria-labelledby="amount-title" data-reveal>
+        <p class="detail__step">{stepLabel(t.amount.step)} · {t.steps[t.amount.step - 1].title}</p>
+        <h3 class="detail__title" id="amount-title">{t.amount.title}</h3>
+        <p class="detail__intro">{t.amount.intro}</p>
+        <ol class="detail__list detail__list--numbered">
+          {t.amount.questions.map((q) => <li>{q}</li>)}
+        </ol>
+        <p class="detail__outro">{t.amount.outro}</p>
+      </section>
+
+      <section class="detail" aria-labelledby="apply-title" data-reveal style="--reveal-delay:120ms">
+        <p class="detail__step">{stepLabel(t.apply.step)} · {t.steps[t.apply.step - 1].title}</p>
+        <h3 class="detail__title" id="apply-title">{t.apply.title}</h3>
+        <ul class="detail__list">
+          {t.apply.items.map((a) => <li>{a}</li>)}
+        </ul>
+      </section>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Photo band: full bleed, tinted deep blue so the photo reads as texture */
+  .process {
+    padding-top: 0;
+  }
+
+  .process__band {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    padding: var(--section-y) 0 calc(var(--section-y) + 88px);
+    background: var(--ink);
+  }
+
+  .process__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .process__media :global(.process__photo) {
+    position: absolute;
+    inset: 0;
+  }
+
+  .process__tint {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+      linear-gradient(100deg, rgba(12, 30, 46, 0.94) 0%, rgba(14, 48, 76, 0.88) 50%, rgba(26, 102, 153, 0.8) 100%);
+  }
+
+  /* Heading colours on the dark band */
+  .process__band :global(.eyebrow) {
+    color: var(--light-blue);
+  }
+
+  .process__band :global(.h2) {
+    color: var(--white);
+  }
+
+  .process__band :global(.section-heading__intro) {
+    color: rgba(255, 255, 255, 0.82);
+  }
+
+  .steps {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 24px;
+    margin: 56px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .step {
+    position: relative;
+    padding-top: 24px;
+    border-top: 2px solid rgba(255, 255, 255, 0.22);
+  }
+
+  /* Small Scarlet marker on the line for each step */
+  .step::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: -2px;
+    width: 40px;
+    height: 2px;
+    background: var(--scarlet);
+  }
+
+  .step__num {
+    font: 700 13px/1 'Lato', var(--sans);
+    letter-spacing: 0.12em;
+    color: var(--light-blue);
+  }
+
+  /* Steps with a detail panel below get a filled number */
+  .step--detail .step__num {
+    display: inline-block;
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: rgba(123, 201, 255, 0.16);
+  }
+
+  .step__title {
+    margin-top: 14px;
+    font: 400 22px/1.25 var(--serif);
+    color: var(--white);
+  }
+
+  :lang(zh) .step__title {
+    font-size: 21px;
+    line-height: 1.45;
+  }
+
+  .step__body {
+    margin-top: 10px;
+    font-size: 15px;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.78);
+  }
+
+  /* Detail panels: pulled up to overlap the bottom of the photo band */
+  .details {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    margin-top: -88px;
+  }
+
+  .detail {
+    padding: clamp(24px, 3.5vw, 40px);
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .detail__step {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: var(--pale-sky);
+    font: 700 12px/1.3 var(--sans);
+    letter-spacing: 0.04em;
+    color: var(--deep-sky);
+  }
+
+  .detail__title {
+    margin-top: 16px;
+    font: 400 clamp(26px, 2.6vw, 32px) / 1.2 var(--serif);
+    color: var(--sky);
+  }
+
+  :lang(zh) .detail__title {
+    line-height: 1.45;
+  }
+
+  .detail__intro {
+    margin-top: 12px;
+    font-size: 16px;
+    color: var(--slate);
+  }
+
+  .detail__list {
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 16px;
+    line-height: 1.55;
+  }
+
+  .detail__list li {
+    position: relative;
+    padding: 12px 0 12px 28px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .detail__list li:first-child {
+    border-top: 0;
+  }
+
+  .detail__list li::before {
+    content: '';
+    position: absolute;
+    left: 4px;
+    top: 21px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--sky);
+  }
+
+  .detail__list--numbered {
+    counter-reset: q;
+  }
+
+  .detail__list--numbered li {
+    counter-increment: q;
+  }
+
+  .detail__list--numbered li::before {
+    content: counter(q);
+    top: 13px;
+    left: 0;
+    width: auto;
+    height: auto;
+    background: none;
+    font: 700 13px/1.9 'Lato', var(--sans);
+    color: var(--scarlet);
+  }
+
+  .detail__outro {
+    margin-top: 12px;
+    font: 400 19px/1.45 var(--serif);
+  }
+
+  :lang(zh) .detail__outro {
+    line-height: 1.7;
+  }
+
+  @media (max-width: 1099px) {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 32px 24px;
+    }
+  }
+
+  @media (max-width: 899px) {
+    .details {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .steps {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 32px;
+    }
+
+    .step {
+      padding-top: 18px;
+    }
+
+    .process__band {
+      padding-bottom: calc(var(--section-y) + 56px);
+    }
+
+    .details {
+      margin-top: -56px;
+      gap: 16px;
+    }
+
+    .detail__list {
+      font-size: 15px;
+    }
+
+    .detail__outro {
+      font-size: 18px;
+    }
+  }
+</style>

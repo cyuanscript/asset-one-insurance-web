@@ -1,0 +1,204 @@
+---
+/**
+ * V5 · Cap and floor, year by year (IUL; reusable for fixed indexed annuities).
+ * Eight hypothetical years in schematic units, no axis numbers.
+ * Each year is focusable; tapping, hovering or focusing it explains
+ * what happened in a live region under the chart.
+ *
+ * Reusable pattern: "Cap-and-floor chart".
+ */
+import { cashValueGuide } from '../../i18n/guides/cash-value';
+import type { Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = cashValueGuide[locale].iul.chart;
+
+// Index change per hypothetical year, in schematic units. Cap = 0.5.
+const years = [0.9, 0.3, -0.6, 0.7, 0.15, -0.3, 1.0, 0.42];
+const cap = 0.5;
+const yearLabel = (n: number) => t.year.replace('{n}', String(n));
+const kind = (v: number) => (v > cap ? 'strong' : v > 0 ? 'modest' : 'down');
+const explain = (v: number, n: number) => `${yearLabel(n)}: ${t[kind(v)]}`;
+
+const variants = [
+  { key: 'wide', w: 720, h: 330, base: 196, unit: 132, x0: 52, slot: 83, bar: 22, gap: 4, fs: 13, compact: false },
+  { key: 'compact', w: 360, h: 290, base: 168, unit: 106, x0: 34, slot: 40.5, bar: 13, gap: 2, fs: 12, compact: true },
+];
+---
+
+<figure class="viz capfloor" data-reveal data-capfloor aria-labelledby="capfloor-title">
+  <p class="viz__title" id="capfloor-title">{t.title}</p>
+  <p class="viz__takeaway">{t.takeaway}</p>
+
+  <ul class="capfloor__legend" aria-hidden="true">
+    <li><span class="swatch swatch--index"></span>{t.index}</li>
+    <li><span class="swatch swatch--credited"></span>{t.credited}</li>
+  </ul>
+
+  {
+    variants.map((v) => {
+      const capY = v.base - cap * v.unit;
+      return (
+        <svg
+          class:list={['capfloor__svg', v.compact ? 'viz__compact' : 'viz__wide']}
+          viewBox={`0 0 ${v.w} ${v.h}`}
+          role="group"
+          aria-label={t.aria}
+          font-size={v.fs}
+        >
+          <line x1="0" y1={capY} x2={v.w} y2={capY} stroke="#1a6699" stroke-width="1.5" stroke-dasharray="6 5" />
+          <text x="0" y={capY - 8} font-weight="700" class="blue">
+            {t.cap}
+          </text>
+          <line x1="0" y1={v.base} x2={v.w} y2={v.base} stroke="#141b22" stroke-width="1.5" />
+          <text x="0" y={v.base - 8} font-weight="700">
+            {t.floor}
+          </text>
+
+          {years.map((val, i) => {
+            const cx = v.x0 + i * v.slot + v.slot / 2;
+            const h = Math.abs(val) * v.unit;
+            const credited = Math.max(0, Math.min(cap, val));
+            return (
+              <g class="capfloor__year" tabindex="0" role="button" aria-label={explain(val, i + 1)} data-explain={explain(val, i + 1)}>
+                <rect class="capfloor__hit" x={cx - v.slot / 2 + 2} y="4" width={v.slot - 4} height={v.h - 8} rx="6" />
+                <rect
+                  class:list={['grow-y', { 'grow-y--down': val < 0 }]}
+                  style={`--grow-delay:${200 + i * 60}ms`}
+                  x={cx - v.bar - v.gap / 2}
+                  y={val >= 0 ? v.base - h : v.base}
+                  width={v.bar}
+                  height={h}
+                  rx="2"
+                  fill="#fff"
+                  stroke="#9fb0bf"
+                  stroke-width="1.5"
+                />
+                {credited > 0 ? (
+                  <rect
+                    class="grow-y"
+                    style={`--grow-delay:${700 + i * 60}ms`}
+                    x={cx + v.gap / 2}
+                    y={v.base - credited * v.unit}
+                    width={v.bar}
+                    height={credited * v.unit}
+                    rx="2"
+                    fill="#2c99d6"
+                  />
+                ) : (
+                  <text x={cx + v.gap / 2 + v.bar / 2} y={v.base - 7} text-anchor="middle" font-weight="700" class="blue fade-late">
+                    0
+                  </text>
+                )}
+                <text x={cx} y={v.h - 10} text-anchor="middle" class="muted">
+                  {v.compact ? String(i + 1) : yearLabel(i + 1)}
+                </text>
+              </g>
+            );
+          })}
+        </svg>
+      );
+    })
+  }
+
+  <p class="capfloor__explain" aria-live="polite" data-capfloor-explain>{t.prompt}</p>
+  <figcaption class="viz__caption">{t.caption}</figcaption>
+</figure>
+
+<style>
+  .capfloor__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+    font-size: 14px;
+    color: var(--slate);
+  }
+
+  .capfloor__legend li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .swatch {
+    width: 14px;
+    height: 14px;
+    border-radius: 2px;
+  }
+
+  .swatch--index {
+    border: 1.5px solid #9fb0bf;
+    background: var(--white);
+  }
+
+  .swatch--credited {
+    background: var(--sky);
+  }
+
+  .capfloor__svg {
+    margin-top: 16px;
+  }
+
+  .capfloor__svg :global(.muted) {
+    fill: var(--slate);
+  }
+
+  .capfloor__svg :global(.blue) {
+    fill: var(--deep-sky);
+  }
+
+  .capfloor__year {
+    cursor: pointer;
+    outline: none;
+  }
+
+  .capfloor__hit {
+    fill: transparent;
+    transition: fill 200ms ease;
+  }
+
+  .capfloor__year:hover .capfloor__hit,
+  .capfloor__year.is-active .capfloor__hit {
+    fill: rgba(234, 245, 252, 0.9);
+  }
+
+  .capfloor__year:focus-visible .capfloor__hit {
+    stroke: var(--deep-sky);
+    stroke-width: 2;
+  }
+
+  .capfloor__explain {
+    min-height: 3.2em;
+    margin-top: 12px;
+    font: 700 16px/1.5 var(--sans);
+    color: var(--deep-sky);
+  }
+</style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-capfloor]').forEach((root) => {
+    const out = root.querySelector<HTMLElement>('[data-capfloor-explain]');
+    const years = Array.from(root.querySelectorAll<SVGGElement>('.capfloor__year'));
+    const show = (g: SVGGElement) => {
+      years.forEach((y) => y.classList.toggle('is-active', y === g));
+      if (out) out.textContent = g.dataset.explain ?? '';
+    };
+    years.forEach((g) => {
+      g.addEventListener('mouseenter', () => show(g));
+      g.addEventListener('focus', () => show(g));
+      g.addEventListener('click', () => show(g));
+      g.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          show(g);
+        }
+      });
+    });
+  });
+</script>
