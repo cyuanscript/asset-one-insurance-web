@@ -4,6 +4,7 @@ import Header from './Header.astro';
 import Hero from './Hero.astro';
 import LifeStages from './LifeStages.astro';
 import Products from './Products.astro';
+import NewsPreview from './NewsPreview.astro';
 import Footer from './Footer.astro';
 import type { Locale } from '../i18n/content';
 
@@ -19,6 +20,7 @@ const { locale } = Astro.props;
     <Hero locale={locale} />
     <LifeStages locale={locale} />
     <Products locale={locale} />
+    <NewsPreview locale={locale} />
   </main>
   <Footer locale={locale} />
 </Base>

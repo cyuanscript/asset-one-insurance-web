@@ -49,6 +49,12 @@ const photoSlots = {
   lifeHero: { src: '/images/family-beach-shoreline.jpg', caption: 'Family standing arm in arm on the beach, looking out at the water', position: '50% 20%' },
   // Life Insurance page, How We Work band (tinted background)
   processConsult: { src: '/images/advisor-client-tablet-consultation.jpg', caption: 'Advisor smiling as he walks a client through a plan on a tablet at a bright office table', position: '60% 35%' },
+  // Health Insurance and Annuities pages: reuse homepage photos until briefed shots exist
+  // (content-packs/services-health-insurance.md and services-annuities.md, Photo briefs)
+  healthHero: { src: '/images/couple-park-meditation.jpg', caption: 'Older couple doing a calm breathing exercise outdoors in a park', position: '50% 12%' },
+  processHealth: { src: '/images/advisor-office-lounge.jpg', caption: 'Advisor reviewing notes with a client in a bright office lounge', position: '50% 40%' },
+  annuitiesHero: { src: '/images/retired-couple-beach-picnic.jpg', caption: 'Retired couple sharing a tablet during a beach picnic', position: '50% 40%' },
+  processAnnuities: { src: '/images/advisor-client-financial-review.jpg', caption: 'Advisor walking a client through financial charts at a table', position: '50% 35%' },
 } satisfies Record<string, PhotoSlot>;
 
 export type PhotoKey = keyof typeof photoSlots;

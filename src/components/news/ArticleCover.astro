@@ -1,0 +1,137 @@
+---
+/**
+ * Typographic article cover: no photo needed. A pale sky panel with the
+ * article's number in large serif, fine "water lines" and a scarlet dot.
+ * (The category is in the card's meta line, so it isn't repeated here.)
+ *
+ * Reusable pattern: "Typographic cover". Gives a consistent, calm look to
+ * article lists before any photography exists, and never looks broken.
+ * When the article has a cover photo (front matter `cover`), the photo is
+ * shown instead, in the same frame, so cards with and without photos line up.
+ * The photo is decorative here (alt=""): the card's title already says what
+ * the article is, and screen readers shouldn't hear an image description on
+ * every card. The article page itself gives the photo its real alt text.
+ */
+interface Props {
+  number: number;
+  size?: 'card' | 'feature';
+  photo?: { src: string; position?: string };
+}
+const { number, size = 'card', photo } = Astro.props;
+const label = String(number).padStart(2, '0');
+---
+
+{
+  photo ? (
+    <div class:list={['cover', 'cover--photo', `cover--${size}`]}>
+      <img
+        class="cover__img"
+        src={photo.src}
+        alt=""
+        loading="lazy"
+        decoding="async"
+        style={photo.position ? `object-position: ${photo.position}` : undefined}
+      />
+    </div>
+  ) : (
+<div class:list={['cover', `cover--${size}`]} aria-hidden="true">
+  <svg class="cover__lines" viewBox="0 0 400 240" preserveAspectRatio="none">
+    {
+      [0, 1, 2, 3, 4, 5, 6].map((i) => (
+        <path
+          d={`M0 ${150 + i * 13} C 80 ${142 + i * 13}, 140 ${160 + i * 13}, 220 ${150 + i * 13} S 340 ${142 + i * 13}, 400 ${152 + i * 13}`}
+          style={`--i:${i}`}
+        />
+      ))
+    }
+  </svg>
+  <span class="cover__num">{label}</span>
+  <span class="cover__dot"></span>
+</div>
+  )
+}
+
+<style>
+  .cover {
+    position: relative;
+    overflow: hidden;
+    aspect-ratio: 16 / 10;
+    background: linear-gradient(165deg, #f3f9fd 0%, var(--pale-sky) 55%, #d9ecf8 100%);
+    color: var(--sky);
+  }
+
+  .cover--feature {
+    aspect-ratio: auto;
+    height: 100%;
+    min-height: 320px;
+  }
+
+  /* Photo cover: same frame, the image fills it */
+  .cover--photo {
+    background: var(--pale-sky);
+  }
+
+  .cover__img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 600ms var(--ease-out);
+  }
+
+  /* Same 1.03x hover zoom as the homepage product cards */
+  :global(.article-card:hover) .cover__img {
+    transform: scale(1.03);
+  }
+
+  .cover__lines {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .cover__lines path {
+    fill: none;
+    stroke: var(--sky);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+    opacity: calc(0.12 + var(--i) * 0.04);
+    transition: transform 900ms var(--ease-out);
+  }
+
+  /* Hovering the card lets the lines drift a little */
+  :global(.article-card:hover) .cover__lines path {
+    transform: translateX(calc((var(--i) - 3) * 3px));
+  }
+
+  .cover__num {
+    position: absolute;
+    left: 28px;
+    top: 14px;
+    font: 400 clamp(72px, 9vw, 112px) / 1 'Noto Serif Display', Georgia, serif;
+    letter-spacing: -0.02em;
+  }
+
+  .cover--feature .cover__num {
+    left: clamp(28px, 4vw, 48px);
+    top: clamp(20px, 3vw, 36px);
+    font-size: clamp(96px, 13vw, 176px);
+  }
+
+  .cover__dot {
+    position: absolute;
+    right: 24px;
+    top: 24px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--scarlet);
+  }
+
+  .cover--feature .cover__dot {
+    right: clamp(24px, 3vw, 36px);
+    top: clamp(24px, 3vw, 36px);
+  }
+</style>

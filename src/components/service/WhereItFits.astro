@@ -5,14 +5,14 @@
  */
 import SectionHeading from '../SectionHeading.astro';
 import Photo from '../Photo.astro';
-import { lifeInsurance } from '../../i18n/life-insurance';
+import type { FitsCopy } from '../../i18n/service-types';
 import { content, localePath, type Locale, type PhotoKey } from '../../i18n/content';
 
 interface Props {
   locale: Locale;
+  t: FitsCopy;
 }
-const { locale } = Astro.props;
-const t = lifeInsurance[locale].fits;
+const { locale, t } = Astro.props;
 const stages = content[locale].stages.items;
 ---
 

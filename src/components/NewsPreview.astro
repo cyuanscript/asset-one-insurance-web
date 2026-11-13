@@ -1,0 +1,103 @@
+---
+/**
+ * Homepage preview of the News section: the first three articles in
+ * reading order, with a link through to /news/.
+ */
+import SectionHeading from './SectionHeading.astro';
+import ArticleCard from './news/ArticleCard.astro';
+import { newsCopy, readingMinutes } from '../i18n/news';
+import { localePath, type Locale } from '../i18n/content';
+import { getArticles } from '../lib/news';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = newsCopy[locale];
+const articles = (await getArticles(locale)).slice(0, 3);
+---
+
+{
+  articles.length > 0 && (
+    <section class="section section--white news-preview" aria-labelledby="news-preview-title">
+      <div class="container">
+        <SectionHeading
+          eyebrow={t.home.eyebrow}
+          title={t.home.title}
+          intro={t.home.intro}
+          id="news-preview-title"
+          span={6}
+        />
+
+        <ul class="news-preview__grid">
+          {articles.map((a, i) => (
+            <li>
+              <ArticleCard
+                href={localePath(locale, `/news/${a.urlSlug}/`)}
+                number={a.data.order}
+                cover={a.data.cover}
+                title={a.data.title}
+                dek={a.data.dek}
+                meta={`${t.categories[a.data.category]} · ${t.minRead(readingMinutes(a.body, locale))}`}
+                more={t.readArticle}
+                delay={i * 100}
+              />
+            </li>
+          ))}
+        </ul>
+
+        <p class="news-preview__all" data-reveal>
+          <a class="text-link" href={localePath(locale, '/news/')}>{t.allArticles}</a>
+        </p>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .news-preview__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin: 56px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .news-preview__grid > li {
+    display: flex;
+  }
+
+  .news-preview__grid > li > :global(*) {
+    flex: 1;
+  }
+
+  .news-preview__all {
+    margin-top: 40px;
+    text-align: center;
+  }
+
+  /* Tablet: two cards side by side, third hidden */
+  @media (max-width: 1023px) {
+    .news-preview__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .news-preview__grid > li:nth-child(3) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .news-preview__grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 32px;
+    }
+    .news-preview__grid > li:nth-child(3) {
+      display: flex;
+    }
+    .news-preview__all {
+      margin-top: 28px;
+    }
+  }
+</style>

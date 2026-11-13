@@ -1,0 +1,195 @@
+---
+/**
+ * How health costs are shared over a year: three bars for the three phases
+ * (until the deductible, after it, after the out-of-pocket maximum), each
+ * split between "you pay" and "your plan pays". A schematic: no amounts,
+ * not to scale (decisions log, 2026-11-11: charts have no axis numbers).
+ *
+ * The takeaway and each phase's text are real text, so the picture is never
+ * the only way to get the point. The bars grow in when revealed.
+ *
+ * Reusable pattern: "Phase bars". Any explainer with 2–4 stages where a
+ * share shifts from one party to another (e.g. vesting, cost sharing).
+ */
+import type { CostSharingCopy } from '../../i18n/health-insurance';
+
+interface Props {
+  t: CostSharingCopy;
+}
+const { t } = Astro.props;
+// Share the person pays in each phase (schematic, not data)
+const youShare = [1, 0.3, 0];
+---
+
+<figure class="viz costs" data-reveal>
+  <figcaption>
+    <p class="viz__title">{t.title}</p>
+    <p class="viz__takeaway">{t.takeaway}</p>
+  </figcaption>
+
+  <ol class="costs__phases">
+    {
+      t.phases.map((p, i) => (
+        <li class="costs__phase" style={`--you:${youShare[i]};--i:${i}`}>
+          <div class="costs__bar" aria-hidden="true">
+            <span class="costs__plan grow-y grow-y--down" />
+            <span class="costs__you grow-y" />
+          </div>
+          <p class="costs__label">
+            <span class="costs__num">{i + 1}</span>
+            {p.label}
+          </p>
+          <p class="costs__text">{p.text}</p>
+        </li>
+      ))
+    }
+  </ol>
+
+  <div class="costs__legend" aria-hidden="true">
+    <span><i class="costs__key costs__key--you"></i>{t.you}</span>
+    <span><i class="costs__key costs__key--plan"></i>{t.plan}</span>
+  </div>
+  <p class="viz__caption">{t.note}</p>
+</figure>
+
+<style>
+  .costs {
+    margin-top: 56px;
+    padding: clamp(24px, 4vw, 48px);
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+  }
+
+  .costs__phases {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(16px, 3vw, 40px);
+    margin: 36px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .costs__bar {
+    display: flex;
+    flex-direction: column;
+    height: 168px;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .costs__plan {
+    flex: calc(1 - var(--you)) 0 0;
+    background: var(--pale-sky);
+    background-image: repeating-linear-gradient(135deg, rgba(44, 153, 214, 0.18) 0 1px, transparent 1px 9px);
+  }
+
+  .costs__you {
+    flex: var(--you) 0 0;
+    background: var(--deep-sky);
+  }
+
+  .costs__phase .grow-y {
+    --grow-delay: calc(250ms + var(--i) * 140ms);
+  }
+
+  .costs__label {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-top: 18px;
+    font: 700 15px/1.4 var(--sans);
+    color: var(--ink);
+  }
+
+  .costs__num {
+    flex: none;
+    display: inline-grid;
+    place-items: center;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    background: var(--scarlet);
+    color: var(--white);
+    font-size: 12px;
+    line-height: 1;
+    transform: translateY(-1px);
+  }
+
+  .costs__text {
+    margin-top: 6px;
+    padding-left: 32px;
+    font-size: 15px;
+    line-height: 1.55;
+    color: var(--slate);
+  }
+
+  .costs__legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin-top: 28px;
+    font-size: 14px;
+    color: var(--slate);
+  }
+
+  .costs__legend span {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .costs__key {
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+  }
+
+  .costs__key--you {
+    background: var(--deep-sky);
+  }
+
+  .costs__key--plan {
+    background: var(--pale-sky);
+    background-image: repeating-linear-gradient(135deg, rgba(44, 153, 214, 0.3) 0 1px, transparent 1px 5px);
+    box-shadow: inset 0 0 0 1px rgba(44, 153, 214, 0.35);
+  }
+
+  /* Phones: each phase becomes a row, with a horizontal bar */
+  @media (max-width: 640px) {
+    .costs {
+      margin-top: 36px;
+    }
+
+    .costs__phases {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      margin-top: 24px;
+    }
+
+    .costs__bar {
+      flex-direction: row-reverse;
+      height: 20px;
+    }
+
+    :global(.js) .costs .costs__phase .grow-y {
+      transform-origin: left center;
+    }
+
+    :global(.js) .costs .costs__phase .grow-y--down {
+      transform-origin: right center;
+    }
+
+    :global(.js) [data-reveal]:not(.is-revealed) .costs__phase .grow-y {
+      transform: scaleX(0);
+    }
+
+    .costs__label {
+      margin-top: 12px;
+    }
+
+    .costs__text {
+      font-size: 14px;
+    }
+  }
+</style>

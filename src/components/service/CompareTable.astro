@@ -1,6 +1,7 @@
 ---
 /**
- * V2 · At a glance: term vs whole life vs IUL.
+ * V2 · At a glance: a level comparison of 2–4 options
+ * (term vs whole life vs IUL; MYGA vs SPIA vs FIA; …).
  *
  * Reusable pattern: "Level comparison table". A real <table> on desktop
  * that restyles into row groups on phones (no sideways scroll). Rows with
@@ -9,14 +10,12 @@
  * the word is what screen readers announce.
  */
 import SectionHeading from '../SectionHeading.astro';
-import { lifeInsurance } from '../../i18n/life-insurance';
-import type { Locale } from '../../i18n/content';
+import type { CompareCopy } from '../../i18n/service-types';
 
 interface Props {
-  locale: Locale;
+  t: CompareCopy;
 }
-const { locale } = Astro.props;
-const t = lifeInsurance[locale].compare;
+const { t } = Astro.props;
 ---
 
 <section class="section section--white glance" aria-labelledby="glance-title">
@@ -24,7 +23,7 @@ const t = lifeInsurance[locale].compare;
     <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.takeaway} id="glance-title" span={6} />
 
     <div class="glance__wrap" data-reveal>
-      <table class="glance__table">
+      <table class:list={['glance__table', { 'glance__table--fixed': t.columns.length !== 3 }]} style={`--cols:${t.columns.length}`}>
         <caption class="visually-hidden">{t.caption}</caption>
         <thead>
           <tr>
@@ -61,7 +60,7 @@ const t = lifeInsurance[locale].compare;
         </tbody>
       </table>
       <p class="glance__legend">{t.legend}</p>
-      <p class="glance__foot">{t.footnote}</p>
+      {t.footnote && <p class="glance__foot">{t.footnote}</p>}
     </div>
   </div>
 </section>
@@ -76,6 +75,15 @@ const t = lifeInsurance[locale].compare;
     border-collapse: collapse;
     font-size: 16px;
     line-height: 1.5;
+  }
+
+  /* Two or four columns: fixed layout keeps the option columns equal */
+  .glance__table--fixed {
+    table-layout: fixed;
+  }
+
+  .glance__table--fixed thead td {
+    width: 22%;
   }
 
   .glance__table th,
@@ -122,7 +130,7 @@ const t = lifeInsurance[locale].compare;
   }
 
   .glance__table td {
-    width: 26%;
+    width: calc(78% / var(--cols, 3));
     color: var(--slate);
   }
 

@@ -1,13 +1,11 @@
 ---
 import SectionHeading from '../SectionHeading.astro';
-import { lifeInsurance } from '../../i18n/life-insurance';
-import type { Locale } from '../../i18n/content';
+import type { FaqCopy } from '../../i18n/service-types';
 
 interface Props {
-  locale: Locale;
+  t: FaqCopy;
 }
-const { locale } = Astro.props;
-const t = lifeInsurance[locale].faq;
+const { t } = Astro.props;
 ---
 
 <section class="section faq" aria-labelledby="faq-title">

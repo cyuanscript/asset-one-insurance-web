@@ -1,0 +1,65 @@
+---
+/**
+ * /services/health-insurance/ — assembled from the shared Services sections
+ * (src/components/service/) with copy from src/i18n/health-insurance.ts.
+ * Adds two health-only pieces: the cost-sharing chart under Plain terms,
+ * and the enrollment windows. No "Where it fits" band: the homepage life
+ * stages are about life insurance and annuities.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import PageHero from '../PageHero.astro';
+import Products from '../Products.astro';
+import Basics from '../service/Basics.astro';
+import TypeCards from '../service/TypeCards.astro';
+import CompareTable from '../service/CompareTable.astro';
+import FeatureGrid from '../service/FeatureGrid.astro';
+import Process from '../service/Process.astro';
+import Faq from '../service/Faq.astro';
+import ClosingCta from '../service/ClosingCta.astro';
+import Disclosures from '../service/Disclosures.astro';
+import CostSharing from '../viz/CostSharing.astro';
+import { healthInsurance } from '../../i18n/health-insurance';
+import { localePath, type Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = healthInsurance[locale];
+---
+
+<Base locale={locale} title={t.meta.title} description={t.meta.description}>
+  <Header locale={locale} />
+  <main class="service-page">
+    <PageHero
+      eyebrow={t.hero.eyebrow}
+      title={t.hero.title}
+      lead={t.hero.lead}
+      photo="healthHero"
+      primary={{ label: t.hero.primary, href: localePath(locale, '/contact/') }}
+      secondary={{ label: t.hero.secondary, href: '#types' }}
+    />
+    <Basics t={t.basics} />
+    <TypeCards t={t.types} />
+    <FeatureGrid t={t.terms} id="terms">
+      <CostSharing t={t.costs} />
+    </FeatureGrid>
+    <CompareTable t={t.compare} />
+    <FeatureGrid t={t.enroll} id="enroll" />
+    <Process t={t.process} details={t.processDetails} photo="processHealth" />
+    <Faq t={t.faq} />
+    <Products
+      locale={locale}
+      only={['/services/life-insurance/', '/services/annuities/']}
+      eyebrow={t.related.eyebrow}
+      title={t.related.title}
+      intro={t.related.intro}
+      id="related-title"
+    />
+    <ClosingCta locale={locale} t={t.cta} />
+    <Disclosures t={t.disclosures} />
+  </main>
+  <Footer locale={locale} />
+</Base>

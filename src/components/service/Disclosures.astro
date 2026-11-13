@@ -1,12 +1,10 @@
 ---
-import { lifeInsurance } from '../../i18n/life-insurance';
-import type { Locale } from '../../i18n/content';
+import type { DisclosuresCopy } from '../../i18n/service-types';
 
 interface Props {
-  locale: Locale;
+  t: DisclosuresCopy;
 }
-const { locale } = Astro.props;
-const t = lifeInsurance[locale].disclosures;
+const { t } = Astro.props;
 ---
 
 <section class="disclosures" aria-labelledby="disclosures-title">

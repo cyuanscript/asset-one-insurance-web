@@ -1,0 +1,103 @@
+---
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import BandHero from './BandHero.astro';
+import ArticleCard from './ArticleCard.astro';
+import ClosingCta from '../service/ClosingCta.astro';
+import { newsCopy, readingMinutes } from '../../i18n/news';
+import { localePath, type Locale } from '../../i18n/content';
+import { getArticles } from '../../lib/news';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = newsCopy[locale];
+const articles = await getArticles(locale);
+const [featured, ...rest] = articles;
+const metaFor = (a: (typeof articles)[number]) =>
+  `${t.categories[a.data.category]} · ${t.minRead(readingMinutes(a.body, locale))}`;
+---
+
+<Base locale={locale} title={t.meta.title} description={t.meta.description}>
+  <Header locale={locale} />
+  <main class="news-page" id="main">
+    <BandHero eyebrow={t.hero.eyebrow} title={t.hero.title} lead={t.hero.lead} photo="hero" />
+
+    <section class="section news-list" aria-labelledby="news-list-title">
+      <div class="container">
+        <h2 class="visually-hidden" id="news-list-title">{t.listLabel}</h2>
+        {
+          featured && (
+            <ArticleCard
+              feature
+              headingLevel="h3"
+              href={localePath(locale, `/news/${featured.urlSlug}/`)}
+              number={featured.data.order}
+              cover={featured.data.cover}
+              title={featured.data.title}
+              dek={featured.data.dek}
+              meta={`${t.latest} · ${metaFor(featured)}`}
+              more={t.readArticle}
+            />
+          )
+        }
+        <ul class="news-grid" style={`--cols:${rest.length === 4 ? 4 : 3}`}>
+          {
+            rest.map((a, i) => (
+              <li>
+                <ArticleCard
+                  href={localePath(locale, `/news/${a.urlSlug}/`)}
+                  number={a.data.order}
+                  cover={a.data.cover}
+                  title={a.data.title}
+                  dek={a.data.dek}
+                  meta={metaFor(a)}
+                  more={t.readArticle}
+                  delay={(i % 3) * 100}
+                />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <ClosingCta locale={locale} t={t.cta} />
+  </main>
+  <Footer locale={locale} />
+</Base>
+
+<style>
+  .news-grid {
+    display: grid;
+    grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+    gap: 24px;
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .news-grid > li {
+    display: flex;
+  }
+
+  .news-grid > li > :global(*) {
+    flex: 1;
+  }
+
+  @media (max-width: 1199px) {
+    .news-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 640px) {
+    .news-grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 16px;
+    }
+  }
+</style>
