@@ -17,6 +17,12 @@ const en = {
     title: 'Notes for planning with clarity',
     lead: 'Short, plain-language articles on the questions families bring to us, starting with U.S. tax basics for those with ties to China and Hong Kong.',
   },
+  /** Homepage preview section (under Our products) */
+  home: {
+    eyebrow: 'News',
+    title: 'Notes for planning with clarity',
+    intro: 'Short, plain-language articles on the questions families bring to us, starting with U.S. tax basics for those with ties to China and Hong Kong.',
+  },
   listLabel: 'All articles',
   latest: 'Start here',
   readArticle: 'Read article',
@@ -49,6 +55,11 @@ const zh: NewsCopy = {
     eyebrow: '新闻',
     title: '把规划想清楚',
     lead: '用浅显的语言，解答家庭常向我们提出的问题。首个系列：为与中国内地和香港有联系的家庭讲解美国税务基础。',
+  },
+  home: {
+    eyebrow: '新闻',
+    title: '把规划想清楚',
+    intro: '用浅显的语言，解答家庭常向我们提出的问题。首个系列：为与中国内地和香港有联系的家庭讲解美国税务基础。',
   },
   listLabel: '全部文章',
   latest: '从这里开始',
