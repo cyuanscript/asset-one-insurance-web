@@ -88,7 +88,7 @@ const en = {
     langLabel: 'Language',
   },
   hero: {
-    eyebrowLong: 'Lake Washington · Bellevue, WA',
+    eyebrowLong: 'Bellevue, WA',
     eyebrowShort: 'Bellevue, WA',
     title: ['Protect what matters, steadily.'],
     lead: 'Life insurance, health insurance and annuities, chosen with care and explained in plain language.',
@@ -221,7 +221,7 @@ const zh: typeof en = {
     langLabel: '语言',
   },
   hero: {
-    eyebrowLong: '华盛顿湖 · 华盛顿州贝尔维尤',
+    eyebrowLong: '华盛顿州贝尔维尤',
     eyebrowShort: '华盛顿州贝尔维尤',
     title: ['稳健守护您所', '珍视的一切。'],
     lead: '寿险、健康险与年金，用心挑选，清楚讲解。',
