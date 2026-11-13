@@ -1,6 +1,7 @@
 ---
 /**
- * Coverage types: goal filter (V0) and four compact cards.
+ * Coverage types: goal filter (V0) and a single row of compact cards
+ * (four on Life Insurance, three on Annuities).
  *
  * Layout: the chips sit directly above a single row of four cards, so on a
  * laptop the goals and every card are on screen together. Below 1100px the
@@ -11,14 +12,13 @@
  * options can reuse the chip + data-coverage markup and the script below.
  */
 import SectionHeading from '../SectionHeading.astro';
-import { lifeInsurance } from '../../i18n/life-insurance';
-import type { Locale } from '../../i18n/content';
+import type { TypesCopy } from '../../i18n/service-types';
 
 interface Props {
-  locale: Locale;
+  t: TypesCopy;
 }
-const { locale } = Astro.props;
-const t = lifeInsurance[locale].types;
+const { t } = Astro.props;
+const allIds = t.cards.map((c) => c.id).join(' ');
 ---
 
 <section class="section types" aria-labelledby="types-title" id="types">
@@ -33,7 +33,7 @@ const t = lifeInsurance[locale].types;
           class="goal-chip"
           aria-pressed="true"
           data-goal="all"
-          data-highlights="term whole iul survivorship"
+          data-highlights={allIds}
           data-note={t.allNote}
         >
           {t.goalsAll}
@@ -61,7 +61,7 @@ const t = lifeInsurance[locale].types;
       </p>
     </div>
 
-    <ul class="type-cards">
+    <ul class="type-cards" style={`--cards:${t.cards.length}`}>
       {
         t.cards.map((c, i) => (
           <li class="type-card" data-coverage={c.id} data-reveal style={`--reveal-delay:${i * 80}ms`}>
@@ -168,7 +168,7 @@ const t = lifeInsurance[locale].types;
   /* Cards: one row of four */
   .type-cards {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(var(--cards, 4), minmax(0, 1fr));
     gap: 16px;
     margin: 12px 0 0;
     padding: 0;
@@ -261,7 +261,8 @@ const t = lifeInsurance[locale].types;
     font: 700 11px/1.4 var(--sans);
     letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: var(--scarlet);
+    /* Deep red, not Scarlet: at 11px the label needs 4.5:1 on white */
+    color: var(--deep-red);
   }
 
   :lang(zh) .type-card__label {

@@ -1,0 +1,282 @@
+---
+/**
+ * One News article: band hero (category, headline, standfirst, reading
+ * time), the body at a ~68-character measure, the article's own note,
+ * three more articles and a closing call to action.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import BandHero from './BandHero.astro';
+import ArticleCard from './ArticleCard.astro';
+import ClosingCta from '../service/ClosingCta.astro';
+import { newsCopy, readingMinutes } from '../../i18n/news';
+import { content, localePath, type Locale } from '../../i18n/content';
+import { getArticles, type Article } from '../../lib/news';
+
+interface Props {
+  locale: Locale;
+  article: Article;
+}
+const { locale, article } = Astro.props;
+const t = newsCopy[locale];
+const { Content } = await article.render();
+const minutes = readingMinutes(article.body, locale);
+const category = t.categories[article.data.category];
+
+// More articles: the next three in reading order, wrapping around
+const all = await getArticles(locale);
+const at = all.findIndex((a) => a.urlSlug === article.urlSlug);
+const more = [1, 2, 3].map((k) => all[(at + k) % all.length]).filter((a) => a.urlSlug !== article.urlSlug);
+
+const dateLabel = article.data.date
+  ? new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(article.data.date)
+  : undefined;
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Article',
+  headline: article.data.title,
+  description: article.data.dek,
+  inLanguage: content[locale].htmlLang,
+  articleSection: category,
+  ...(article.data.date && { datePublished: article.data.date.toISOString().slice(0, 10) }),
+  ...(article.data.author && { author: { '@type': 'Person', name: article.data.author } }),
+  publisher: { '@type': 'Organization', name: 'Asset One Insurance' },
+};
+---
+
+<Base locale={locale} title={`${article.data.title} · Asset One Insurance`} description={article.data.dek}>
+  <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+  <Header locale={locale} />
+  <main id="main">
+    <article class="article" aria-labelledby="article-title">
+      <BandHero eyebrow={t.breadcrumb} eyebrowHref={localePath(locale, '/news/')} title={article.data.title} lead={article.data.dek} narrow>
+        <p class="article__meta">
+          <span>{category}</span>
+          <span aria-hidden="true">·</span>
+          <span>{t.minRead(minutes)}</span>
+          {dateLabel && <span aria-hidden="true">·</span>}
+          {dateLabel && <time datetime={article.data.date!.toISOString().slice(0, 10)}>{dateLabel}</time>}
+          {article.data.author && <span aria-hidden="true">·</span>}
+          {article.data.author && <span>{article.data.author}</span>}
+        </p>
+      </BandHero>
+
+      <div class="container">
+        <div class="article__body prose">
+          <Content />
+        </div>
+
+        <aside class="article__note" aria-labelledby="article-note-title">
+          <h2 class="article__note-title" id="article-note-title">{t.noteTitle}</h2>
+          <p>{article.data.disclaimer}</p>
+          <p class="article__note-general">{t.general}</p>
+        </aside>
+      </div>
+    </article>
+
+    <section class="section section--white more" aria-labelledby="more-title">
+      <div class="container">
+        <div class="more__head">
+          <h2 class="h2" id="more-title">{t.moreTitle}</h2>
+          <a class="text-link" href={localePath(locale, '/news/')}>{t.allArticles}</a>
+        </div>
+        <ul class="more__grid">
+          {
+            more.map((a, i) => (
+              <li>
+                <ArticleCard
+                  href={localePath(locale, `/news/${a.urlSlug}/`)}
+                  number={a.data.order}
+                  title={a.data.title}
+                  dek={a.data.dek}
+                  meta={`${t.categories[a.data.category]} · ${t.minRead(readingMinutes(a.body, locale))}`}
+                  more={t.readArticle}
+                  delay={i * 100}
+                />
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </section>
+
+    <ClosingCta locale={locale} t={t.cta} />
+  </main>
+  <Footer locale={locale} />
+</Base>
+
+<style>
+  .article {
+    padding-bottom: var(--section-y);
+  }
+
+  /* The title id lives on the hero's h1 */
+  .article :global(.band-hero__title) {
+    scroll-margin-top: 96px;
+  }
+
+  .article__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 10px;
+    margin-top: 28px;
+    font: 700 12px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  :lang(zh) .article__meta {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .article__body {
+    max-width: 720px;
+    margin: clamp(48px, 7vw, 88px) auto 0;
+  }
+
+  .article__note {
+    max-width: 720px;
+    margin: 56px auto 0;
+    padding: 24px 28px;
+    border-radius: var(--radius);
+    background: var(--white);
+    border: 1px solid var(--hairline);
+    border-left: 3px solid var(--scarlet);
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--slate);
+  }
+
+  .article__note-title {
+    font: 700 12px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  :lang(zh) .article__note-title {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .article__note p {
+    margin-top: 8px;
+  }
+
+  .article__note-general {
+    font-size: 13px;
+  }
+
+  .more__head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .more__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 24px;
+    margin: 40px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .more__grid > li {
+    display: flex;
+  }
+
+  .more__grid > li > :global(*) {
+    flex: 1;
+  }
+
+  /* Article body typography (Markdown output) */
+  .prose :global(p) {
+    margin-top: 1.4em;
+    font-size: 19px;
+    line-height: 1.75;
+    color: #26313b;
+  }
+
+  .prose :global(p:first-child) {
+    margin-top: 0;
+  }
+
+  /* First paragraph: a little larger, as a lead-in */
+  .prose > :global(p:first-child) {
+    font-size: 21px;
+    line-height: 1.65;
+    color: var(--ink);
+  }
+
+  :lang(zh) .prose :global(p) {
+    font-size: 18px;
+    line-height: 1.95;
+  }
+
+  :lang(zh) .prose > :global(p:first-child) {
+    font-size: 19px;
+  }
+
+  /* Pull quote */
+  .prose :global(blockquote) {
+    position: relative;
+    margin: 2.2em 0;
+    padding: 6px 0 6px 28px;
+    border-left: 3px solid var(--scarlet);
+  }
+
+  .prose :global(blockquote p),
+  :lang(zh) .prose :global(blockquote p) {
+    margin: 0;
+    font: 400 clamp(24px, 2.6vw, 30px) / 1.4 var(--serif);
+    color: var(--deep-sky);
+  }
+
+  :lang(zh) .prose :global(blockquote p) {
+    line-height: 1.7;
+  }
+
+  @media (max-width: 1023px) {
+    .more__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .more__grid > li:nth-child(3) {
+      display: none;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .prose :global(p),
+    :lang(zh) .prose :global(p) {
+      font-size: 17px;
+    }
+    .prose > :global(p:first-child),
+    :lang(zh) .prose > :global(p:first-child) {
+      font-size: 18px;
+    }
+    .prose :global(blockquote) {
+      padding-left: 20px;
+    }
+    .article__note {
+      padding: 20px;
+    }
+    .more__head {
+      flex-direction: column;
+      gap: 8px;
+    }
+    .more__grid {
+      grid-template-columns: 1fr;
+      gap: 16px;
+      margin-top: 28px;
+    }
+    .more__grid > li:nth-child(3) {
+      display: flex;
+    }
+  }
+</style>

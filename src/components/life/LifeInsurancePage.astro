@@ -4,16 +4,16 @@ import Header from '../Header.astro';
 import Footer from '../Footer.astro';
 import PageHero from '../PageHero.astro';
 import Products from '../Products.astro';
-import Basics from './Basics.astro';
-import CoverageTypes from './CoverageTypes.astro';
-import AtAGlance from './AtAGlance.astro';
-import Riders from './Riders.astro';
+import Basics from '../service/Basics.astro';
+import TypeCards from '../service/TypeCards.astro';
+import CompareTable from '../service/CompareTable.astro';
+import FeatureGrid from '../service/FeatureGrid.astro';
+import Process from '../service/Process.astro';
+import Faq from '../service/Faq.astro';
+import WhereItFits from '../service/WhereItFits.astro';
+import ClosingCta from '../service/ClosingCta.astro';
+import Disclosures from '../service/Disclosures.astro';
 import BusinessPlanning from './BusinessPlanning.astro';
-import Process from './Process.astro';
-import Faq from './Faq.astro';
-import WhereItFits from './WhereItFits.astro';
-import ClosingCta from './ClosingCta.astro';
-import Disclosures from './Disclosures.astro';
 import { lifeInsurance } from '../../i18n/life-insurance';
 import { localePath, type Locale } from '../../i18n/content';
 
@@ -22,11 +22,16 @@ interface Props {
 }
 const { locale } = Astro.props;
 const t = lifeInsurance[locale];
+// The two "zoom-in" panels under How we work
+const processDetails = [
+  { step: t.process.amount.step, title: t.process.amount.title, intro: t.process.amount.intro, items: t.process.amount.questions, numbered: true, outro: t.process.amount.outro },
+  { step: t.process.apply.step, title: t.process.apply.title, items: t.process.apply.items },
+];
 ---
 
 <Base locale={locale} title={t.meta.title} description={t.meta.description}>
   <Header locale={locale} />
-  <main class="life-page">
+  <main class="life-page service-page">
     <PageHero
       eyebrow={t.hero.eyebrow}
       title={t.hero.title}
@@ -35,14 +40,14 @@ const t = lifeInsurance[locale];
       primary={{ label: t.hero.primary, href: localePath(locale, '/contact/') }}
       secondary={{ label: t.hero.secondary, href: '#types' }}
     />
-    <Basics locale={locale} />
-    <CoverageTypes locale={locale} />
-    <AtAGlance locale={locale} />
-    <Riders locale={locale} />
-    <Process locale={locale} />
+    <Basics t={t.basics} />
+    <TypeCards t={t.types} />
+    <CompareTable t={t.compare} />
+    <FeatureGrid t={t.riders} />
+    <Process t={t.process} details={processDetails} />
     <BusinessPlanning locale={locale} />
-    <Faq locale={locale} />
-    <WhereItFits locale={locale} />
+    <Faq t={t.faq} />
+    <WhereItFits locale={locale} t={t.fits} />
     <Products
       locale={locale}
       only={['/services/health-insurance/', '/services/annuities/']}
@@ -51,22 +56,8 @@ const t = lifeInsurance[locale];
       intro={t.fits.relatedIntro}
       id="related-title"
     />
-    <ClosingCta locale={locale} />
-    <Disclosures locale={locale} />
+    <ClosingCta locale={locale} t={t.cta} />
+    <Disclosures t={t.disclosures} />
   </main>
   <Footer locale={locale} />
 </Base>
-
-<style>
-  /* Scarlet accent: a small dot before every section eyebrow on this page,
-     matching the dot in the page hero */
-  :global(.life-page .section .eyebrow::before),
-  :global(.life-page .products .eyebrow::before) {
-    content: '';
-    flex: none;
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: var(--scarlet);
-  }
-</style>

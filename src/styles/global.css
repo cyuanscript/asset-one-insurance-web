@@ -307,6 +307,18 @@ button {
   background: var(--pale-sky);
 }
 
+/* Services pages: a small scarlet dot before every section eyebrow,
+   matching the dot in the page hero */
+.service-page .section .eyebrow::before,
+.service-page .products .eyebrow::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--scarlet);
+}
+
 /* Visual (chart / diagram) blocks: a one-line takeaway in text above,
    so the picture is never the only way to get the point */
 .viz__title {

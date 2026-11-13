@@ -1,0 +1,192 @@
+---
+/**
+ * Article card for the News index and "More articles".
+ * The whole card is clickable through one real link on the title
+ * (a stretched ::after), so screen readers hear a single link.
+ */
+import ArticleCover from './ArticleCover.astro';
+
+interface Props {
+  href: string;
+  number: number;
+  title: string;
+  dek: string;
+  meta: string;
+  more: string;
+  feature?: boolean;
+  headingLevel?: 'h2' | 'h3';
+  delay?: number;
+}
+const { href, number, title, dek, meta, more, feature = false, headingLevel = 'h3', delay = 0 } = Astro.props;
+const Heading = headingLevel;
+---
+
+<article class:list={['article-card', { 'article-card--feature': feature }]} data-reveal style={`--reveal-delay:${delay}ms`}>
+  <div class="article-card__cover">
+    <ArticleCover number={number} size={feature ? 'feature' : 'card'} />
+  </div>
+  <div class="article-card__body">
+    <p class="article-card__meta">{meta}</p>
+    <Heading class="article-card__title">
+      <a class="article-card__link" href={href}>{title}</a>
+    </Heading>
+    <p class="article-card__dek">{dek}</p>
+    <span class="article-card__more text-link" aria-hidden="true">{more}</span>
+  </div>
+</article>
+
+<style>
+  .article-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+
+  /* Once the reveal has finished, hover lifts the card 2px
+     (same timing as the product cards on the homepage) */
+  :global(html:not(.js)) .article-card,
+  :global(.js) .article-card.is-settled {
+    transition:
+      transform 500ms var(--ease-out),
+      box-shadow 500ms var(--ease-out);
+  }
+
+  .article-card:hover,
+  :global(.js) .article-card.is-revealed:hover {
+    transform: translateY(-2px);
+    box-shadow:
+      0 2px 4px rgba(20, 27, 34, 0.06),
+      0 22px 48px rgba(20, 27, 34, 0.1);
+  }
+
+  .article-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    padding: 24px 28px 28px;
+  }
+
+  .article-card__meta {
+    font: 700 11px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  :lang(zh) .article-card__meta {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  .article-card__title {
+    margin-top: 12px;
+    font: 400 24px/1.25 var(--serif);
+    color: var(--ink);
+  }
+
+  :lang(zh) .article-card__title {
+    font-size: 21px;
+    line-height: 1.5;
+  }
+
+  .article-card__link {
+    color: inherit;
+  }
+
+  /* Stretch the title link over the whole card */
+  .article-card__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .article-card__link:hover {
+    color: var(--deep-sky);
+  }
+
+  .article-card__link:focus-visible {
+    outline: none;
+  }
+
+  .article-card:focus-within {
+    outline: 2px solid var(--deep-sky);
+    outline-offset: 3px;
+  }
+
+  .article-card__dek {
+    margin-top: 12px;
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--slate);
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .article-card__more {
+    margin-top: auto;
+    padding-top: 20px;
+  }
+
+  /* Featured: cover on the left, text on the right */
+  .article-card--feature {
+    display: grid;
+    grid-template-columns: 7fr 5fr;
+  }
+
+  .article-card--feature .article-card__body {
+    justify-content: center;
+    padding: clamp(28px, 4vw, 56px);
+  }
+
+  .article-card--feature .article-card__title {
+    font-size: clamp(28px, 3vw, 38px);
+    line-height: 1.18;
+  }
+
+  :lang(zh) .article-card--feature .article-card__title {
+    font-size: clamp(24px, 2.6vw, 32px);
+    line-height: 1.45;
+  }
+
+  .article-card--feature .article-card__dek {
+    font-size: 17px;
+    -webkit-line-clamp: 5;
+  }
+
+  .article-card--feature .article-card__more {
+    margin-top: 0;
+    padding-top: 28px;
+  }
+
+  @media (max-width: 900px) {
+    .article-card--feature {
+      grid-template-columns: 1fr;
+    }
+    .article-card--feature .article-card__cover {
+      height: 240px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .article-card__body {
+      padding: 20px 22px 24px;
+    }
+    .article-card__title {
+      font-size: 22px;
+    }
+    .article-card--feature .article-card__title {
+      font-size: 26px;
+    }
+    .article-card__dek,
+    .article-card--feature .article-card__dek {
+      font-size: 15px;
+    }
+  }
+</style>

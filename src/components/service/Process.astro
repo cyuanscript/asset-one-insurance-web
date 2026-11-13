@@ -1,30 +1,31 @@
 ---
 /**
- * How we work: five steps, then two "zoom-in" panels tied to steps 2 and 4:
- * how much coverage is enough (needs review) and what to expect when you
- * apply (underwriting). Replaces the separate Coverage Amount section.
+ * How we work: numbered steps, then optional "zoom-in" panels, each tied
+ * to one step (on Life Insurance: how much coverage is enough, and what to
+ * expect when you apply).
  *
  * The heading and steps sit on a full-bleed photo band with a deep blue
  * tint; the two detail panels overlap the bottom edge of the band.
  */
 import Photo from '../Photo.astro';
 import SectionHeading from '../SectionHeading.astro';
-import { lifeInsurance } from '../../i18n/life-insurance';
-import type { Locale } from '../../i18n/content';
+import type { ProcessCopy, ProcessDetail } from '../../i18n/service-types';
+import type { PhotoKey } from '../../i18n/content';
 
 interface Props {
-  locale: Locale;
+  t: ProcessCopy;
+  details?: ProcessDetail[];
+  photo?: PhotoKey;
 }
-const { locale } = Astro.props;
-const t = lifeInsurance[locale].process;
+const { t, details = [], photo = 'processConsult' } = Astro.props;
 const stepLabel = (n: number) => t.stepLabel.replace('{n}', String(n));
-const detailSteps = [t.amount.step, t.apply.step];
+const detailSteps = details.map((d) => d.step);
 ---
 
 <section class="section section--white process" aria-labelledby="process-title">
   <div class="process__band on-dark">
     <div class="process__media" aria-hidden="true">
-      <Photo photo="processConsult" tone="dark" class="process__photo" />
+      <Photo photo={photo} tone="dark" class="process__photo" />
     </div>
     <div class="process__tint" aria-hidden="true"></div>
 
@@ -48,24 +49,37 @@ const detailSteps = [t.amount.step, t.apply.step];
   </div>
 
   <div class="container">
-    <div class="details">
-      <section class="detail" aria-labelledby="amount-title" data-reveal>
-        <p class="detail__step">{stepLabel(t.amount.step)} · {t.steps[t.amount.step - 1].title}</p>
-        <h3 class="detail__title" id="amount-title">{t.amount.title}</h3>
-        <p class="detail__intro">{t.amount.intro}</p>
-        <ol class="detail__list detail__list--numbered">
-          {t.amount.questions.map((q) => <li>{q}</li>)}
-        </ol>
-        <p class="detail__outro">{t.amount.outro}</p>
-      </section>
-
-      <section class="detail" aria-labelledby="apply-title" data-reveal style="--reveal-delay:120ms">
-        <p class="detail__step">{stepLabel(t.apply.step)} · {t.steps[t.apply.step - 1].title}</p>
-        <h3 class="detail__title" id="apply-title">{t.apply.title}</h3>
-        <ul class="detail__list">
-          {t.apply.items.map((a) => <li>{a}</li>)}
-        </ul>
-      </section>
+    {
+      details.length > 0 && (
+        <div class="details">
+          {details.map((d, i) => (
+            <section class="detail" aria-labelledby={`detail-${d.step}-title`} data-reveal style={`--reveal-delay:${i * 120}ms`}>
+              <p class="detail__step">
+                {stepLabel(d.step)} · {t.steps[d.step - 1].title}
+              </p>
+              <h3 class="detail__title" id={`detail-${d.step}-title`}>
+                {d.title}
+              </h3>
+              {d.intro && <p class="detail__intro">{d.intro}</p>}
+              {d.numbered ? (
+                <ol class="detail__list detail__list--numbered">
+                  {d.items.map((q) => (
+                    <li>{q}</li>
+                  ))}
+                </ol>
+              ) : (
+                <ul class="detail__list">
+                  {d.items.map((a) => (
+                    <li>{a}</li>
+                  ))}
+                </ul>
+              )}
+              {d.outro && <p class="detail__outro">{d.outro}</p>}
+            </section>
+          ))}
+        </div>
+      )
+    }
     </div>
   </div>
 </section>

@@ -1,0 +1,60 @@
+---
+/**
+ * /services/annuities/ — assembled from the shared Services sections
+ * (src/components/service/) with copy from src/i18n/annuities.ts.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import PageHero from '../PageHero.astro';
+import Products from '../Products.astro';
+import Basics from '../service/Basics.astro';
+import TypeCards from '../service/TypeCards.astro';
+import CompareTable from '../service/CompareTable.astro';
+import FeatureGrid from '../service/FeatureGrid.astro';
+import Process from '../service/Process.astro';
+import Faq from '../service/Faq.astro';
+import WhereItFits from '../service/WhereItFits.astro';
+import ClosingCta from '../service/ClosingCta.astro';
+import Disclosures from '../service/Disclosures.astro';
+import { annuities } from '../../i18n/annuities';
+import { localePath, type Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = annuities[locale];
+---
+
+<Base locale={locale} title={t.meta.title} description={t.meta.description}>
+  <Header locale={locale} />
+  <main class="service-page">
+    <PageHero
+      eyebrow={t.hero.eyebrow}
+      title={t.hero.title}
+      lead={t.hero.lead}
+      photo="annuitiesHero"
+      primary={{ label: t.hero.primary, href: localePath(locale, '/contact/') }}
+      secondary={{ label: t.hero.secondary, href: '#types' }}
+    />
+    <Basics t={t.basics} />
+    <TypeCards t={t.types} />
+    <CompareTable t={t.compare} />
+    <FeatureGrid t={t.features} id="features" />
+    <Process t={t.process} details={t.processDetails} photo="processAnnuities" />
+    <Faq t={t.faq} />
+    <WhereItFits locale={locale} t={t.fits} />
+    <Products
+      locale={locale}
+      only={['/services/life-insurance/', '/services/health-insurance/']}
+      eyebrow={t.fits.relatedEyebrow}
+      title={t.fits.relatedTitle}
+      intro={t.fits.relatedIntro}
+      id="related-title"
+    />
+    <ClosingCta locale={locale} t={t.cta} />
+    <Disclosures t={t.disclosures} />
+  </main>
+  <Footer locale={locale} />
+</Base>

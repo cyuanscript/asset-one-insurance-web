@@ -1,12 +1,10 @@
 ---
-import { lifeInsurance } from '../../i18n/life-insurance';
-import type { Locale } from '../../i18n/content';
+import type { BasicsCopy } from '../../i18n/service-types';
 
 interface Props {
-  locale: Locale;
+  t: BasicsCopy;
 }
-const { locale } = Astro.props;
-const t = lifeInsurance[locale].basics;
+const { t } = Astro.props;
 ---
 
 <section class="section basics" aria-labelledby="basics-title" id="main">

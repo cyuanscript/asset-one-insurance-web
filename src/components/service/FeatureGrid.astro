@@ -1,18 +1,23 @@
 ---
+/**
+ * Feature grid: a heading and 3 × 2 cards (one column on phones).
+ * Used for life insurance riders, annuity riders and health insurance terms.
+ */
 import SectionHeading from '../SectionHeading.astro';
-import { lifeInsurance } from '../../i18n/life-insurance';
-import type { Locale } from '../../i18n/content';
+import type { FeatureGridCopy } from '../../i18n/service-types';
 
 interface Props {
-  locale: Locale;
+  t: FeatureGridCopy;
+  /** Section id prefix, e.g. 'riders' -> #riders, #riders-title */
+  id?: string;
+  white?: boolean;
 }
-const { locale } = Astro.props;
-const t = lifeInsurance[locale].riders;
+const { t, id = 'riders', white = false } = Astro.props;
 ---
 
-<section class="section riders" aria-labelledby="riders-title">
+<section class:list={['section riders', { 'section--white': white }]} aria-labelledby={`${id}-title`} id={id}>
   <div class="container">
-    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="riders-title" span={6} />
+    <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id={`${id}-title`} span={6} />
     <ul class="riders__grid">
       {
         t.items.map((r, i) => (
@@ -23,6 +28,7 @@ const t = lifeInsurance[locale].riders;
         ))
       }
     </ul>
+    <slot />
   </div>
 </section>
 
@@ -41,6 +47,10 @@ const t = lifeInsurance[locale].riders;
     background: var(--white);
     border-radius: var(--radius);
     border: 1px solid var(--hairline);
+  }
+
+  .section--white .rider {
+    background: var(--cloud);
   }
 
   .rider__name {
