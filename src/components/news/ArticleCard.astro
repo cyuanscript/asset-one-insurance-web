@@ -16,14 +16,16 @@ interface Props {
   feature?: boolean;
   headingLevel?: 'h2' | 'h3';
   delay?: number;
+  /** Optional cover photo (front matter `cover`); falls back to the typographic cover */
+  cover?: { src: string; position?: string };
 }
-const { href, number, title, dek, meta, more, feature = false, headingLevel = 'h3', delay = 0 } = Astro.props;
+const { href, number, title, dek, meta, more, feature = false, headingLevel = 'h3', delay = 0, cover } = Astro.props;
 const Heading = headingLevel;
 ---
 
 <article class:list={['article-card', { 'article-card--feature': feature }]} data-reveal style={`--reveal-delay:${delay}ms`}>
   <div class="article-card__cover">
-    <ArticleCover number={number} size={feature ? 'feature' : 'card'} />
+    <ArticleCover number={number} size={feature ? 'feature' : 'card'} photo={cover} />
   </div>
   <div class="article-card__body">
     <p class="article-card__meta">{meta}</p>

@@ -35,6 +35,7 @@ const metaFor = (a: (typeof articles)[number]) =>
               headingLevel="h3"
               href={localePath(locale, `/news/${featured.urlSlug}/`)}
               number={featured.data.order}
+              cover={featured.data.cover}
               title={featured.data.title}
               dek={featured.data.dek}
               meta={`${t.latest} · ${metaFor(featured)}`}
@@ -49,6 +50,7 @@ const metaFor = (a: (typeof articles)[number]) =>
                 <ArticleCard
                   href={localePath(locale, `/news/${a.urlSlug}/`)}
                   number={a.data.order}
+                  cover={a.data.cover}
                   title={a.data.title}
                   dek={a.data.dek}
                   meta={metaFor(a)}

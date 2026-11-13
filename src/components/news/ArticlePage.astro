@@ -29,6 +29,8 @@ const all = await getArticles(locale);
 const at = all.findIndex((a) => a.urlSlug === article.urlSlug);
 const more = [1, 2, 3].map((k) => all[(at + k) % all.length]).filter((a) => a.urlSlug !== article.urlSlug);
 
+const cover = article.data.cover;
+
 const dateLabel = article.data.date
   ? new Intl.DateTimeFormat(locale === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' }).format(article.data.date)
   : undefined;
@@ -51,7 +53,7 @@ const jsonLd = {
   <Header locale={locale} />
   <main id="main">
     <article class="article" aria-labelledby="article-title">
-      <BandHero eyebrow={t.breadcrumb} eyebrowHref={localePath(locale, '/news/')} title={article.data.title} lead={article.data.dek} narrow>
+      <BandHero eyebrow={t.breadcrumb} eyebrowHref={localePath(locale, '/news/')} title={article.data.title} lead={article.data.dek} image={cover} narrow>
         <p class="article__meta">
           <span>{category}</span>
           <span aria-hidden="true">·</span>
@@ -89,6 +91,7 @@ const jsonLd = {
                 <ArticleCard
                   href={localePath(locale, `/news/${a.urlSlug}/`)}
                   number={a.data.order}
+                  cover={a.data.cover}
                   title={a.data.title}
                   dek={a.data.dek}
                   meta={`${t.categories[a.data.category]} · ${t.minRead(readingMinutes(a.body, locale))}`}

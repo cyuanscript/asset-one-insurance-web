@@ -3,6 +3,10 @@ title: "The Ordinary Mutual Fund That Becomes a Tax Trap"
 dek: "Chinese and Hong Kong mutual funds are ordinary investments back home. Once you're a U.S. taxpayer, many of them are reclassified as PFICs — and taxed under some of the harshest rules in the entire U.S. tax code."
 category: us-tax-basics
 order: 5
+cover:
+  src: /images/news/pfic-tax-trap.jpg
+  alt: "A hand filling in a U.S. Form 1040-NR tax return with a pen"
+  position: "50% 55%"
 disclaimer: "This article is educational and general in nature, not individualized tax or investment advice. PFIC determinations and elections are technical and fact-specific — consult a qualified tax professional before making any changes to your holdings."
 ---
 

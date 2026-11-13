@@ -2,8 +2,10 @@
 /**
  * Compact dark hero for reading pages (News index and articles).
  * Shorter than PageHero, so the reading starts sooner, and dark so the
- * transparent header stays legible. With `photo`, a Lake Washington image
- * sits behind a deep scrim; without one, a slate ground with fine water lines.
+ * transparent header stays legible. With `photo` (a named slot from
+ * src/i18n/content.ts, e.g. the Lake Washington shot on the News index) or
+ * `image` (a direct file, e.g. an article's cover photo), the picture sits
+ * behind a deep scrim; without either, a slate ground with fine water lines.
  *
  * Reusable pattern: "Band hero". Use it for any text-led page (guides,
  * legal pages, contact) where a full photo hero would be too much.
@@ -18,15 +20,31 @@ interface Props {
   title: string;
   lead?: string;
   photo?: PhotoKey;
+  /** A direct image instead of a named photo slot (used for article covers) */
+  image?: { src: string; alt: string; position?: string };
   /** Narrower measure for article headlines */
   narrow?: boolean;
 }
-const { eyebrow, eyebrowHref, title, lead, photo, narrow = false } = Astro.props;
+const { eyebrow, eyebrowHref, title, lead, photo, image, narrow = false } = Astro.props;
+const hasMedia = Boolean(photo || image);
 ---
 
-<section class:list={['band-hero on-dark', { 'band-hero--photo': photo, 'band-hero--narrow': narrow }]}>
+<section class:list={['band-hero on-dark', { 'band-hero--photo': hasMedia, 'band-hero--image': image, 'band-hero--narrow': narrow }]}>
   {
-    photo ? (
+    image ? (
+      <div class="band-hero__media" data-parallax="0.12">
+        <div class="band-hero__photo">
+          <img
+            src={image.src}
+            alt={image.alt}
+            loading="eager"
+            fetchpriority="high"
+            decoding="async"
+            style={image.position ? `object-position: ${image.position}` : undefined}
+          />
+        </div>
+      </div>
+    ) : photo ? (
       <div class="band-hero__media" data-parallax="0.12">
         <Photo photo={photo} tone="dark" eager class="band-hero__photo" />
       </div>
@@ -79,6 +97,14 @@ const { eyebrow, eyebrowHref, title, lead, photo, narrow = false } = Astro.props
     inset: 0;
   }
 
+  .band-hero__media img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
   .band-hero__scrim {
     position: absolute;
     inset: 0;
@@ -87,6 +113,15 @@ const { eyebrow, eyebrowHref, title, lead, photo, narrow = false } = Astro.props
 
   .band-hero--photo .band-hero__scrim {
     background: linear-gradient(180deg, rgba(14, 22, 29, 0.62) 0%, rgba(14, 22, 29, 0.35) 40%, rgba(14, 22, 29, 0.85) 100%);
+  }
+
+  /* Article covers vary a lot in brightness (blue sky, white paper), so they
+     get an extra left-to-right shade behind the headline. This keeps white
+     text above WCAG contrast on any photo without darkening the whole image. */
+  .band-hero--image .band-hero__scrim {
+    background:
+      linear-gradient(90deg, rgba(14, 22, 29, 0.72) 0%, rgba(14, 22, 29, 0.45) 55%, rgba(14, 22, 29, 0.15) 100%),
+      linear-gradient(180deg, rgba(14, 22, 29, 0.55) 0%, rgba(14, 22, 29, 0.2) 40%, rgba(14, 22, 29, 0.8) 100%);
   }
 
   .band-hero__lines {
@@ -206,6 +241,10 @@ const { eyebrow, eyebrowHref, title, lead, photo, narrow = false } = Astro.props
     }
     .band-hero--photo {
       min-height: 460px;
+    }
+    /* On phones the text spans the full width, so shade evenly instead */
+    .band-hero--image .band-hero__scrim {
+      background: linear-gradient(180deg, rgba(14, 22, 29, 0.6) 0%, rgba(14, 22, 29, 0.5) 40%, rgba(14, 22, 29, 0.85) 100%);
     }
     .band-hero__eyebrow {
       font-size: 11px;

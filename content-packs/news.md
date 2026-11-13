@@ -19,6 +19,10 @@ category: us-tax-basics      # add new categories in config.ts and news.ts
 order: 6                     # reading order; also the big numeral on the cover
 date: 2026-11-20             # optional: real publication date only
 author: "Name"               # optional: leave out rather than invent
+cover:                       # optional cover photo (cards + top of the article)
+  src: /images/news/<slug>.jpg
+  alt: "What the photo shows, in this file's language"
+  position: "50% 40%"        # optional: keeps the subject in frame when cropped
 disclaimer: "The article's own note"
 draft: false
 ```
@@ -77,8 +81,9 @@ These are flagged, not fixed, because the articles are the client's content. **A
 
 ## Design notes
 
-- **Band hero:** a shorter dark hero (`news/BandHero.astro`): the Lake Washington photo on the index; a slate ground with fine water lines on articles, so reading starts sooner.
-- **Typographic covers:** no photos yet, so each card shows the article number in large serif on pale sky with water lines (`news/ArticleCover.astro`). A photo can replace it later.
+- **Band hero:** a shorter dark hero (`news/BandHero.astro`): the Lake Washington photo on the index; the article's cover photo on articles (or a slate ground with fine water lines if it has none).
+- **Cover photos:** each article's `cover` photo fills its card (1.03× zoom on hover) and fills the dark banner behind the headline on the article page, under a shade that keeps the white text readable. Photos live in `public/images/news/<slug>.jpg`, about 1600px wide; full-resolution sources go in `photo-originals/news/` (not committed). On cards the photo is decorative (`alt=""`) because the title already says what the article is; the article page uses the `alt` text.
+- **Typographic covers:** an article without `cover` falls back to its number in large serif on pale sky with water lines (`news/ArticleCover.astro`), so nothing looks broken.
 - **Article page:** ~720px reading measure, larger first paragraph, scarlet-ruled pull quotes, a "Please note" box, three more articles, a closing call to action.
 - **Structured data:** each article outputs schema.org `Article` JSON-LD (date and author only when set).
 

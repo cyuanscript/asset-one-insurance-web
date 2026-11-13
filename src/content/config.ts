@@ -23,6 +23,21 @@ const news = defineCollection({
     date: z.coerce.date().optional(),
     /** Optional byline. Leave out rather than invent one */
     author: z.string().optional(),
+    /**
+     * Optional cover photo, used on the article's cards and at the top of the
+     * article. Put the web-sized file in public/images/news/<slug>.jpg (keep
+     * full-resolution sources in photo-originals/news/). `alt` describes the
+     * photo in this file's language; `position` is a CSS object-position
+     * (e.g. "50% 30%") to keep the subject in frame when the photo is cropped.
+     * Leave the whole block out and the card shows the typographic cover.
+     */
+    cover: z
+      .object({
+        src: z.string().regex(/^\/images\/news\/[\w-]+\.(jpe?g|png|webp|avif)$/, 'Use /images/news/<file>.jpg'),
+        alt: z.string().min(1),
+        position: z.string().optional(),
+      })
+      .optional(),
     /** Article-specific note shown under the body */
     disclaimer: z.string(),
     draft: z.boolean().default(false),

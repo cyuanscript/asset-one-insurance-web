@@ -3,6 +3,10 @@ title: "The Forms That Turn Your Bank Account Into a Disclosure"
 dek: "Two federal reporting regimes — FBAR and FATCA — require U.S. persons to disclose foreign accounts once they cross fairly low thresholds. Missing them isn't a paperwork slip; the penalties are some of the steepest in the tax code."
 category: us-tax-basics
 order: 3
+cover:
+  src: /images/news/fatca-fbar-disclosure.jpg
+  alt: "Hands working a calculator and notebook beside a laptop and a stack of U.S. dollar bills"
+  position: "50% 50%"
 disclaimer: "This article is educational and general in nature, not individualized tax or legal advice. Reporting requirements and penalty exposure depend on your specific accounts and history — consult a qualified professional."
 ---
 

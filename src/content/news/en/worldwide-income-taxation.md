@@ -3,6 +3,10 @@ title: "The Day Your Shanghai Rent Check Became America's Business"
 dek: "The U.S. is one of the few countries that taxes based on residency and citizenship, not just where the money is earned. Understanding what \"worldwide income\" actually pulls in changes how you plan before you arrive."
 category: us-tax-basics
 order: 2
+cover:
+  src: /images/news/worldwide-income-taxation.jpg
+  alt: "The Shanghai skyline across the Huangpu River, with the Oriental Pearl Tower on the left"
+  position: "50% 65%"
 disclaimer: "This article is educational and general in nature, not individualized tax advice. Foreign tax credit and anti-deferral rules are complex and fact-specific — consult a cross-border tax professional before your first U.S. filing."
 ---
 

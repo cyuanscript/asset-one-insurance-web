@@ -3,6 +3,10 @@ title: "China Is Already Telling the IRS What You Told Your Bank"
 dek: "FATCA made foreign banks report U.S. account holders to the IRS. The Common Reporting Standard (CRS) does the reverse, and dozens of countries — increasingly including places Chinese families hold assets — now exchange this data automatically."
 category: us-tax-basics
 order: 4
+cover:
+  src: /images/news/crs-vs-fatca.jpg
+  alt: "Looking up at Hong Kong's Bank of China Tower between neighboring skyscrapers at dusk"
+  position: "50% 40%"
 disclaimer: "This article is educational and general in nature, not individualized tax or legal advice. Information-exchange rules and their scope vary by jurisdiction and can change — consult a qualified professional for current details."
 ---
 

@@ -3,6 +3,10 @@ title: "Are You a U.S. Taxpayer Yet? The Test Nobody Tells You About"
 dek: "Your tax status doesn't wait for your visa status. A simple day-counting formula can make you a U.S. tax resident months before any immigration paperwork clears."
 category: us-tax-basics
 order: 1
+cover:
+  src: /images/news/are-you-a-us-taxpayer-yet.jpg
+  alt: "The Statue of Liberty raising her torch against a clear blue sky"
+  position: "45% 25%"
 disclaimer: "This article is educational and general in nature, not individualized tax advice. Residency determinations depend on your specific travel history and visa category — consult a qualified tax professional to confirm your status."
 ---
 
