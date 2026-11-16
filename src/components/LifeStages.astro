@@ -62,7 +62,11 @@ const approachHref = localePath(locale, '/insurance-and-you/');
                   <span class="stage__fits-label">{t.mayFit}</span>
                   <ul class="stage__chips">
                     {item.fits.map((fit) => (
-                      <li class="chip">{fit}</li>
+                      <li>
+                        <a class="chip" href={localePath(locale, fit.href)}>
+                          {fit.label}
+                        </a>
+                      </li>
                     ))}
                   </ul>
                 </div>
@@ -266,15 +270,46 @@ const approachHref = localePath(locale, '/insurance-and-you/');
     list-style: none;
   }
 
+  /* Each chip opens that coverage card on its Services page */
   .chip {
     display: inline-flex;
     align-items: center;
-    height: 32px;
-    padding: 0 12px;
+    min-height: 36px;
+    padding: 0 14px;
     border-radius: var(--radius);
     background: var(--scarlet);
     font: 400 14px/1 var(--sans);
     color: var(--white);
+    text-decoration: none;
+    transition:
+      background-color 200ms ease,
+      transform 200ms var(--ease-out);
+  }
+
+  /* Hover: grows slightly (pointer devices only, so taps don't stick) */
+  @media (hover: hover) {
+    .chip:hover {
+      background: var(--deep-red);
+      transform: scale(1.06);
+    }
+  }
+
+  .chip:active {
+    transform: scale(0.97);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .chip {
+      transition: background-color 200ms ease;
+    }
+    .chip:hover {
+      transform: none;
+    }
+  }
+
+  .chip:focus-visible {
+    outline: 2px solid var(--scarlet);
+    outline-offset: 3px;
   }
 
   .stage__link {

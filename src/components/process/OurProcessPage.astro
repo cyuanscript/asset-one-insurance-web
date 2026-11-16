@@ -1,0 +1,157 @@
+---
+/**
+ * /our-process/ — the "How we work" steps for all three services on one
+ * page, replacing the separate How we work sections on each Services page.
+ *
+ * Order follows assetone.com/our-process: a compact dark hero, then a
+ * "Get started" intro (photo + short copy + button) so the way to begin
+ * comes first, then the step-by-step band with a Life / Health / Annuities
+ * slider, then the Let's talk band.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import BandHero from '../news/BandHero.astro';
+import Photo from '../Photo.astro';
+import Process from '../service/Process.astro';
+import ClosingCta from '../service/ClosingCta.astro';
+import { processCopy } from '../../i18n/process';
+import type { ProcessTrack } from '../../i18n/service-types';
+import { lifeInsurance } from '../../i18n/life-insurance';
+import { healthInsurance } from '../../i18n/health-insurance';
+import { annuities } from '../../i18n/annuities';
+import { contact, localePath, type Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = processCopy[locale];
+const life = lifeInsurance[locale];
+const health = healthInsurance[locale];
+const ann = annuities[locale];
+
+const tracks: ProcessTrack[] = [
+  {
+    key: 'life',
+    label: t.tracks.life.label,
+    t: life.process,
+    // Life keeps its two "zoom-in" panels as named blocks
+    details: [
+      {
+        step: life.process.amount.step,
+        title: life.process.amount.title,
+        intro: life.process.amount.intro,
+        items: life.process.amount.questions,
+        numbered: true,
+        outro: life.process.amount.outro,
+      },
+      { step: life.process.apply.step, title: life.process.apply.title, items: life.process.apply.items },
+    ],
+    photo: 'processConsult',
+    link: { label: t.tracks.life.link, href: localePath(locale, '/services/life-insurance/') },
+  },
+  {
+    key: 'health',
+    label: t.tracks.health.label,
+    t: health.process,
+    details: health.processDetails,
+    photo: 'processHealth',
+    link: { label: t.tracks.health.link, href: localePath(locale, '/services/health-insurance/') },
+  },
+  {
+    key: 'annuities',
+    label: t.tracks.annuities.label,
+    t: ann.process,
+    details: ann.processDetails,
+    photo: 'processAnnuities',
+    link: { label: t.tracks.annuities.link, href: localePath(locale, '/services/annuities/') },
+  },
+];
+---
+
+<Base locale={locale} title={t.meta.title} description={t.meta.description}>
+  <Header locale={locale} />
+  <main class="service-page process-page" id="main">
+    <BandHero eyebrow={t.hero.eyebrow} title={t.hero.title} lead={t.hero.lead} />
+
+    <section class="section section--white intro" aria-labelledby="intro-title">
+      <div class="container intro__grid">
+        <div class="intro__media" data-reveal>
+          <Photo photo="processIntro" class="intro__photo" />
+        </div>
+        <div class="intro__copy" data-reveal style="--reveal-delay:120ms">
+          <p class="eyebrow">{t.intro.eyebrow}</p>
+          <h2 class="h2 intro__title" id="intro-title">{t.intro.title}</h2>
+          {t.intro.body.map((p) => <p class="lead-text intro__p">{p}</p>)}
+          <div class="intro__actions">
+            <a class="btn btn-primary" href={localePath(locale, '/contact/')}>{t.intro.primary}</a>
+            <a class="btn btn-outline" href={contact.phoneHref}>{t.intro.phone} {contact.phone}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <Process heading={t.steps} switchLabel={t.switchLabel} tracks={tracks} />
+
+    <ClosingCta locale={locale} t={t.cta} />
+  </main>
+  <Footer locale={locale} />
+</Base>
+
+<style>
+  .intro__grid {
+    display: grid;
+    grid-template-columns: 6fr 5fr;
+    gap: clamp(32px, 6vw, 88px);
+    align-items: center;
+  }
+
+  .intro__media {
+    position: relative;
+    aspect-ratio: 5 / 4;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .intro__media :global(.intro__photo) {
+    position: absolute;
+    inset: 0;
+  }
+
+  .intro__title {
+    margin-top: 20px;
+  }
+
+  .intro__p {
+    margin-top: 20px;
+  }
+
+  .intro__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 32px;
+  }
+
+  @media (max-width: 899px) {
+    .intro__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .intro__media {
+      aspect-ratio: 16 / 10;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .intro__actions {
+      flex-direction: column;
+    }
+
+    .intro__actions .btn {
+      width: 100%;
+    }
+  }
+</style>

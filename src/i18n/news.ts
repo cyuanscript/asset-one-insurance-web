@@ -1,5 +1,7 @@
 /**
- * Interface copy for /news/ and /news/<slug>/ (EN + 中文).
+ * Interface copy for the Insights section, /insights/ and /insights/<slug>/
+ * (EN + 中文). Internally the collection, components and this file keep
+ * the original "news" name.
  * The articles themselves live in src/content/news/{en,zh}/.
  * Source and review notes: content-packs/news.md
  */
@@ -8,18 +10,18 @@ import type { CtaCopy } from './service-types';
 
 const en = {
   meta: {
-    title: 'News · Asset One Insurance',
+    title: 'Insights · Asset One Insurance',
     description:
       'Short, plain-language articles on insurance, retirement and cross-border planning for families in Bellevue and beyond. In English and 中文.',
   },
   hero: {
-    eyebrow: 'News',
+    eyebrow: 'Insights',
     title: 'Notes for planning with clarity',
     lead: 'Short, plain-language articles on the questions families bring to us, starting with U.S. tax basics for those with ties to China and Hong Kong.',
   },
   /** Homepage preview section (under Our products) */
   home: {
-    eyebrow: 'News',
+    eyebrow: 'Insights',
     title: 'Notes for planning with clarity',
     intro: 'Short, plain-language articles on the questions families bring to us, starting with U.S. tax basics for those with ties to China and Hong Kong.',
   },
@@ -30,7 +32,7 @@ const en = {
   categories: {
     'us-tax-basics': 'U.S. Tax Basics',
   } as Record<string, string>,
-  breadcrumb: 'News',
+  breadcrumb: 'Insights',
   allArticles: 'All articles',
   moreTitle: 'More articles',
   noteTitle: 'Please note',
@@ -48,16 +50,16 @@ export type NewsCopy = typeof en;
 
 const zh: NewsCopy = {
   meta: {
-    title: '新闻 · Asset One Insurance',
+    title: '洞察 · Asset One Insurance',
     description: '用浅显的语言，解答家庭在保险、退休与跨境规划中的常见问题。中英文提供。',
   },
   hero: {
-    eyebrow: '新闻',
+    eyebrow: '洞察',
     title: '把规划想清楚',
     lead: '用浅显的语言，解答家庭常向我们提出的问题。首个系列：为与中国内地和香港有联系的家庭讲解美国税务基础。',
   },
   home: {
-    eyebrow: '新闻',
+    eyebrow: '洞察',
     title: '把规划想清楚',
     intro: '用浅显的语言，解答家庭常向我们提出的问题。首个系列：为与中国内地和香港有联系的家庭讲解美国税务基础。',
   },
@@ -68,7 +70,7 @@ const zh: NewsCopy = {
   categories: {
     'us-tax-basics': '美国税务基础',
   },
-  breadcrumb: '新闻',
+  breadcrumb: '洞察',
   allArticles: '全部文章',
   moreTitle: '更多文章',
   noteTitle: '温馨提示',

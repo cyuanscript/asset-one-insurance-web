@@ -5,6 +5,7 @@
  * annuities.ts) but the sections are built from the same components in
  * src/components/service/, which accept these shapes as props.
  */
+import type { PhotoKey } from './content';
 
 export type Link = { label: string; href: string };
 
@@ -85,6 +86,17 @@ export type ProcessCopy = {
   steps: { title: string; body: string }[];
 };
 
+/** One service's steps on /our-process/ (Life, Health or Annuities) */
+export type ProcessTrack = {
+  key: string;
+  label: string;
+  t: ProcessCopy;
+  details?: ProcessDetail[];
+  /** Photo key from src/i18n/content.ts, for the band behind the steps */
+  photo: PhotoKey;
+  link?: Link;
+};
+
 export type FaqCopy = {
   eyebrow: string;
   title: string;
@@ -104,10 +116,14 @@ export type FitsCopy = {
 };
 
 export type CtaCopy = {
+  /** Small label above the title, e.g. "Let’s talk" */
+  eyebrow?: string;
   title: string;
   body: string;
   primary: string;
   phone: string;
+  /** Optional text link under the buttons, e.g. to /our-process/ */
+  more?: Link;
 };
 
 export type DisclosuresCopy = {

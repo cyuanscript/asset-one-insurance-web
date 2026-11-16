@@ -55,6 +55,23 @@ const photoSlots = {
   processHealth: { src: '/images/advisor-office-lounge.jpg', caption: 'Advisor reviewing notes with a client in a bright office lounge', position: '50% 40%' },
   annuitiesHero: { src: '/images/retired-couple-beach-picnic.jpg', caption: 'Retired couple sharing a tablet during a beach picnic', position: '50% 40%' },
   processAnnuities: { src: '/images/advisor-client-financial-review.jpg', caption: 'Advisor walking a client through financial charts at a table', position: '50% 35%' },
+  // Our Process page: photo beside the "Get started" intro
+  processIntro: { src: '/images/grandparents-grandchildren-music.jpg', caption: 'Grandparents playing music with their grandchildren at home', position: '50% 45%' },
+
+  // Coverage cards on the Services pages: one image per coverage type.
+  // The key is `coverage-<card id>` (card ids live in the page's i18n file).
+  // Until `src` is set, each card shows a striped placeholder with this caption.
+  'coverage-term': { src: '', caption: 'Image: Term life' },
+  'coverage-whole': { src: '', caption: 'Image: Whole life' },
+  'coverage-iul': { src: '', caption: 'Image: Indexed universal life' },
+  'coverage-survivorship': { src: '', caption: 'Image: Survivorship life' },
+  'coverage-individual': { src: '', caption: 'Image: Individual and family' },
+  'coverage-group': { src: '', caption: 'Image: Small business group' },
+  'coverage-advantage': { src: '', caption: 'Image: Medicare Advantage' },
+  'coverage-supplement': { src: '', caption: 'Image: Medicare Supplement' },
+  'coverage-myga': { src: '', caption: 'Image: Multi-year guaranteed annuity' },
+  'coverage-spia': { src: '', caption: 'Image: Immediate annuity' },
+  'coverage-fia': { src: '', caption: 'Image: Fixed indexed annuity' },
 } satisfies Record<string, PhotoSlot>;
 
 export type PhotoKey = keyof typeof photoSlots;
@@ -77,9 +94,9 @@ const en = {
       { label: 'Annuities', href: '/services/annuities/', note: 'Steady retirement income' },
     ],
     links: [
-      { label: 'Insurance & You', href: '/insurance-and-you/' },
+      { label: 'Our Process', href: '/our-process/' },
       { label: 'About', href: '/about/' },
-      { label: 'News', href: '/news/' },
+      { label: 'Insights', href: '/insights/' },
     ],
     contact: 'Contact',
     contactHref: '/contact/',
@@ -108,31 +125,31 @@ const en = {
       {
         name: 'Family Protection',
         body: 'If others depend on your income, life insurance can help them keep the home, the routines and the plans you made together.',
-        fits: ['Term life', 'Permanent life'],
+        fits: [{ label: 'Term life', href: '/services/life-insurance/#term' }, { label: 'Permanent life', href: '/services/life-insurance/#whole' }],
         photo: 'stageFamily',
       },
       {
         name: 'Education Funding',
         body: "Some policies build cash value over time that may help with a child's education costs. We explain the trade-offs next to other ways to save.",
-        fits: ['Permanent life', 'Indexed universal life'],
+        fits: [{ label: 'Permanent life', href: '/services/life-insurance/#whole' }, { label: 'Indexed universal life', href: '/services/life-insurance/#iul' }],
         photo: 'stageEducation',
       },
       {
         name: 'Retirement Income',
         body: 'Annuities can help turn part of your savings into income that continues for a set period or for life.',
-        fits: ['Fixed annuities', 'Indexed annuities'],
+        fits: [{ label: 'Fixed annuities', href: '/services/annuities/#myga' }, { label: 'Indexed annuities', href: '/services/annuities/#fia' }],
         photo: 'stageRetirement',
       },
       {
         name: 'Investment Growth',
         body: 'Some insurance products offer growth potential with a degree of protection from loss. We walk through the costs, caps and limits in plain language.',
-        fits: ['Indexed annuities', 'Indexed universal life'],
+        fits: [{ label: 'Indexed annuities', href: '/services/annuities/#fia' }, { label: 'Indexed universal life', href: '/services/life-insurance/#iul' }],
         photo: 'stageGrowth',
       },
       {
         name: 'Legacy Planning',
         body: "Life insurance can help pass on what you've built to the people and causes you care about, in coordination with your CPA or estate attorney.",
-        fits: ['Permanent life', 'Survivorship life'],
+        fits: [{ label: 'Permanent life', href: '/services/life-insurance/#whole' }, { label: 'Survivorship life', href: '/services/life-insurance/#survivorship' }],
         photo: 'stageLegacy',
       },
     ],
@@ -174,8 +191,9 @@ const en = {
     companyHeading: 'Company',
     company: [
       { label: 'Insurance & You', href: '/insurance-and-you/' },
+      { label: 'Our Process', href: '/our-process/' },
       { label: 'About', href: '/about/' },
-      { label: 'News', href: '/news/' },
+      { label: 'Insights', href: '/insights/' },
       { label: 'Contact', href: '/contact/' },
     ],
     newsletterHeading: 'Newsletter',
@@ -210,9 +228,9 @@ const zh: typeof en = {
       { label: '年金', href: '/services/annuities/', note: '稳定的退休收入' },
     ],
     links: [
-      { label: '保险与您', href: '/insurance-and-you/' },
+      { label: '我们的流程', href: '/our-process/' },
       { label: '关于我们', href: '/about/' },
-      { label: '新闻', href: '/news/' },
+      { label: '洞察', href: '/insights/' },
     ],
     contact: '联系我们',
     contactHref: '/contact/',
@@ -240,31 +258,31 @@ const zh: typeof en = {
       {
         name: '家庭保障',
         body: '如果家人依靠您的收入生活，寿险可以帮助他们守住家园、日常生活和你们共同的规划。',
-        fits: ['定期寿险', '永久寿险'],
+        fits: [{ label: '定期寿险', href: '/services/life-insurance/#term' }, { label: '永久寿险', href: '/services/life-insurance/#whole' }],
         photo: 'stageFamily',
       },
       {
         name: '教育金规划',
         body: '有些保单会随时间累积现金价值，可能有助于支付孩子的教育费用。我们会把它与其他储蓄方式放在一起比较，讲清利弊。',
-        fits: ['永久寿险', '指数型万能寿险'],
+        fits: [{ label: '永久寿险', href: '/services/life-insurance/#whole' }, { label: '指数型万能寿险', href: '/services/life-insurance/#iul' }],
         photo: 'stageEducation',
       },
       {
         name: '退休收入',
         body: '年金可以帮助您把部分储蓄转化为在一定期限内或终身持续领取的收入。',
-        fits: ['固定年金', '指数型年金'],
+        fits: [{ label: '固定年金', href: '/services/annuities/#myga' }, { label: '指数型年金', href: '/services/annuities/#fia' }],
         photo: 'stageRetirement',
       },
       {
         name: '投资增长',
         body: '有些保险产品在提供增长潜力的同时，也能在一定程度上防范亏损。我们会用浅显的语言讲清费用、收益上限和各项限制。',
-        fits: ['指数型年金', '指数型万能寿险'],
+        fits: [{ label: '指数型年金', href: '/services/annuities/#fia' }, { label: '指数型万能寿险', href: '/services/life-insurance/#iul' }],
         photo: 'stageGrowth',
       },
       {
         name: '传承规划',
         body: '寿险可以帮助您把一生的积累传给您关心的人和公益事业，并与您的会计师或遗产律师协同规划。',
-        fits: ['永久寿险', '第二身故寿险'],
+        fits: [{ label: '永久寿险', href: '/services/life-insurance/#whole' }, { label: '第二身故寿险', href: '/services/life-insurance/#survivorship' }],
         photo: 'stageLegacy',
       },
     ],
@@ -305,8 +323,9 @@ const zh: typeof en = {
     companyHeading: '公司',
     company: [
       { label: '保险与您', href: '/insurance-and-you/' },
+      { label: '我们的流程', href: '/our-process/' },
       { label: '关于我们', href: '/about/' },
-      { label: '新闻', href: '/news/' },
+      { label: '洞察', href: '/insights/' },
       { label: '联系我们', href: '/contact/' },
     ],
     newsletterHeading: '订阅通讯',

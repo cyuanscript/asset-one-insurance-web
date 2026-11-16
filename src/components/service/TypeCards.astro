@@ -1,24 +1,57 @@
 ---
 /**
- * Coverage types: goal filter (V0) and a single row of compact cards
- * (four on Life Insurance, three on Annuities).
+ * Coverage types + comparison, merged into one section.
  *
- * Layout: the chips sit directly above a single row of four cards, so on a
- * laptop the goals and every card are on screen together. Below 1100px the
- * cards wrap, so cards that match the chosen goal move to the front (CSS
- * `order`), right under the chips.
+ * Replaces the former separate "Coverage types" cards and "Compare / At a
+ * glance" table. Each card now carries:
+ *   1. an image slot (photo key `coverage-<id>` in src/i18n/content.ts),
+ *   2. the name and a short summary,
+ *   3. the comparison levels for that option (Low / Medium / High bars),
+ *   4. a details drawer: "May fit", "Worth weighing" and the comparison
+ *      rows in words.
  *
- * Reusable pattern: "Goal chips that highlight cards". Any page with 3–6
- * options can reuse the chip + data-coverage markup and the script below.
+ * One "Compare in detail" button opens every card's drawer at once, so the
+ * rows line up across the cards (CSS subgrid) and still read like a table.
+ * The goal chips above dim and highlight cards as before.
+ *
+ * A card id in the URL hash (e.g. /services/life-insurance/#term, used by
+ * the homepage "May fit" chips) scrolls to that card and outlines it.
+ *
+ * `compareIds` maps each comparison column to a card id, in column order.
+ * Cards with no column (e.g. survivorship life) simply show no levels.
  */
 import SectionHeading from '../SectionHeading.astro';
-import type { TypesCopy } from '../../i18n/service-types';
+import Photo from '../Photo.astro';
+import type { CompareCopy, TypesCopy } from '../../i18n/service-types';
+import type { Locale, PhotoKey } from '../../i18n/content';
 
 interface Props {
+  locale: Locale;
   t: TypesCopy;
+  compare?: CompareCopy;
+  compareIds?: string[];
 }
-const { t } = Astro.props;
+const { locale, t, compare, compareIds = [] } = Astro.props;
 const allIds = t.cards.map((c) => c.id).join(' ');
+
+const ui = {
+  en: { more: 'Compare in detail', less: 'Hide details' },
+  zh: { more: '详细比较', less: '收起详情' },
+}[locale];
+
+/** Comparison rows for one card, split into levels (always shown) and words (in the drawer). */
+const glanceFor = (id: string) => {
+  const col = compareIds.indexOf(id);
+  if (!compare || col < 0) return { levels: [], words: [] };
+  const cells = compare.rows.map((r) => ({ label: r.label, cell: r.cells[col] })).filter((r) => r.cell);
+  return {
+    levels: cells.filter((r) => r.cell.level !== undefined),
+    words: cells,
+  };
+};
+const cards = t.cards.map((c) => ({ ...c, glance: glanceFor(c.id) }));
+const hasLevels = cards.some((c) => c.glance.levels.length > 0);
+const drawerId = `types-drawer`;
 ---
 
 <section class="section types" aria-labelledby="types-title" id="types">
@@ -61,11 +94,16 @@ const allIds = t.cards.map((c) => c.id).join(' ');
       </p>
     </div>
 
-    <ul class="type-cards" style={`--cards:${t.cards.length}`}>
+    <ul class="type-cards" style={`--cards:${t.cards.length}`} data-type-cards>
       {
-        t.cards.map((c, i) => (
+        cards.map((c, i) => (
           <li class="type-card" data-coverage={c.id} data-reveal style={`--reveal-delay:${i * 80}ms`}>
+            <div class="type-card__media">
+              <Photo photo={`coverage-${c.id}` as PhotoKey} class="type-card__photo" />
+            </div>
+
             <h3 class="type-card__name">{c.name}</h3>
+
             <div class="type-card__intro">
               <p class="type-card__summary">{c.summary}</p>
               {c.bullets && (
@@ -77,18 +115,76 @@ const allIds = t.cards.map((c) => c.id).join(' ');
               )}
               {c.note && <p class="type-card__note">{c.note}</p>}
             </div>
-            <div class="type-card__fact">
-              <p class="type-card__label">{t.labels.mayFit}</p>
-              <p class="type-card__text">{c.mayFit}</p>
+
+            <div class="type-card__levels">
+              {c.glance.levels.length > 0 && (
+                <ul class="meters">
+                  {c.glance.levels.map(({ label, cell }) => (
+                    <li class="meter">
+                      <span class="meter__label">{label}</span>
+                      <span class:list={['meter__value', `level--${cell.level}`]}>
+                        <span class="meter__bar" aria-hidden="true">
+                          {[0, 1, 2].map((k) => (
+                            <i class:list={{ on: k < (cell.level ?? 0) }} style={`--k:${k}`} />
+                          ))}
+                        </span>
+                        <span class="visually-hidden">: </span>
+                        <span class="meter__word">{compare?.levels[cell.level ?? 0]}</span>
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+              )}
             </div>
-            <div class="type-card__fact">
-              <p class="type-card__label">{t.labels.weigh}</p>
-              <p class="type-card__text">{c.weigh}</p>
+
+            <div class="type-card__drawer" data-drawer id={`${drawerId}-${c.id}`}>
+              <div class="type-card__drawer-inner">
+                <dl class="facts">
+                  <div class="fact fact--accent">
+                    <dt>{t.labels.mayFit}</dt>
+                    <dd>{c.mayFit}</dd>
+                  </div>
+                  <div class="fact fact--accent">
+                    <dt>{t.labels.weigh}</dt>
+                    <dd>{c.weigh}</dd>
+                  </div>
+                  {c.glance.words.map(({ label, cell }) => (
+                    <div class="fact">
+                      <dt>{label}</dt>
+                      <dd>{cell.text}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </div>
             </div>
           </li>
         ))
       }
     </ul>
+
+    <div class="types__foot" data-reveal>
+      <button
+        type="button"
+        class="types__toggle"
+        aria-expanded="false"
+        aria-controls={cards.map((c) => `${drawerId}-${c.id}`).join(' ')}
+        data-types-toggle
+        data-more={ui.more}
+        data-less={ui.less}
+      >
+        <span data-types-toggle-label>{ui.more}</span>
+        <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true">
+          <path d="M3 5.2 7 9.2l4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      </button>
+      {
+        compare && (
+          <p class="types__legend">
+            {hasLevels && compare.legend} {compare.footnote}
+          </p>
+        )
+      }
+    </div>
   </div>
 </section>
 
@@ -165,7 +261,7 @@ const allIds = t.cards.map((c) => c.id).join(' ');
     margin-left: 6px;
   }
 
-  /* Cards: one row of four */
+  /* ---------- Cards ---------- */
   .type-cards {
     display: grid;
     grid-template-columns: repeat(var(--cards, 4), minmax(0, 1fr));
@@ -179,39 +275,83 @@ const allIds = t.cards.map((c) => c.id).join(' ');
     margin-top: 40px;
   }
 
-  /* Subgrid: each card spans four shared rows (name, intro, may fit,
-     worth weighing), so the labels line up across the row of cards */
+  /* Subgrid: each card spans five shared rows (image, name, intro, levels,
+     drawer), so levels and drawer rows line up across the cards */
   .type-card {
     display: grid;
-    grid-row: span 4;
+    grid-row: span 5;
     grid-template-rows: subgrid;
     row-gap: 0;
     align-content: start;
-    padding: 20px 20px 22px;
+    overflow: hidden;
     background: var(--white);
     border-radius: var(--radius);
     box-shadow: var(--shadow);
-    border-top: 3px solid transparent;
     transition:
       opacity 250ms ease,
-      border-color 250ms ease;
+      box-shadow 250ms ease;
   }
 
-  .type-card.is-match {
-    border-top-color: var(--sky);
+  /* Highlight: a Sky line along the bottom of the image */
+  .type-card__media {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    border-bottom: 3px solid transparent;
+    transition: border-color 250ms ease;
+  }
+
+  .type-card.is-match .type-card__media {
+    border-bottom-color: var(--sky);
+  }
+
+  /* Arrived from a link to this card (#term etc.): a Sky outline fades in */
+  .type-card {
+    scroll-margin-top: 112px;
+    outline: 2px solid transparent;
+    outline-offset: 4px;
+  }
+
+  .type-card.is-spotlit {
+    outline-color: var(--sky);
+    transition:
+      opacity 250ms ease,
+      box-shadow 250ms ease,
+      outline-color 500ms ease 400ms;
+  }
+
+  .type-card.is-spotlit .type-card__media {
+    border-bottom-color: var(--sky);
   }
 
   .type-cards .type-card.is-dim {
     opacity: 0.45;
   }
 
+  .type-card__media :global(.type-card__photo) {
+    position: absolute;
+    inset: 0;
+  }
+
+  .type-card__media :global(img) {
+    transition: transform 600ms var(--ease-out);
+  }
+
+  .type-card:hover .type-card__media :global(img) {
+    transform: scale(1.03);
+  }
+
   .type-card__name {
+    padding: 18px 20px 0;
     font: 400 23px/1.2 var(--serif);
   }
 
   :lang(zh) .type-card__name {
     font-size: 22px;
     line-height: 1.4;
+  }
+
+  .type-card__intro {
+    padding: 0 20px;
   }
 
   .type-card__summary {
@@ -253,25 +393,183 @@ const allIds = t.cards.map((c) => c.id).join(' ');
     color: var(--slate);
   }
 
-  .type-card__fact {
-    padding-top: 12px;
+  /* ---------- Levels ---------- */
+  .type-card__levels {
+    padding: 14px 20px 20px;
   }
 
-  .type-card__label {
-    font: 700 11px/1.4 var(--sans);
-    letter-spacing: 0.12em;
+  .meters {
+    margin: 0;
+    padding: 12px 0 0;
+    list-style: none;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .meter {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 5px 0;
+    font-size: 13px;
+    line-height: 1.35;
+    color: var(--slate);
+  }
+
+  .meter__value {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+  }
+
+  .meter__bar {
+    display: inline-flex;
+    gap: 3px;
+  }
+
+  .meter__bar i {
+    display: block;
+    width: 13px;
+    height: 5px;
+    border-radius: 3px;
+    background: var(--hairline);
+  }
+
+  .meter__bar i.on {
+    background: var(--deep-sky);
+  }
+
+  .meter__word {
+    min-width: 4.6em;
+    font: 700 10.5px/1 var(--sans);
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    /* Deep red, not Scarlet: at 11px the label needs 4.5:1 on white */
-    color: var(--deep-red);
+    color: var(--deep-sky);
   }
 
-  :lang(zh) .type-card__label {
+  :lang(zh) .meter__word {
+    min-width: 2.4em;
     font-size: 12px;
     letter-spacing: 0.04em;
   }
 
-  .type-card__text {
-    margin-top: 3px;
+  .level--0 .meter__word {
+    color: var(--slate);
+  }
+
+  /* Segments fill one by one when the card is revealed */
+  :global(.js) .type-card .meter__bar i.on {
+    background: var(--hairline);
+    transition: background-color 300ms ease;
+    transition-delay: calc(500ms + var(--k) * 90ms);
+  }
+
+  :global(.js) .type-card.is-revealed .meter__bar i.on {
+    background: var(--deep-sky);
+  }
+
+  /* ---------- Drawer ---------- */
+  /* Without JS the drawer is simply open */
+  .type-card__drawer {
+    display: grid;
+    grid-template-rows: 1fr;
+    transition: grid-template-rows 450ms var(--ease-out);
+  }
+
+  :global(.js) .type-cards:not(.is-open) .type-card__drawer {
+    grid-template-rows: 0fr;
+  }
+
+  .type-card__drawer-inner {
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  :global(.js) .type-cards:not(.is-open) .type-card__drawer-inner {
+    visibility: hidden;
+    transition: visibility 0s 450ms;
+  }
+
+  .facts {
+    margin: 0 20px 22px;
+    padding-top: 4px;
+    border-top: 1px solid var(--hairline);
+  }
+
+  .fact {
+    padding-top: 12px;
+  }
+
+  .fact dt {
+    font: 700 11px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--deep-sky);
+  }
+
+  /* Deep red, not Scarlet: at 11px the label needs 4.5:1 on white */
+  .fact--accent dt {
+    color: var(--deep-red);
+  }
+
+  :lang(zh) .fact dt {
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+
+  .fact dd {
+    margin: 3px 0 0;
+    font-size: 14px;
+    line-height: 1.55;
+    color: var(--slate);
+  }
+
+  /* ---------- Toggle + legend ---------- */
+  .types__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px 24px;
+    margin-top: 24px;
+  }
+
+  :global(html:not(.js)) .types__toggle {
+    display: none;
+  }
+
+  .types__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+    padding: 10px 20px;
+    border: 1.5px solid var(--deep-sky);
+    border-radius: 999px;
+    background: var(--white);
+    color: var(--deep-sky);
+    font: 700 15px/1.2 var(--sans);
+    cursor: pointer;
+    transition:
+      background-color 200ms ease,
+      color 200ms ease;
+  }
+
+  .types__toggle:hover {
+    background: var(--deep-sky);
+    color: var(--white);
+  }
+
+  .types__toggle svg {
+    transition: transform 300ms var(--ease-out);
+  }
+
+  .types__toggle[aria-expanded='true'] svg {
+    transform: rotate(180deg);
+  }
+
+  .types__legend {
+    flex: 1 1 320px;
     font-size: 14px;
     line-height: 1.55;
     color: var(--slate);
@@ -288,6 +586,11 @@ const allIds = t.cards.map((c) => c.id).join(' ');
   @media (max-width: 1099px) {
     .type-cards {
       grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    /* Three cards: let the last one span both columns */
+    .type-cards[style*='--cards:3'] .type-card:last-child {
+      grid-column: 1 / -1;
     }
 
     .type-card.is-match {
@@ -314,12 +617,28 @@ const allIds = t.cards.map((c) => c.id).join(' ');
       gap: 12px;
     }
 
-    .type-card {
-      padding: 22px 20px;
+    .type-cards[style*='--cards:3'] .type-card:last-child {
+      grid-column: auto;
+    }
+
+    .type-card__media {
+      aspect-ratio: 16 / 9;
     }
 
     .type-card__name {
       font-size: 23px;
+    }
+
+    .types__toggle {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .type-card__drawer,
+    .types__toggle svg {
+      transition: none;
     }
   }
 </style>
@@ -354,10 +673,46 @@ const allIds = t.cards.map((c) => c.id).join(' ');
 
     chips.forEach((chip) => {
       chip.addEventListener('click', () => {
+        cards.forEach((card) => card.classList.remove('is-spotlit'));
         // Pressing the active goal again returns to "All four"
         const pressed = chip.getAttribute('aria-pressed') === 'true';
         select(pressed && chip.dataset.goal !== 'all' ? chips[0] : chip);
       });
     });
+  });
+
+  // "Compare in detail": opens every card's drawer together
+  document.querySelectorAll<HTMLButtonElement>('[data-types-toggle]').forEach((btn) => {
+    const list = btn.closest('section')?.querySelector<HTMLElement>('[data-type-cards]');
+    const label = btn.querySelector<HTMLElement>('[data-types-toggle-label]');
+    if (!list) return;
+    btn.addEventListener('click', () => {
+      const open = btn.getAttribute('aria-expanded') !== 'true';
+      btn.setAttribute('aria-expanded', String(open));
+      list.classList.toggle('is-open', open);
+      if (label) label.textContent = (open ? btn.dataset.less : btn.dataset.more) ?? '';
+    });
+  });
+
+  // #term, #whole, #myga…: glide to that card and outline it
+  document.querySelectorAll<HTMLElement>('[data-type-cards]').forEach((list) => {
+    const cards = Array.from(list.querySelectorAll<HTMLElement>('[data-coverage]'));
+    const allChip = list.closest('section')?.querySelector<HTMLButtonElement>('[data-goal="all"]');
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const show = () => {
+      const card = cards.find((c) => `#${c.dataset.coverage}` === location.hash);
+      if (!card) return;
+      // Clear any goal filter so the card isn't dimmed
+      if (allChip && allChip.getAttribute('aria-pressed') !== 'true') allChip.click();
+      cards.forEach((c) => c.classList.toggle('is-spotlit', c === card));
+      const go = () =>
+        window.setTimeout(() => card.scrollIntoView({ block: 'start', behavior: reduce ? 'instant' : 'smooth' }), 250);
+      if (document.readyState === 'complete') go();
+      else window.addEventListener('load', go, { once: true });
+    };
+
+    show();
+    window.addEventListener('hashchange', show);
   });
 </script>

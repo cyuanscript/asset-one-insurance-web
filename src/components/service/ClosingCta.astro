@@ -1,32 +1,79 @@
 ---
+/**
+ * "Let's talk" band, centred, with the contact button, the phone number
+ * and an optional text link (e.g. to /our-process/).
+ *
+ * Two looks:
+ *  - with `photo`: a full-bleed photo tinted deep blue, the same treatment
+ *    as the "Step by step" band on /our-process/. Used on the Services
+ *    pages, right after the coverage cards.
+ *  - without: the plain white band (Our Process, Insights).
+ */
+import Photo from '../Photo.astro';
 import type { CtaCopy } from '../../i18n/service-types';
-import { contact, localePath, type Locale } from '../../i18n/content';
+import { contact, localePath, type Locale, type PhotoKey } from '../../i18n/content';
 
 interface Props {
   locale: Locale;
   t: CtaCopy;
+  photo?: PhotoKey;
 }
-const { locale, t } = Astro.props;
+const { locale, t, photo } = Astro.props;
 ---
 
-<section class="section section--white cta" aria-labelledby="cta-title">
+<section
+  class:list={['section cta', photo ? 'cta--photo on-dark' : 'section--white']}
+  aria-labelledby="cta-title"
+  id="talk"
+>
+  {
+    photo && (
+      <>
+        <div class="cta__media" aria-hidden="true">
+          <Photo photo={photo} tone="dark" class="cta__photo" />
+        </div>
+        <div class="cta__tint" aria-hidden="true" />
+      </>
+    )
+  }
   <div class="container">
     <div class="cta__inner" data-reveal>
+      {t.eyebrow && <p class="eyebrow cta__eyebrow">{t.eyebrow}</p>}
       <h2 class="h2 cta__title" id="cta-title">{t.title}</h2>
       <p class="lead-text cta__body">{t.body}</p>
       <div class="cta__actions">
         <a class="btn btn-primary" href={localePath(locale, '/contact/')}>{t.primary}</a>
-        <a class="btn btn-outline" href={contact.phoneHref}>{t.phone} {contact.phone}</a>
+        <a class:list={['btn', photo ? 'btn-outline-light' : 'btn-outline']} href={contact.phoneHref}>
+          {t.phone} {contact.phone}
+        </a>
       </div>
+      {
+        t.more && (
+          <p class="cta__more">
+            <a href={localePath(locale, t.more.href)}>
+              {t.more.label} <span aria-hidden="true">→</span>
+            </a>
+          </p>
+        )
+      }
     </div>
   </div>
 </section>
 
 <style>
+  /* White band right after another white section: one gap, not two */
+  :global(.section--white) + .cta.section--white {
+    padding-top: 0;
+  }
+
   .cta__inner {
     max-width: 760px;
     margin-inline: auto;
     text-align: center;
+  }
+
+  .cta__eyebrow + .cta__title {
+    margin-top: 16px;
   }
 
   .cta__body {
@@ -39,6 +86,68 @@ const { locale, t } = Astro.props;
     justify-content: center;
     gap: 16px;
     margin-top: 36px;
+  }
+
+  .cta__more {
+    margin-top: 24px;
+  }
+
+  .cta__more a {
+    font: 700 15px/1.4 var(--sans);
+    color: var(--deep-sky);
+    text-decoration: underline;
+    text-decoration-color: currentColor;
+    text-underline-offset: 4px;
+    transition: text-decoration-color 200ms ease;
+  }
+
+  /* ---------- Photo band (Services pages) ---------- */
+  .cta--photo {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    background: var(--ink);
+    color: var(--white);
+  }
+
+  .cta__media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+  }
+
+  .cta__media :global(.cta__photo) {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* Same tint as the Step by step band on /our-process/ */
+  .cta__tint {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background: linear-gradient(100deg, rgba(12, 30, 46, 0.94) 0%, rgba(14, 48, 76, 0.88) 50%, rgba(26, 102, 153, 0.8) 100%);
+  }
+
+  .cta--photo .cta__eyebrow {
+    color: var(--light-blue);
+  }
+
+  .cta--photo .cta__title {
+    color: var(--white);
+  }
+
+  .cta--photo .cta__body {
+    color: rgba(255, 255, 255, 0.84);
+  }
+
+  .cta--photo .cta__more a {
+    color: var(--white);
+    text-decoration-color: rgba(255, 255, 255, 0.4);
+  }
+
+  .cta--photo .cta__more a:hover {
+    text-decoration-color: var(--white);
   }
 
   @media (max-width: 640px) {
