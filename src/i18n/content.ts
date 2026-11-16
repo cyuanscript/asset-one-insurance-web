@@ -60,18 +60,18 @@ const photoSlots = {
 
   // Coverage cards on the Services pages: one image per coverage type.
   // The key is `coverage-<card id>` (card ids live in the page's i18n file).
-  // Until `src` is set, each card shows a striped placeholder with this caption.
-  'coverage-term': { src: '', caption: 'Image: Term life' },
-  'coverage-whole': { src: '', caption: 'Image: Whole life' },
-  'coverage-iul': { src: '', caption: 'Image: Indexed universal life' },
-  'coverage-survivorship': { src: '', caption: 'Image: Survivorship life' },
-  'coverage-individual': { src: '', caption: 'Image: Individual and family' },
-  'coverage-group': { src: '', caption: 'Image: Small business group' },
-  'coverage-advantage': { src: '', caption: 'Image: Medicare Advantage' },
-  'coverage-supplement': { src: '', caption: 'Image: Medicare Supplement' },
-  'coverage-myga': { src: '', caption: 'Image: Multi-year guaranteed annuity' },
-  'coverage-spia': { src: '', caption: 'Image: Immediate annuity' },
-  'coverage-fia': { src: '', caption: 'Image: Fixed indexed annuity' },
+  // Web copies live in public/images/coverage/<card id>.jpg (originals in photo-originals/coverage/).
+  'coverage-term': { src: '/images/coverage/term.jpg', caption: 'Young parents hugging their smiling toddler daughter in an autumn park', position: '50% 35%' },
+  'coverage-whole': { src: '/images/coverage/whole.jpg', caption: 'Smiling older couple standing close together against a plain wall', position: '50% 35%' },
+  'coverage-iul': { src: '/images/coverage/iul.jpg', caption: 'Two people pointing at a printed bar chart of market activity', position: '50% 50%' },
+  'coverage-survivorship': { src: '/images/coverage/survivorship.jpg', caption: 'Three generations of a family gathered around a girl holding a camera', position: '50% 55%' },
+  'coverage-individual': { src: '/images/coverage/individual.jpg', caption: 'Smiling older woman in a cardigan standing in a backyard set for a garden party', position: '40% 35%' },
+  'coverage-group': { src: '/images/coverage/group.jpg', caption: 'Two café coworkers in aprons chatting over coffee during a break', position: '50% 40%' },
+  'coverage-advantage': { src: '/images/coverage/advantage.jpg', caption: 'Woman talking with a healthcare worker in scrubs in a bright waiting area', position: '50% 40%' },
+  'coverage-supplement': { src: '/images/coverage/supplement.jpg', caption: 'Woman in a pink sweater holding a red felt heart and a stethoscope', position: '50% 50%' },
+  'coverage-myga': { src: '/images/coverage/myga.jpg', caption: 'Older couple reviewing something together on a laptop at a desk', position: '50% 40%' },
+  'coverage-spia': { src: '/images/coverage/spia.jpg', caption: 'Retired couple on their sofa checking a phone and a laptop together', position: '50% 45%' },
+  'coverage-fia': { src: '/images/coverage/fia.jpg', caption: 'Woman on a phone call watching a market chart on her tablet by a window', position: '50% 50%' },
 } satisfies Record<string, PhotoSlot>;
 
 export type PhotoKey = keyof typeof photoSlots;
