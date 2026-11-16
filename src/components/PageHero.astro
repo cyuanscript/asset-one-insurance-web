@@ -74,8 +74,12 @@ const { eyebrow, title, lead, photo, primary, secondary } = Astro.props;
 <style>
   .page-hero {
     position: relative;
-    height: 680px;
-    max-height: max(600px, 92svh);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    /* Grows past this when the copy is tall, so it never slides under the fixed header */
+    min-height: min(680px, max(600px, 92svh));
+    padding: calc(96px + 40px) 0 80px;
     overflow: hidden;
     background: #2e4250;
     color: var(--white);
@@ -120,10 +124,7 @@ const { eyebrow, title, lead, photo, primary, secondary } = Astro.props;
   }
 
   .page-hero__content {
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 80px;
+    position: relative;
   }
 
   .page-hero__copy {
@@ -222,12 +223,8 @@ const { eyebrow, title, lead, photo, primary, secondary } = Astro.props;
 
   @media (max-width: 767px) {
     .page-hero {
-      height: 620px;
-      max-height: max(540px, 100svh);
-    }
-
-    .page-hero__content {
-      bottom: 36px;
+      min-height: min(620px, max(540px, 100svh));
+      padding: calc(64px + 32px) 0 36px;
     }
 
     .page-hero__eyebrow {
