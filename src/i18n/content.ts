@@ -30,6 +30,18 @@ export const contact = {
 };
 
 /**
+ * Sister companies in the Asset One family. Shared by the footer
+ * "Asset One Family" column and the About page family section; the
+ * per-language descriptions live in `family` in the copy below.
+ */
+export const familySites = [
+  { id: 'wealth', name: 'Asset One Wealth Management', url: 'https://www.assetone.com/' },
+  { id: 'tax', name: 'Asset One Tax', url: 'https://www.assetonetax.com/' },
+] as const;
+
+export type FamilyId = (typeof familySites)[number]['id'];
+
+/**
  * Photo slots. Drop files into /public/images and set `src` to use them.
  * `position` (optional) sets the crop focal point, e.g. '50% 40%'.
  */
@@ -188,6 +200,14 @@ const en = {
       },
     ],
   },
+  family: {
+    heading: 'Asset One Family',
+    newTab: '(opens in a new tab)',
+    notes: {
+      wealth: 'Wealth planning, investment management and family office services.',
+      tax: 'Tax preparation and planning for individuals, families and businesses.',
+    } satisfies Record<FamilyId, string>,
+  },
   footer: {
     ctaBefore: 'Questions are welcome, in English or ',
     ctaAccent: '中文',
@@ -209,7 +229,7 @@ const en = {
     subscribing: 'Subscribing…',
     success: "Thanks! You're on the list.",
     error: 'Please enter a valid email address.',
-    sibling: 'A sibling of Asset One Wealth Management',
+    sibling: 'Part of the Asset One family of companies',
     legal: [
       { label: 'Disclosures', href: '/disclosures/' },
       { label: 'Privacy', href: '/privacy/' },
@@ -319,6 +339,14 @@ const zh: typeof en = {
       },
     ],
   },
+  family: {
+    heading: 'Asset One 家族',
+    newTab: '（在新标签页中打开）',
+    notes: {
+      wealth: '财富规划、投资管理与家族办公室服务。',
+      tax: '为个人、家庭及企业提供报税与税务规划。',
+    },
+  },
   footer: {
     ctaBefore: '欢迎提问，英文或',
     ctaAccent: '中文',
@@ -340,7 +368,7 @@ const zh: typeof en = {
     subscribing: '正在订阅…',
     success: '感谢订阅！',
     error: '请输入有效的电子邮箱地址。',
-    sibling: 'Asset One Wealth Management 旗下姊妹公司',
+    sibling: 'Asset One 家族成员公司',
     legal: [
       { label: '披露信息', href: '/disclosures/' },
       { label: '隐私', href: '/privacy/' },

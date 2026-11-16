@@ -2,7 +2,7 @@
  * Copy for /about/ (EN) and /zh/about/.
  *
  * Structure follows assetone.com/about: band hero, a photo + "who we are"
- * intro, the team grid, then the Let's talk band.
+ * intro, the team grid, the Let's talk band, then the Asset One family section.
  *
  * Team: add a person by filling in an entry below. Portraits go in
  * public/images/team/<first-last>.jpg with a matching `team-<first-last>`
@@ -104,6 +104,14 @@ const en = {
     primary: 'Schedule a call',
     phone: 'Call',
   },
+  family: {
+    eyebrow: 'The Asset One family',
+    title: 'Part of a bigger picture',
+    body: 'Insurance is one piece of a complete plan. Our sister companies help with the rest, so your coverage, investments and taxes can work together.',
+    visit: 'Visit site',
+    disclosure:
+      '[PLACEHOLDER] Asset One Insurance, Asset One Wealth Management and Asset One Tax are separate companies. Confirm this wording with compliance.',
+  },
   cta: {
     eyebrow: 'Let’s talk',
     title: 'Let’s talk about what you’re planning for',
@@ -182,6 +190,13 @@ const zh: AboutPageCopy = {
     license: '执照',
     primary: '预约通话',
     phone: '致电',
+  },
+  family: {
+    eyebrow: 'Asset One 家族',
+    title: '整体规划中的一环',
+    body: '保险只是完整规划的一部分。我们的姊妹公司负责其余部分，让您的保障、投资与税务协同运作。',
+    visit: '访问网站',
+    disclosure: '[待补充] Asset One Insurance、Asset One Wealth Management 与 Asset One Tax 为各自独立的公司。请与合规部门确认此措辞。',
   },
   cta: {
     eyebrow: '聊一聊',
