@@ -22,17 +22,20 @@ Requires Node 18.14 or newer.
 | `content-packs/` | Page copy decks (EN + 中文) for inner pages, ready to move into `content.ts` |
 | `src/styles/global.css` | Design tokens (colours, type, spacing, motion), buttons, reveal animation |
 | `src/components/` | Header, Hero, PageHero (inner pages), LifeStages (selector), Products, Footer, LogoMark, Photo |
-| `src/components/service/` | Sections shared by every Services page: Basics, TypeCards (goal chips + cards), CompareTable (Low/Medium/High), FeatureGrid, Process, Faq, WhereItFits, ClosingCta, Disclosures. Each takes its copy as a `t` prop (shapes in `src/i18n/service-types.ts`) |
-| `src/components/life/`, `health/`, `annuities/` | Page assemblers for each Services page (plus Life's BusinessPlanning section) |
-| `src/components/news/` | News index and article page, BandHero (compact dark hero), ArticleCard, ArticleCover (typographic cover) |
-| `src/content/news/{en,zh}/` | News articles as Markdown, one file per language with the same filename (= URL slug). Schema in `src/content/config.ts`; how-to in `content-packs/news.md` |
+| `src/components/service/` | Sections shared by every Services page: Basics, TypeCards (coverage cards merged with the comparison: image slot, goal chips, Low/Medium/High meters and a "Compare in detail" drawer; a card id in the hash, e.g. `/services/life-insurance/#term`, scrolls to that card and outlines it, which is what the homepage "May fit" chips link to), FeatureGrid, Faq, ClosingCta (the "Let's talk" band: pass `photo` for the tinted photo version used on the Services pages, leave it out for the white one on Our Process and Insights), Disclosures. WhereItFits is archived (on no page). Process (the How we work band with the Life / Health / Annuities slider) is used on Our Process. Each takes its copy as a `t` prop (shapes in `src/i18n/service-types.ts`) |
+| `src/components/life/`, `health/`, `annuities/` | Page assemblers for each Services page. Archived, not on any page: Life's BusinessPlanning (Advanced planning), Health's Plain terms + CostSharing chart and Timing (copy kept in the i18n files) |
+| `src/components/process/`, `src/i18n/process.ts` | Our Process page (`/our-process/`). Steps come from each Services file's `process` / `processDetails`; `#life`, `#health`, `#annuities` open a tab |
+| `src/components/news/` | Insights (formerly News) index and article page, BandHero (compact dark hero), ArticleCard, ArticleCover (typographic cover) |
+| `src/content/news/{en,zh}/` | Insights articles as Markdown, one file per language with the same filename (= URL slug). Schema in `src/content/config.ts`; how-to in `content-packs/news.md` |
 | `src/components/viz/`, `src/components/guides/` | Charts and a tabbed section for a future Insurance & You guide on cash value (copy in `src/i18n/guides/cash-value.ts`). Not on any page yet |
 | `src/i18n/life-insurance.ts`, `health-insurance.ts`, `annuities.ts` | Services page copy (EN + 中文), from the matching `content-packs/services-*.md` |
-| `src/i18n/news.ts` | News page copy and the reading-time helper |
+| `src/i18n/news.ts` | Insights page copy and the reading-time helper |
 | `src/scripts/motion.ts` | Scroll reveals and hero parallax |
 | `src/pages/index.astro`, `src/pages/zh/index.astro` | English and Chinese homepage routes |
 | `src/pages/services/*.astro` (+ `zh/`) | Life Insurance, Health Insurance and Annuities pages |
-| `src/pages/news/` (+ `zh/`) | `/news/` and `/news/<slug>/` |
+| `src/pages/insights/` (+ `zh/`) | `/insights/` and `/insights/<slug>/` (old `/news/` URLs redirect, see `astro.config.mjs`) |
+| `src/pages/our-process/` (+ `zh/`) | `/our-process/` |
+| `src/components/about/`, `src/i18n/about.ts` | About page (`/about/`): band hero (homepage Lake Washington photo), handshake photo + intro, Meet our team grid (3 columns), Let's talk band. Team members are listed in `about.ts`; portraits go in `public/images/team/<first-last>.jpg` with a `team-<first-last>` photo slot. Entries with no name show as blank seats. A member with a `profile` gets a page at `/about/<id>/` (`TeamMemberPage.astro`, routes in `src/pages/about/[member].astro` + `zh/`) and their card links there |
 | `public/brand/` | Logo: original PNG plus vector mark (`asset-one-mark.svg`, `-reversed.svg` for dark grounds) |
 
 ## Adding photos
@@ -62,9 +65,11 @@ describing the intended shot.
 - Final body copy from the content packs; native review of the draft Chinese.
 - Newsletter: the form validates and shows success/error states but is **not
   connected to a mailing service yet** (see the TODO in `Footer.astro`).
-- Inner pages: Life Insurance, Health Insurance, Annuities and News are built.
-  Services overview, Insurance & You, About, Contact and the legal pages still 404.
+- About: Duncan Li's profile page (`/about/duncan-li/`) is placeholder copy (philosophy, background, languages, license no.); three team seats are blank (`src/i18n/about.ts`).
+- Coverage card images: one slot per coverage type, `coverage-<id>` in `photos` (`src/i18n/content.ts`).
+- Inner pages: Life Insurance, Health Insurance, Annuities, Our Process, Insights and About are built.
+  Services overview, Insurance & You, Contact and the legal pages still 404.
 - Health Insurance and Annuities: open [CONFIRM] items in their content packs
   (plan types offered, Medicare and marketplace certification, variable annuities).
-- News: tax review of the five articles (fact-check flags in `content-packs/news.md`),
+- Insights: tax review of the five articles (fact-check flags in `content-packs/news.md`),
   publication dates and bylines.

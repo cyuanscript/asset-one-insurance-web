@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| **Routes** | `/news/` and `/news/<slug>/` (EN) · `/zh/news/` and `/zh/news/<slug>/` (中文) |
+| **Routes** | `/insights/` and `/insights/<slug>/` (EN) · `/zh/insights/` and `/zh/insights/<slug>/` (中文). The section was renamed from News to Insights (洞察); old `/news/` links redirect |
 | **Status** | v1, 2026-11-12. Five articles built. **Needs a tax professional's review before launch** (see [Fact-check flags](#fact-check-flags)) and a native review of the Chinese |
 | **Source** | `Weekly Articles 5.1.zip`: five bilingual Word drafts from Global Sagacity Consulting ("彼岸 TWO SHORES · U.S. Tax Basics") |
 | **Where things live** | Articles: `src/content/news/en/<slug>.md` and `src/content/news/zh/<slug>.md` (same filename = same article). Page copy: `src/i18n/news.ts`. Schema: `src/content/config.ts` |

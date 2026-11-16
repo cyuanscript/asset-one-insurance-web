@@ -371,10 +371,12 @@ const en: HealthContent = {
   },
 
   cta: {
+    eyebrow: 'Let’s talk',
     title: 'Start with a conversation',
     body: 'Tell us who needs coverage and which doctors matter to you. We’ll compare the plans that may fit, with no pressure to decide.',
     primary: 'Talk with us',
     phone: 'Call',
+    more: { label: 'See how we work, step by step', href: '/our-process/#health' },
   },
 
   // CONFIRM: compliance sign-off; the Medicare statements follow CMS rules for agents
@@ -695,10 +697,12 @@ const zh: HealthContent = {
   },
 
   cta: {
+    eyebrow: '聊一聊',
     title: '从一次交流开始',
     body: '告诉我们谁需要保险、哪些医生对您很重要。我们会为您比较可能适合的计划，绝不催促您做决定。',
     primary: '联系我们',
     phone: '致电',
+    more: { label: '逐步了解我们的流程', href: '/our-process/#health' },
   },
 
   disclosures: {

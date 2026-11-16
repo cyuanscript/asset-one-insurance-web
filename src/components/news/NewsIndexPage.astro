@@ -33,7 +33,7 @@ const metaFor = (a: (typeof articles)[number]) =>
             <ArticleCard
               feature
               headingLevel="h3"
-              href={localePath(locale, `/news/${featured.urlSlug}/`)}
+              href={localePath(locale, `/insights/${featured.urlSlug}/`)}
               number={featured.data.order}
               cover={featured.data.cover}
               title={featured.data.title}
@@ -48,7 +48,7 @@ const metaFor = (a: (typeof articles)[number]) =>
             rest.map((a, i) => (
               <li>
                 <ArticleCard
-                  href={localePath(locale, `/news/${a.urlSlug}/`)}
+                  href={localePath(locale, `/insights/${a.urlSlug}/`)}
                   number={a.data.order}
                   cover={a.data.cover}
                   title={a.data.title}

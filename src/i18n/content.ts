@@ -30,6 +30,18 @@ export const contact = {
 };
 
 /**
+ * Sister companies in the Asset One family. Shared by the footer
+ * "Asset One Family" column and the About page family section; the
+ * per-language descriptions live in `family` in the copy below.
+ */
+export const familySites = [
+  { id: 'wealth', name: 'Asset One Wealth Management', url: 'https://www.assetone.com/' },
+  { id: 'tax', name: 'Asset One Tax', url: 'https://www.assetonetax.com/' },
+] as const;
+
+export type FamilyId = (typeof familySites)[number]['id'];
+
+/**
  * Photo slots. Drop files into /public/images and set `src` to use them.
  * `position` (optional) sets the crop focal point, e.g. '50% 40%'.
  */
@@ -55,6 +67,30 @@ const photoSlots = {
   processHealth: { src: '/images/advisor-office-lounge.jpg', caption: 'Advisor reviewing notes with a client in a bright office lounge', position: '50% 40%' },
   annuitiesHero: { src: '/images/retired-couple-beach-picnic.jpg', caption: 'Retired couple sharing a tablet during a beach picnic', position: '50% 40%' },
   processAnnuities: { src: '/images/advisor-client-financial-review.jpg', caption: 'Advisor walking a client through financial charts at a table', position: '50% 35%' },
+  // Our Process page: header background. Wide crop of the homepage Annuities photo
+  // (photo-originals/pexels-shkrabaanthony-5816285.jpg); the portrait web copy is too narrow for a full-width band
+  processHero: { src: '/images/advisor-client-financial-review-wide.jpg', caption: 'Advisor walking a client through financial charts at a table', position: '50% 35%' },
+  // Our Process page: photo beside the "Get started" intro
+  processIntro: { src: '/images/advisor-senior-couple-home-consultation.jpg', caption: 'Advisor smiling as he walks an older couple through paperwork at their dining table', position: '50% 40%' },
+
+  // About page: photo beside the intro, and team portraits (public/images/team/<first-last>.jpg)
+  aboutIntro: { src: '/images/business-handshake.jpg', caption: 'Close-up of two people in suits shaking hands', position: '45% 50%' },
+  'team-duncan-li': { src: '/images/team/duncan-li.jpg', caption: 'Portrait of Duncan Li, Managing Partner', position: '50% 20%' },
+
+  // Coverage cards on the Services pages: one image per coverage type.
+  // The key is `coverage-<card id>` (card ids live in the page's i18n file).
+  // Web copies live in public/images/coverage/<card id>.jpg (originals in photo-originals/coverage/).
+  'coverage-term': { src: '/images/coverage/term.jpg', caption: 'Young parents hugging their smiling toddler daughter in an autumn park', position: '50% 35%' },
+  'coverage-whole': { src: '/images/coverage/whole.jpg', caption: 'Smiling older couple standing close together against a plain wall', position: '50% 35%' },
+  'coverage-iul': { src: '/images/coverage/iul.jpg', caption: 'Two people pointing at a printed bar chart of market activity', position: '50% 50%' },
+  'coverage-survivorship': { src: '/images/coverage/survivorship.jpg', caption: 'Three generations of a family gathered around a girl holding a camera', position: '50% 55%' },
+  'coverage-individual': { src: '/images/coverage/individual.jpg', caption: 'Smiling older woman in a cardigan standing in a backyard set for a garden party', position: '40% 35%' },
+  'coverage-group': { src: '/images/coverage/group.jpg', caption: 'Two café coworkers in aprons chatting over coffee during a break', position: '50% 40%' },
+  'coverage-advantage': { src: '/images/coverage/advantage.jpg', caption: 'Woman talking with a healthcare worker in scrubs in a bright waiting area', position: '50% 40%' },
+  'coverage-supplement': { src: '/images/coverage/supplement.jpg', caption: 'Woman in a pink sweater holding a red felt heart and a stethoscope', position: '50% 50%' },
+  'coverage-myga': { src: '/images/coverage/myga.jpg', caption: 'Older couple reviewing something together on a laptop at a desk', position: '50% 40%' },
+  'coverage-spia': { src: '/images/coverage/spia.jpg', caption: 'Retired couple on their sofa checking a phone and a laptop together', position: '50% 45%' },
+  'coverage-fia': { src: '/images/coverage/fia.jpg', caption: 'Woman on a phone call watching a market chart on her tablet by a window', position: '50% 50%' },
 } satisfies Record<string, PhotoSlot>;
 
 export type PhotoKey = keyof typeof photoSlots;
@@ -77,9 +113,10 @@ const en = {
       { label: 'Annuities', href: '/services/annuities/', note: 'Steady retirement income' },
     ],
     links: [
-      { label: 'Insurance & You', href: '/insurance-and-you/' },
+      { label: 'Our Process', href: '/our-process/' },
       { label: 'About', href: '/about/' },
-      { label: 'News', href: '/news/' },
+      { label: 'Insights', href: '/insights/' },
+      { label: 'Media', href: '/media/' },
     ],
     contact: 'Contact',
     contactHref: '/contact/',
@@ -108,31 +145,31 @@ const en = {
       {
         name: 'Family Protection',
         body: 'If others depend on your income, life insurance can help them keep the home, the routines and the plans you made together.',
-        fits: ['Term life', 'Permanent life'],
+        fits: [{ label: 'Term life', href: '/services/life-insurance/#term' }, { label: 'Permanent life', href: '/services/life-insurance/#whole' }],
         photo: 'stageFamily',
       },
       {
         name: 'Education Funding',
         body: "Some policies build cash value over time that may help with a child's education costs. We explain the trade-offs next to other ways to save.",
-        fits: ['Permanent life', 'Indexed universal life'],
+        fits: [{ label: 'Permanent life', href: '/services/life-insurance/#whole' }, { label: 'Indexed universal life', href: '/services/life-insurance/#iul' }],
         photo: 'stageEducation',
       },
       {
         name: 'Retirement Income',
         body: 'Annuities can help turn part of your savings into income that continues for a set period or for life.',
-        fits: ['Fixed annuities', 'Indexed annuities'],
+        fits: [{ label: 'Fixed annuities', href: '/services/annuities/#myga' }, { label: 'Indexed annuities', href: '/services/annuities/#fia' }],
         photo: 'stageRetirement',
       },
       {
         name: 'Investment Growth',
         body: 'Some insurance products offer growth potential with a degree of protection from loss. We walk through the costs, caps and limits in plain language.',
-        fits: ['Indexed annuities', 'Indexed universal life'],
+        fits: [{ label: 'Indexed annuities', href: '/services/annuities/#fia' }, { label: 'Indexed universal life', href: '/services/life-insurance/#iul' }],
         photo: 'stageGrowth',
       },
       {
         name: 'Legacy Planning',
         body: "Life insurance can help pass on what you've built to the people and causes you care about, in coordination with your CPA or estate attorney.",
-        fits: ['Permanent life', 'Survivorship life'],
+        fits: [{ label: 'Permanent life', href: '/services/life-insurance/#whole' }, { label: 'Survivorship life', href: '/services/life-insurance/#survivorship' }],
         photo: 'stageLegacy',
       },
     ],
@@ -164,6 +201,14 @@ const en = {
       },
     ],
   },
+  family: {
+    heading: 'Asset One Family',
+    newTab: '(opens in a new tab)',
+    notes: {
+      wealth: 'Wealth planning, investment management and family office services.',
+      tax: 'Tax preparation and planning for individuals, families and businesses.',
+    } satisfies Record<FamilyId, string>,
+  },
   footer: {
     ctaBefore: 'Questions are welcome, in English or ',
     ctaAccent: '中文',
@@ -173,9 +218,9 @@ const en = {
     servicesHeading: 'Services',
     companyHeading: 'Company',
     company: [
-      { label: 'Insurance & You', href: '/insurance-and-you/' },
+      { label: 'Our Process', href: '/our-process/' },
       { label: 'About', href: '/about/' },
-      { label: 'News', href: '/news/' },
+      { label: 'Insights', href: '/insights/' },
       { label: 'Contact', href: '/contact/' },
     ],
     newsletterHeading: 'Newsletter',
@@ -185,7 +230,7 @@ const en = {
     subscribing: 'Subscribing…',
     success: "Thanks! You're on the list.",
     error: 'Please enter a valid email address.',
-    sibling: 'A sibling of Asset One Wealth Management',
+    sibling: 'Part of the Asset One family of companies',
     legal: [
       { label: 'Disclosures', href: '/disclosures/' },
       { label: 'Privacy', href: '/privacy/' },
@@ -210,9 +255,10 @@ const zh: typeof en = {
       { label: '年金', href: '/services/annuities/', note: '稳定的退休收入' },
     ],
     links: [
-      { label: '保险与您', href: '/insurance-and-you/' },
+      { label: '我们的流程', href: '/our-process/' },
       { label: '关于我们', href: '/about/' },
-      { label: '新闻', href: '/news/' },
+      { label: '洞察', href: '/insights/' },
+      { label: '媒体', href: '/media/' },
     ],
     contact: '联系我们',
     contactHref: '/contact/',
@@ -240,31 +286,31 @@ const zh: typeof en = {
       {
         name: '家庭保障',
         body: '如果家人依靠您的收入生活，寿险可以帮助他们守住家园、日常生活和你们共同的规划。',
-        fits: ['定期寿险', '永久寿险'],
+        fits: [{ label: '定期寿险', href: '/services/life-insurance/#term' }, { label: '永久寿险', href: '/services/life-insurance/#whole' }],
         photo: 'stageFamily',
       },
       {
         name: '教育金规划',
         body: '有些保单会随时间累积现金价值，可能有助于支付孩子的教育费用。我们会把它与其他储蓄方式放在一起比较，讲清利弊。',
-        fits: ['永久寿险', '指数型万能寿险'],
+        fits: [{ label: '永久寿险', href: '/services/life-insurance/#whole' }, { label: '指数型万能寿险', href: '/services/life-insurance/#iul' }],
         photo: 'stageEducation',
       },
       {
         name: '退休收入',
         body: '年金可以帮助您把部分储蓄转化为在一定期限内或终身持续领取的收入。',
-        fits: ['固定年金', '指数型年金'],
+        fits: [{ label: '固定年金', href: '/services/annuities/#myga' }, { label: '指数型年金', href: '/services/annuities/#fia' }],
         photo: 'stageRetirement',
       },
       {
         name: '投资增长',
         body: '有些保险产品在提供增长潜力的同时，也能在一定程度上防范亏损。我们会用浅显的语言讲清费用、收益上限和各项限制。',
-        fits: ['指数型年金', '指数型万能寿险'],
+        fits: [{ label: '指数型年金', href: '/services/annuities/#fia' }, { label: '指数型万能寿险', href: '/services/life-insurance/#iul' }],
         photo: 'stageGrowth',
       },
       {
         name: '传承规划',
         body: '寿险可以帮助您把一生的积累传给您关心的人和公益事业，并与您的会计师或遗产律师协同规划。',
-        fits: ['永久寿险', '第二身故寿险'],
+        fits: [{ label: '永久寿险', href: '/services/life-insurance/#whole' }, { label: '第二身故寿险', href: '/services/life-insurance/#survivorship' }],
         photo: 'stageLegacy',
       },
     ],
@@ -295,6 +341,14 @@ const zh: typeof en = {
       },
     ],
   },
+  family: {
+    heading: 'Asset One 家族',
+    newTab: '（在新标签页中打开）',
+    notes: {
+      wealth: '财富规划、投资管理与家族办公室服务。',
+      tax: '为个人、家庭及企业提供报税与税务规划。',
+    },
+  },
   footer: {
     ctaBefore: '欢迎提问，英文或',
     ctaAccent: '中文',
@@ -304,9 +358,9 @@ const zh: typeof en = {
     servicesHeading: '服务',
     companyHeading: '公司',
     company: [
-      { label: '保险与您', href: '/insurance-and-you/' },
+      { label: '我们的流程', href: '/our-process/' },
       { label: '关于我们', href: '/about/' },
-      { label: '新闻', href: '/news/' },
+      { label: '洞察', href: '/insights/' },
       { label: '联系我们', href: '/contact/' },
     ],
     newsletterHeading: '订阅通讯',
@@ -316,7 +370,7 @@ const zh: typeof en = {
     subscribing: '正在订阅…',
     success: '感谢订阅！',
     error: '请输入有效的电子邮箱地址。',
-    sibling: 'Asset One Wealth Management 旗下姊妹公司',
+    sibling: 'Asset One 家族成员公司',
     legal: [
       { label: '披露信息', href: '/disclosures/' },
       { label: '隐私', href: '/privacy/' },

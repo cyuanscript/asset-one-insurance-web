@@ -82,7 +82,6 @@ const en = {
         label: 'Protect my business',
         highlights: ['term', 'whole', 'iul'],
         note: 'Key person and buy-sell plans can use term or permanent coverage.',
-        link: { label: 'See planning for business owners', href: '#business' },
       },
       {
         key: 'child',
@@ -388,10 +387,12 @@ const en = {
   },
 
   cta: {
+    eyebrow: 'Let’s talk',
     title: 'Start with a conversation',
     body: 'Tell us a little about your family and what you’d like your coverage to do. We’ll explain the options that may fit, with no pressure to decide.',
     primary: 'Talk with us',
     phone: 'Call',
+    more: { label: 'See how we work, step by step', href: '/our-process/#life' },
   },
 
   // CONFIRM: compliance sign-off before launch
@@ -481,7 +482,6 @@ const zh: LifeInsuranceContent = {
         label: '保障我的企业',
         highlights: ['term', 'whole', 'iul'],
         note: '关键人保险和股权买卖协议可以使用定期或永久保障。',
-        link: { label: '了解企业主规划', href: '#business' },
       },
       {
         key: 'child',
@@ -740,10 +740,12 @@ const zh: LifeInsuranceContent = {
   },
 
   cta: {
+    eyebrow: '聊一聊',
     title: '从一次交流开始',
     body: '简单告诉我们您的家庭情况，以及您希望保障发挥什么作用。我们会讲解可能适合的方案，绝不催促您做决定。',
     primary: '联系我们',
     phone: '致电',
+    more: { label: '逐步了解我们的流程', href: '/our-process/#life' },
   },
 
   disclosures: {

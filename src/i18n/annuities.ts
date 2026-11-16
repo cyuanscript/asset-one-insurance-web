@@ -352,10 +352,12 @@ const en: AnnuitiesContent = {
   },
 
   cta: {
+    eyebrow: 'Let’s talk',
     title: 'Start with a conversation',
     body: 'Tell us when you’d like to retire and what you want your savings to do. We’ll explain the options that may fit, with no pressure to decide.',
     primary: 'Talk with us',
     phone: 'Call',
+    more: { label: 'See how we work, step by step', href: '/our-process/#annuities' },
   },
 
   // CONFIRM: compliance sign-off before launch
@@ -677,10 +679,12 @@ const zh: AnnuitiesContent = {
   },
 
   cta: {
+    eyebrow: '聊一聊',
     title: '从一次交流开始',
     body: '告诉我们您希望何时退休，以及希望这笔储蓄发挥什么作用。我们会为您讲解可能适合的方案，绝不催促您做决定。',
     primary: '联系我们',
     phone: '致电',
+    more: { label: '逐步了解我们的流程', href: '/our-process/#annuities' },
   },
 
   disclosures: {

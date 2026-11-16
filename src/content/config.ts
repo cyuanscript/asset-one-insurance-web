@@ -1,8 +1,9 @@
 /**
- * Content collections. Each News article is two Markdown files with the same
+ * Content collections. Each Insights article is two Markdown files with the same
  * filename, one per language: src/content/news/en/<slug>.md and
  * src/content/news/zh/<slug>.md. The filename is the URL slug in both
- * languages (/news/<slug>/ and /zh/news/<slug>/).
+ * languages (/insights/<slug>/ and /zh/insights/<slug>/; the section was
+ * renamed from News to Insights, the collection keeps its "news" name).
  *
  * The schema is checked at build time, so a missing or misspelt field fails
  * the build instead of breaking the live page.

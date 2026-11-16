@@ -1,0 +1,285 @@
+---
+/**
+ * /about/<id>/ — one team member's profile.
+ *
+ * Layout follows assetone.com/austin-velarde: a compact dark band hero with
+ * the name and role, then a portrait card on the left (photo, name, role,
+ * contact buttons, languages and license) that stays in view while the
+ * Philosophy, Why I do this work and Licenses & background sections scroll
+ * on the right. Ends with the Let's talk band.
+ *
+ * Content comes from the member's `profile` in src/i18n/about.ts.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import BandHero from '../news/BandHero.astro';
+import Photo from '../Photo.astro';
+import ClosingCta from '../service/ClosingCta.astro';
+import { aboutCopy, type TeamMember, type MemberProfile } from '../../i18n/about';
+import { contact, localePath, type Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+  member: TeamMember & { name: string; profile: MemberProfile };
+}
+const { locale, member } = Astro.props;
+const t = aboutCopy[locale];
+const l = t.member;
+const p = member.profile;
+const siteName = 'Asset One Insurance';
+const title = `${member.name} · ${member.role ?? ''} · ${siteName}`;
+const description = p.philosophy[0]?.replace(/^\[[^\]]+\]\s*/, '').slice(0, 155);
+const teamHref = `${localePath(locale, '/about/')}#team`;
+---
+
+<Base locale={locale} title={title} description={description}>
+  <Header locale={locale} />
+  <main class="service-page member-page" id="main">
+    <BandHero eyebrow={l.eyebrow} eyebrowHref={teamHref} title={member.name} lead={member.role} />
+
+    <section class="section section--white profile" aria-label={member.name}>
+      <div class="container profile__grid">
+        <aside class="card" data-reveal>
+          <div class="card__portrait">
+            {
+              member.photo ? (
+                <Photo photo={member.photo} tone="dark" alt={member.name} eager class="card__photo" />
+              ) : (
+                <svg class="card__silhouette" viewBox="0 0 120 150" aria-hidden="true">
+                  <circle cx="60" cy="58" r="24" />
+                  <path d="M14 150c0-30 20-50 46-50s46 20 46 50z" />
+                </svg>
+              )
+            }
+          </div>
+          <div class="card__body">
+            <p class="card__name">{member.name}</p>
+            {member.role && <p class="card__role">{member.role}</p>}
+            <div class="card__actions">
+              <a class="btn btn-primary" href={localePath(locale, '/contact/')}>{l.primary}</a>
+              <a class="btn btn-outline" href={contact.phoneHref}>{l.phone} {contact.phone}</a>
+            </div>
+            {
+              (p.languages || p.license) && (
+                <dl class="card__facts">
+                  {p.languages && (
+                    <div>
+                      <dt>{l.languages}</dt>
+                      <dd>{p.languages}</dd>
+                    </div>
+                  )}
+                  {p.license && (
+                    <div>
+                      <dt>{l.license}</dt>
+                      <dd>{p.license}</dd>
+                    </div>
+                  )}
+                </dl>
+              )
+            }
+          </div>
+        </aside>
+
+        <div class="profile__copy">
+          <section class="block" data-reveal style="--reveal-delay:100ms" aria-labelledby="philosophy">
+            <h2 class="block__title" id="philosophy">{l.philosophy}</h2>
+            {p.philosophy.map((para) => <p class="lead-text block__p">{para}</p>)}
+          </section>
+
+          <section class="block" data-reveal aria-labelledby="why">
+            <h2 class="block__title" id="why">{l.why}</h2>
+            {p.why.map((para) => <p class="lead-text block__p">{para}</p>)}
+          </section>
+
+          <section class="block" data-reveal aria-labelledby="background">
+            <h2 class="block__title" id="background">{l.background}</h2>
+            <ul class="block__list">
+              {p.background.map((item) => <li>{item}</li>)}
+            </ul>
+          </section>
+
+          <p class="profile__back" data-reveal>
+            <a href={teamHref}><span aria-hidden="true">←</span> {l.back}</a>
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <ClosingCta locale={locale} t={t.cta} photo="aboutIntro" />
+  </main>
+  <Footer locale={locale} />
+</Base>
+
+<style>
+  .profile__grid {
+    display: grid;
+    grid-template-columns: minmax(280px, 4fr) 7fr;
+    gap: clamp(36px, 6vw, 88px);
+    align-items: start;
+  }
+
+  /* ---------- Portrait card ---------- */
+  .card {
+    position: sticky;
+    top: 104px;
+    background: var(--white);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .card__portrait {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    background: linear-gradient(170deg, #4a5560 0%, #333b43 100%);
+  }
+
+  .card__portrait :global(.card__photo) {
+    position: absolute;
+    inset: 0;
+  }
+
+  .card__silhouette {
+    position: absolute;
+    inset: 18% 14% 0;
+    width: 72%;
+    height: 82%;
+    fill: rgba(255, 255, 255, 0.12);
+  }
+
+  .card__body {
+    padding: 26px 26px 28px;
+    text-align: center;
+  }
+
+  .card__name {
+    font: 400 28px/1.2 var(--serif);
+    color: var(--ink);
+  }
+
+  .card__role {
+    margin-top: 8px;
+    font: 700 12px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  :lang(zh) .card__role {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .card__actions {
+    display: grid;
+    gap: 12px;
+    margin-top: 22px;
+  }
+
+  .card__actions .btn {
+    width: 100%;
+    height: 52px;
+    font-size: 17px;
+  }
+
+  .card__facts {
+    display: grid;
+    gap: 12px;
+    margin: 22px 0 0;
+    padding-top: 20px;
+    border-top: 1px solid var(--hairline);
+    text-align: left;
+  }
+
+  .card__facts div {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .card__facts dt {
+    font: 700 12px/1.6 var(--sans);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--deep-sky);
+  }
+
+  .card__facts dd {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.5;
+    color: var(--slate);
+    text-align: right;
+  }
+
+  /* ---------- Copy blocks ---------- */
+  .block + .block {
+    margin-top: clamp(40px, 5vw, 56px);
+  }
+
+  .block__title {
+    font: 400 clamp(30px, 3.2vw, 40px) / 1.15 var(--serif);
+    color: var(--sky);
+  }
+
+  :lang(zh) .block__title {
+    line-height: 1.4;
+  }
+
+  .block__p {
+    margin-top: 16px;
+  }
+
+  .block__list {
+    margin: 18px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .block__list li {
+    position: relative;
+    padding: 12px 0 12px 22px;
+    border-bottom: 1px solid var(--hairline);
+    color: var(--slate);
+    line-height: 1.55;
+  }
+
+  .block__list li::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 1.15em;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--scarlet);
+  }
+
+  .profile__back {
+    margin-top: clamp(40px, 5vw, 56px);
+  }
+
+  .profile__back a {
+    font: 700 15px/1.4 var(--sans);
+    color: var(--deep-sky);
+  }
+
+  .profile__back a:hover {
+    color: var(--deep-sky-hover);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 899px) {
+    .profile__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .card {
+      position: static;
+      width: 100%;
+      max-width: 420px;
+      margin-inline: auto;
+    }
+  }
+</style>

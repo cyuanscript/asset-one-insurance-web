@@ -1,4 +1,13 @@
 ---
+/**
+ * /services/life-insurance/ — kept short on purpose:
+ * hero → basics → coverage (cards + comparison) → riders → Let's talk → FAQ.
+ * The How we work steps moved to /our-process/ (Life tab). Advanced
+ * planning (BusinessPlanning.astro, copy in `business`) is archived: still
+ * in the repo, not on the page. So is Where it fits (WhereItFits.astro,
+ * copy in `fits.stageLinks`): the homepage "May fit" chips now link
+ * straight to a card here (#term, #whole, #iul, #survivorship).
+ */
 import Base from '../../layouts/Base.astro';
 import Header from '../Header.astro';
 import Footer from '../Footer.astro';
@@ -6,14 +15,10 @@ import PageHero from '../PageHero.astro';
 import Products from '../Products.astro';
 import Basics from '../service/Basics.astro';
 import TypeCards from '../service/TypeCards.astro';
-import CompareTable from '../service/CompareTable.astro';
 import FeatureGrid from '../service/FeatureGrid.astro';
-import Process from '../service/Process.astro';
 import Faq from '../service/Faq.astro';
-import WhereItFits from '../service/WhereItFits.astro';
 import ClosingCta from '../service/ClosingCta.astro';
 import Disclosures from '../service/Disclosures.astro';
-import BusinessPlanning from './BusinessPlanning.astro';
 import { lifeInsurance } from '../../i18n/life-insurance';
 import { localePath, type Locale } from '../../i18n/content';
 
@@ -22,11 +27,6 @@ interface Props {
 }
 const { locale } = Astro.props;
 const t = lifeInsurance[locale];
-// The two "zoom-in" panels under How we work
-const processDetails = [
-  { step: t.process.amount.step, title: t.process.amount.title, intro: t.process.amount.intro, items: t.process.amount.questions, numbered: true, outro: t.process.amount.outro },
-  { step: t.process.apply.step, title: t.process.apply.title, items: t.process.apply.items },
-];
 ---
 
 <Base locale={locale} title={t.meta.title} description={t.meta.description}>
@@ -41,13 +41,10 @@ const processDetails = [
       secondary={{ label: t.hero.secondary, href: '#types' }}
     />
     <Basics t={t.basics} />
-    <TypeCards t={t.types} />
-    <CompareTable t={t.compare} />
+    <TypeCards locale={locale} t={t.types} compare={t.compare} compareIds={['term', 'whole', 'iul']} />
     <FeatureGrid t={t.riders} />
-    <Process t={t.process} details={processDetails} />
-    <BusinessPlanning locale={locale} />
+    <ClosingCta locale={locale} t={t.cta} photo="processConsult" />
     <Faq t={t.faq} />
-    <WhereItFits locale={locale} t={t.fits} />
     <Products
       locale={locale}
       only={['/services/health-insurance/', '/services/annuities/']}
@@ -56,7 +53,6 @@ const processDetails = [
       intro={t.fits.relatedIntro}
       id="related-title"
     />
-    <ClosingCta locale={locale} t={t.cta} />
     <Disclosures t={t.disclosures} />
   </main>
   <Footer locale={locale} />

@@ -2,6 +2,11 @@
 /**
  * /services/annuities/ — assembled from the shared Services sections
  * (src/components/service/) with copy from src/i18n/annuities.ts.
+ * Kept short on purpose: hero → basics → annuity types (cards +
+ * comparison) → good to know → Let's talk → FAQ. The How we work steps
+ * moved to /our-process/ (Annuities tab). Where it fits (WhereItFits.astro,
+ * copy in `fits.stageLinks`) is archived: the homepage "May fit" chips
+ * now link straight to a card here (#myga, #fia).
  */
 import Base from '../../layouts/Base.astro';
 import Header from '../Header.astro';
@@ -10,11 +15,8 @@ import PageHero from '../PageHero.astro';
 import Products from '../Products.astro';
 import Basics from '../service/Basics.astro';
 import TypeCards from '../service/TypeCards.astro';
-import CompareTable from '../service/CompareTable.astro';
 import FeatureGrid from '../service/FeatureGrid.astro';
-import Process from '../service/Process.astro';
 import Faq from '../service/Faq.astro';
-import WhereItFits from '../service/WhereItFits.astro';
 import ClosingCta from '../service/ClosingCta.astro';
 import Disclosures from '../service/Disclosures.astro';
 import { annuities } from '../../i18n/annuities';
@@ -39,12 +41,10 @@ const t = annuities[locale];
       secondary={{ label: t.hero.secondary, href: '#types' }}
     />
     <Basics t={t.basics} />
-    <TypeCards t={t.types} />
-    <CompareTable t={t.compare} />
+    <TypeCards locale={locale} t={t.types} compare={t.compare} compareIds={['myga', 'spia', 'fia']} />
     <FeatureGrid t={t.features} id="features" />
-    <Process t={t.process} details={t.processDetails} photo="processAnnuities" />
+    <ClosingCta locale={locale} t={t.cta} photo="processAnnuities" />
     <Faq t={t.faq} />
-    <WhereItFits locale={locale} t={t.fits} />
     <Products
       locale={locale}
       only={['/services/life-insurance/', '/services/health-insurance/']}
@@ -53,7 +53,6 @@ const t = annuities[locale];
       intro={t.fits.relatedIntro}
       id="related-title"
     />
-    <ClosingCta locale={locale} t={t.cta} />
     <Disclosures t={t.disclosures} />
   </main>
   <Footer locale={locale} />

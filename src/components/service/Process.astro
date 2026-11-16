@@ -1,86 +1,143 @@
 ---
 /**
- * How we work: numbered steps, then optional "zoom-in" panels, each tied
- * to one step (on Life Insurance: how much coverage is enough, and what to
- * expect when you apply).
+ * How we work: numbered steps on a tinted photo band, then "zoom-in"
+ * panels that overlap the bottom edge of the band, each tied to one step.
  *
- * The heading and steps sit on a full-bleed photo band with a deep blue
- * tint; the two detail panels overlap the bottom edge of the band.
+ * Takes one or more `tracks` (Life Insurance, Health Insurance,
+ * Annuities). With more than one, a three-way slider above the steps
+ * switches between them: the steps, the detail panels and the background
+ * photo all change together. `#life`, `#health` or `#annuities` in the URL
+ * opens that track and scrolls to the band.
+ *
+ * Used on /our-process/. The copy for each track still lives in the
+ * matching Services page file (process + processDetails).
  */
 import Photo from '../Photo.astro';
 import SectionHeading from '../SectionHeading.astro';
-import type { ProcessCopy, ProcessDetail } from '../../i18n/service-types';
-import type { PhotoKey } from '../../i18n/content';
+import type { ProcessCopy, ProcessTrack } from '../../i18n/service-types';
 
 interface Props {
-  t: ProcessCopy;
-  details?: ProcessDetail[];
-  photo?: PhotoKey;
+  heading: { eyebrow: string; title: string; intro: string };
+  /** Accessible name for the slider, e.g. "Choose a service" */
+  switchLabel?: string;
+  tracks: ProcessTrack[];
 }
-const { t, details = [], photo = 'processConsult' } = Astro.props;
-const stepLabel = (n: number) => t.stepLabel.replace('{n}', String(n));
-const detailSteps = details.map((d) => d.step);
+const { heading, switchLabel = '', tracks } = Astro.props;
+const multi = tracks.length > 1;
+const stepLabel = (t: ProcessCopy, n: number) => t.stepLabel.replace('{n}', String(n));
 ---
 
-<section class="section section--white process" aria-labelledby="process-title">
+<section class="section section--white process" aria-labelledby="process-title" id="steps" data-process>
   <div class="process__band on-dark">
     <div class="process__media" aria-hidden="true">
-      <Photo photo={photo} tone="dark" class="process__photo" />
+      {
+        tracks.map((tr, i) => (
+          <div class:list={['process__layer', { 'is-active': i === 0 }]} data-layer={tr.key}>
+            <Photo photo={tr.photo} tone="dark" class="process__photo" />
+          </div>
+        ))
+      }
     </div>
     <div class="process__tint" aria-hidden="true"></div>
 
     <div class="container process__band-inner">
-      <SectionHeading eyebrow={t.eyebrow} title={t.title} intro={t.intro} id="process-title" span={6} />
+      <SectionHeading eyebrow={heading.eyebrow} title={heading.title} intro={heading.intro} id="process-title" span={6} />
 
-      <ol class="steps">
-        {
-          t.steps.map((s, i) => (
-            <li class:list={['step', { 'step--detail': detailSteps.includes(i + 1) }]} data-reveal style={`--reveal-delay:${i * 90}ms`}>
-              <span class="step__num" aria-hidden="true">
-                {String(i + 1).padStart(2, '0')}
-              </span>
-              <h3 class="step__title">{s.title}</h3>
-              <p class="step__body">{s.body}</p>
-            </li>
-          ))
-        }
-      </ol>
+      {
+        multi && (
+          <div class="switch" role="tablist" aria-label={switchLabel} style={`--n:${tracks.length};--i:0`} data-switch data-reveal>
+            <span class="switch__thumb" aria-hidden="true" />
+            {tracks.map((tr, i) => (
+              <button
+                type="button"
+                class="switch__btn"
+                role="tab"
+                id={`process-tab-${tr.key}`}
+                aria-controls={`process-panel-${tr.key}`}
+                aria-selected={i === 0 ? 'true' : 'false'}
+                tabindex={i === 0 ? 0 : -1}
+                data-track={tr.key}
+              >
+                {tr.label}
+              </button>
+            ))}
+          </div>
+        )
+      }
+
+      {
+        tracks.map((tr, ti) => (
+          <div
+            class="process__panel"
+            id={`process-panel-${tr.key}`}
+            role={multi ? 'tabpanel' : undefined}
+            aria-labelledby={multi ? `process-tab-${tr.key}` : undefined}
+            data-panel={tr.key}
+            hidden={ti !== 0}
+          >
+            <ol class="steps">
+              {tr.t.steps.map((s, i) => {
+                const hasDetail = (tr.details ?? []).some((d) => d.step === i + 1);
+                return (
+                  <li class:list={['step', { 'step--detail': hasDetail }]} data-reveal style={`--reveal-delay:${i * 90}ms;--i:${i}`}>
+                    <span class="step__num" aria-hidden="true">
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <h3 class="step__title">{s.title}</h3>
+                    <p class="step__body">{s.body}</p>
+                  </li>
+                );
+              })}
+            </ol>
+          </div>
+        ))
+      }
     </div>
   </div>
 
   <div class="container">
     {
-      details.length > 0 && (
-        <div class="details">
-          {details.map((d, i) => (
-            <section class="detail" aria-labelledby={`detail-${d.step}-title`} data-reveal style={`--reveal-delay:${i * 120}ms`}>
-              <p class="detail__step">
-                {stepLabel(d.step)} · {t.steps[d.step - 1].title}
-              </p>
-              <h3 class="detail__title" id={`detail-${d.step}-title`}>
-                {d.title}
-              </h3>
-              {d.intro && <p class="detail__intro">{d.intro}</p>}
-              {d.numbered ? (
-                <ol class="detail__list detail__list--numbered">
-                  {d.items.map((q) => (
-                    <li>{q}</li>
-                  ))}
-                </ol>
-              ) : (
-                <ul class="detail__list">
-                  {d.items.map((a) => (
-                    <li>{a}</li>
-                  ))}
-                </ul>
-              )}
-              {d.outro && <p class="detail__outro">{d.outro}</p>}
-            </section>
-          ))}
+      tracks.map((tr, ti) => (
+        <div class="process__details" data-details={tr.key} hidden={ti !== 0}>
+          {(tr.details ?? []).length > 0 && (
+            <div class="details">
+              {(tr.details ?? []).map((d, i) => (
+                <section class="detail" aria-labelledby={`detail-${tr.key}-${d.step}-title`} data-reveal style={`--reveal-delay:${i * 120}ms;--i:${i}`}>
+                  <p class="detail__step">
+                    {stepLabel(tr.t, d.step)} · {tr.t.steps[d.step - 1].title}
+                  </p>
+                  <h3 class="detail__title" id={`detail-${tr.key}-${d.step}-title`}>
+                    {d.title}
+                  </h3>
+                  {d.intro && <p class="detail__intro">{d.intro}</p>}
+                  {d.numbered ? (
+                    <ol class="detail__list detail__list--numbered">
+                      {d.items.map((q) => (
+                        <li>{q}</li>
+                      ))}
+                    </ol>
+                  ) : (
+                    <ul class="detail__list">
+                      {d.items.map((a) => (
+                        <li>{a}</li>
+                      ))}
+                    </ul>
+                  )}
+                  {d.outro && <p class="detail__outro">{d.outro}</p>}
+                </section>
+              ))}
+            </div>
+          )}
+          {tr.link && (
+            <p class="process__more">
+              <a class="text-link" href={tr.link.href}>
+                {tr.link.label} <span aria-hidden="true">→</span>
+              </a>
+            </p>
+          )}
         </div>
-      )
+      ))
     }
-    </div>
   </div>
 </section>
 
@@ -88,6 +145,7 @@ const detailSteps = details.map((d) => d.step);
   /* Photo band: full bleed, tinted deep blue so the photo reads as texture */
   .process {
     padding-top: 0;
+    scroll-margin-top: 0;
   }
 
   .process__band {
@@ -104,7 +162,19 @@ const detailSteps = details.map((d) => d.step);
     z-index: -2;
   }
 
-  .process__media :global(.process__photo) {
+  /* One photo per track; the active one fades in */
+  .process__layer {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    transition: opacity 700ms ease;
+  }
+
+  .process__layer.is-active {
+    opacity: 1;
+  }
+
+  .process__layer :global(.process__photo) {
     position: absolute;
     inset: 0;
   }
@@ -130,6 +200,60 @@ const detailSteps = details.map((d) => d.step);
     color: rgba(255, 255, 255, 0.82);
   }
 
+  /* ---------- Three-way slider ---------- */
+  .switch {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--n), minmax(0, 1fr));
+    width: min(100%, 600px);
+    margin-top: 48px;
+    padding: 5px;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.2);
+  }
+
+  .switch__thumb {
+    position: absolute;
+    top: 5px;
+    bottom: 5px;
+    left: 5px;
+    width: calc((100% - 10px) / var(--n));
+    border-radius: 999px;
+    background: var(--white);
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18);
+    transform: translateX(calc(var(--i) * 100%));
+    transition: transform 450ms var(--ease-out);
+  }
+
+  .switch__btn {
+    position: relative;
+    z-index: 1;
+    min-height: 46px;
+    padding: 10px 14px;
+    border: 0;
+    border-radius: 999px;
+    background: none;
+    color: rgba(255, 255, 255, 0.86);
+    font: 700 15px/1.2 var(--sans);
+    cursor: pointer;
+    transition: color 300ms ease;
+  }
+
+  .switch__btn:hover {
+    color: var(--white);
+  }
+
+  .switch__btn[aria-selected='true'] {
+    color: var(--deep-sky);
+  }
+
+  .switch__btn:focus-visible {
+    outline: 2px solid var(--light-blue);
+    outline-offset: 2px;
+  }
+
+  /* ---------- Steps ---------- */
   .steps {
     display: grid;
     grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -137,6 +261,10 @@ const detailSteps = details.map((d) => d.step);
     margin: 56px 0 0;
     padding: 0;
     list-style: none;
+  }
+
+  .switch + .process__panel .steps {
+    margin-top: 40px;
   }
 
   .step {
@@ -188,7 +316,25 @@ const detailSteps = details.map((d) => d.step);
     color: rgba(255, 255, 255, 0.78);
   }
 
-  /* Detail panels: pulled up to overlap the bottom of the photo band */
+  /* Switching tracks: the new steps and panels rise in, staggered */
+  .is-entering .step,
+  .is-entering .detail {
+    animation: process-in 600ms var(--ease-out) both;
+    animation-delay: calc(var(--i, 0) * 70ms);
+  }
+
+  @keyframes process-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  /* ---------- Detail panels: overlap the bottom of the photo band ---------- */
   .details {
     position: relative;
     display: grid;
@@ -287,6 +433,11 @@ const detailSteps = details.map((d) => d.step);
     line-height: 1.7;
   }
 
+  .process__more {
+    margin-top: 28px;
+    text-align: center;
+  }
+
   @media (max-width: 1099px) {
     .steps {
       grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -301,10 +452,28 @@ const detailSteps = details.map((d) => d.step);
   }
 
   @media (max-width: 640px) {
+    .switch {
+      margin-top: 32px;
+    }
+
+    .switch__btn {
+      min-height: 44px;
+      padding: 8px 6px;
+      font-size: 13.5px;
+    }
+
+    :lang(zh) .switch__btn {
+      font-size: 14px;
+    }
+
     .steps {
       grid-template-columns: 1fr;
       gap: 24px;
       margin-top: 32px;
+    }
+
+    .switch + .process__panel .steps {
+      margin-top: 28px;
     }
 
     .step {
@@ -329,3 +498,71 @@ const detailSteps = details.map((d) => d.step);
     }
   }
 </style>
+
+<script>
+  document.querySelectorAll<HTMLElement>('[data-process]').forEach((root) => {
+    const tabs = Array.from(root.querySelectorAll<HTMLButtonElement>('[role="tab"]'));
+    const control = root.querySelector<HTMLElement>('[data-switch]');
+    if (!tabs.length || !control) return;
+
+    const parts = (key: string) => [
+      root.querySelector<HTMLElement>(`[data-panel="${key}"]`),
+      root.querySelector<HTMLElement>(`[data-details="${key}"]`),
+    ];
+
+    const select = (index: number, opts: { focus?: boolean; animate?: boolean; updateHash?: boolean } = {}) => {
+      const key = tabs[index].dataset.track ?? '';
+      control.style.setProperty('--i', String(index));
+      tabs.forEach((tab, i) => {
+        const on = i === index;
+        tab.setAttribute('aria-selected', String(on));
+        tab.tabIndex = on ? 0 : -1;
+        const k = tab.dataset.track ?? '';
+        parts(k).forEach((el) => {
+          if (!el) return;
+          el.hidden = !on;
+          if (on && opts.animate) {
+            // Skip the scroll reveal for content shown by a switch; animate it instead
+            el.querySelectorAll<HTMLElement>('[data-reveal]').forEach((r) => r.classList.add('is-revealed', 'is-settled'));
+            el.classList.remove('is-entering');
+            void el.offsetWidth;
+            el.classList.add('is-entering');
+          }
+        });
+        root.querySelector(`[data-layer="${k}"]`)?.classList.toggle('is-active', on);
+      });
+      if (opts.focus) tabs[index].focus();
+      if (opts.updateHash) history.replaceState(null, '', `#${key}`);
+    };
+
+    tabs.forEach((tab, i) => {
+      tab.addEventListener('click', () => select(i, { animate: true, updateHash: true }));
+      tab.addEventListener('keydown', (e) => {
+        const last = tabs.length - 1;
+        const next =
+          e.key === 'ArrowRight' ? (i === last ? 0 : i + 1)
+          : e.key === 'ArrowLeft' ? (i === 0 ? last : i - 1)
+          : e.key === 'Home' ? 0
+          : e.key === 'End' ? last
+          : -1;
+        if (next < 0) return;
+        e.preventDefault();
+        select(next, { focus: true, animate: true, updateHash: true });
+      });
+    });
+
+    // #life / #health / #annuities: open that track and bring the band into view
+    const fromHash = (scroll: boolean) => {
+      const index = tabs.findIndex((t) => `#${t.dataset.track}` === location.hash);
+      if (index < 0) return;
+      select(index);
+      if (!scroll) return;
+      // Wait until images and fonts have settled, so the band lands in the right place
+      const go = () => root.scrollIntoView({ block: 'start', behavior: 'instant' });
+      if (document.readyState === 'complete') go();
+      else window.addEventListener('load', go, { once: true });
+    };
+    fromHash(true);
+    window.addEventListener('hashchange', () => fromHash(true));
+  });
+</script>

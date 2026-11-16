@@ -1,0 +1,15 @@
+---
+/** /about/<id>/ — one page per team member with a `profile` in src/i18n/about.ts */
+import TeamMemberPage from '../../components/about/TeamMemberPage.astro';
+import { aboutCopy } from '../../i18n/about';
+
+export function getStaticPaths() {
+  return aboutCopy.en.team.members
+    .filter((m) => m.name && m.profile)
+    .map((m) => ({ params: { member: m.id }, props: { member: m } }));
+}
+
+const { member } = Astro.props;
+---
+
+<TeamMemberPage locale="en" member={member} />

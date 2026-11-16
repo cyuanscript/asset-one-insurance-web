@@ -1,6 +1,6 @@
 ---
 import LogoMark from './LogoMark.astro';
-import { content, contact, localePath, alternatePath, type Locale } from '../i18n/content';
+import { content, contact, familySites, localePath, alternatePath, type Locale } from '../i18n/content';
 
 interface Props {
   locale: Locale;
@@ -52,6 +52,25 @@ const f = t.footer;
             f.company.map((item) => (
               <li>
                 <a href={localePath(locale, item.href)}>{item.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </nav>
+
+      <nav class="footer__col footer__col--family" aria-labelledby="footer-family">
+        <h3 class="footer__heading" id="footer-family">{t.family.heading}</h3>
+        <ul>
+          {
+            familySites.map((site) => (
+              <li>
+                <a class="footer__external" href={site.url} target="_blank" rel="noopener" lang="en">
+                  {site.name}
+                  <svg width="10" height="10" viewBox="0 0 10 10" aria-hidden="true">
+                    <path d="M3 1.5h5.5V7M8.5 1.5 1.5 8.5" fill="none" stroke="currentColor" stroke-width="1.4" />
+                  </svg>
+                  <span class="visually-hidden" lang={t.htmlLang}>{t.family.newTab}</span>
+                </a>
               </li>
             ))
           }
@@ -178,15 +197,26 @@ const f = t.footer;
   }
 
   .footer__col--services {
-    grid-column: 5 / span 2;
+    grid-column: 4 / span 2;
   }
 
   .footer__col--company {
-    grid-column: 7 / span 2;
+    grid-column: 6 / span 2;
+  }
+
+  .footer__col--family {
+    grid-column: 8 / span 2;
   }
 
   .footer__col--newsletter {
-    grid-column: 9 / -1;
+    grid-column: 10 / -1;
+  }
+
+  .footer__external svg {
+    display: inline-block;
+    margin-left: 6px;
+    vertical-align: 1px;
+    opacity: 0.7;
   }
 
   .footer__brand-name {
@@ -346,7 +376,8 @@ const f = t.footer;
     font-weight: 700;
   }
 
-  @media (max-width: 1023px) {
+  /* Five columns need room: tablet layout until 1200px */
+  @media (max-width: 1199px) {
     .footer__brand {
       grid-column: 1 / span 6;
     }
@@ -354,10 +385,20 @@ const f = t.footer;
       grid-column: 7 / -1;
     }
     .footer__col--services {
-      grid-column: 1 / span 3;
+      grid-column: 1 / span 4;
     }
     .footer__col--company {
-      grid-column: 4 / span 3;
+      grid-column: 5 / span 4;
+    }
+    .footer__col--family {
+      grid-column: 9 / -1;
+    }
+    /* Row 1: brand + newsletter; row 2: the three link columns */
+    .footer__brand {
+      order: -2;
+    }
+    .footer__col--newsletter {
+      order: -1;
     }
   }
 
@@ -388,6 +429,9 @@ const f = t.footer;
     }
     .footer__col--company {
       grid-column: 2;
+    }
+    .footer__col--family {
+      grid-column: 1 / -1;
     }
     .footer__col--newsletter {
       order: -1;

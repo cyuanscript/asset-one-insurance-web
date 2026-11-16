@@ -33,6 +33,11 @@ const { t, id = 'riders', white = false } = Astro.props;
 </section>
 
 <style>
+  /* Right after the coverage cards on the same ground: one gap, not two */
+  :global(.types) + .riders:not(.section--white) {
+    padding-top: 0;
+  }
+
   .riders__grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
