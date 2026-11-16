@@ -35,6 +35,7 @@ Requires Node 18.14 or newer.
 | `src/pages/services/*.astro` (+ `zh/`) | Life Insurance, Health Insurance and Annuities pages |
 | `src/pages/insights/` (+ `zh/`) | `/insights/` and `/insights/<slug>/` (old `/news/` URLs redirect, see `astro.config.mjs`) |
 | `src/pages/our-process/` (+ `zh/`) | `/our-process/` |
+| `src/components/about/`, `src/i18n/about.ts` | About page (`/about/`): band hero (homepage Lake Washington photo), handshake photo + intro, Meet our team grid (3 columns), Let's talk band. Team members are listed in `about.ts`; portraits go in `public/images/team/<first-last>.jpg` with a `team-<first-last>` photo slot. Entries with no name show as blank seats. A member with a `profile` gets a page at `/about/<id>/` (`TeamMemberPage.astro`, routes in `src/pages/about/[member].astro` + `zh/`) and their card links there |
 | `public/brand/` | Logo: original PNG plus vector mark (`asset-one-mark.svg`, `-reversed.svg` for dark grounds) |
 
 ## Adding photos
@@ -64,9 +65,10 @@ describing the intended shot.
 - Final body copy from the content packs; native review of the draft Chinese.
 - Newsletter: the form validates and shows success/error states but is **not
   connected to a mailing service yet** (see the TODO in `Footer.astro`).
+- About: Duncan Li's profile page (`/about/duncan-li/`) is placeholder copy (philosophy, background, languages, license no.); three team seats are blank (`src/i18n/about.ts`).
 - Coverage card images: one slot per coverage type, `coverage-<id>` in `photos` (`src/i18n/content.ts`).
-- Inner pages: Life Insurance, Health Insurance, Annuities, Our Process and Insights are built.
-  Services overview, Insurance & You, About, Contact and the legal pages still 404.
+- Inner pages: Life Insurance, Health Insurance, Annuities, Our Process, Insights and About are built.
+  Services overview, Insurance & You, Contact and the legal pages still 404.
 - Health Insurance and Annuities: open [CONFIRM] items in their content packs
   (plan types offered, Medicare and marketplace certification, variable annuities).
 - Insights: tax review of the five articles (fact-check flags in `content-packs/news.md`),

@@ -1,0 +1,324 @@
+---
+/**
+ * /about/ — who we are and the team.
+ *
+ * Order follows assetone.com/about: a compact dark band hero, a photo +
+ * "Meet the team behind your coverage" intro with a Get started button,
+ * the "Meet our team" grid of portrait cards, then the Let's talk band.
+ *
+ * Team cards: a member with a `profile` links to their own page at
+ * /about/<id>/ (the whole card is the click target). Members without a name or photo
+ * render as blank seats (silhouette, "Team member", "Coming soon").
+ * Copy and the member list live in src/i18n/about.ts.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import BandHero from '../news/BandHero.astro';
+import Photo from '../Photo.astro';
+import ClosingCta from '../service/ClosingCta.astro';
+import { aboutCopy } from '../../i18n/about';
+import { contact, localePath, type Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = aboutCopy[locale];
+---
+
+<Base locale={locale} title={t.meta.title} description={t.meta.description}>
+  <Header locale={locale} />
+  <main class="service-page about-page" id="main">
+    <BandHero eyebrow={t.hero.eyebrow} title={t.hero.title} lead={t.hero.lead} photo="hero" />
+
+    <section class="section section--white intro" aria-labelledby="intro-title">
+      <div class="container intro__grid">
+        <div class="intro__media" data-reveal>
+          <Photo photo="aboutIntro" class="intro__photo" />
+        </div>
+        <div class="intro__copy" data-reveal style="--reveal-delay:120ms">
+          <p class="eyebrow">{t.intro.eyebrow}</p>
+          <h2 class="h2 intro__title" id="intro-title">{t.intro.title}</h2>
+          <p class="intro__subtitle">{t.intro.subtitle}</p>
+          {t.intro.body.map((p) => <p class="lead-text intro__p">{p}</p>)}
+          <div class="intro__actions">
+            <a class="btn btn-primary" href={localePath(locale, '/contact/')}>{t.intro.primary}</a>
+            <a class="btn btn-outline" href={contact.phoneHref}>{t.intro.phone} {contact.phone}</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section section--pale team" aria-labelledby="team-title" id="team">
+      <div class="container">
+        <div class="team__head" data-reveal>
+          <p class="eyebrow">{t.team.eyebrow}</p>
+          <h2 class="h2 team__title" id="team-title">{t.team.title}</h2>
+        </div>
+
+        <ul class="team__grid" role="list">
+          {
+            t.team.members.map((m, i) => {
+              const blank = !m.name;
+              const href = m.profile ? localePath(locale, `/about/${m.id}/`) : undefined;
+              return (
+                <li class:list={['member', { 'member--blank': blank }]} data-reveal style={`--reveal-delay:${i * 100}ms`}>
+                  <div class="member__portrait">
+                    {m.photo ? (
+                      <Photo photo={m.photo} tone="dark" alt={m.name} class="member__photo" />
+                    ) : (
+                      <svg class="member__silhouette" viewBox="0 0 120 150" aria-hidden="true">
+                        <circle cx="60" cy="58" r="24" />
+                        <path d="M14 150c0-30 20-50 46-50s46 20 46 50z" />
+                      </svg>
+                    )}
+                  </div>
+                  <div class="member__body">
+                    <h3 class="member__name">{m.name ?? t.team.blankName}</h3>
+                    <p class="member__role">{m.role ?? t.team.blankRole}</p>
+                    {href && (
+                      <a class="member__more" href={href} aria-label={`${t.team.more}: ${m.name}`}>
+                        {t.team.more} <span aria-hidden="true">→</span>
+                      </a>
+                    )}
+                  </div>
+                </li>
+              );
+            })
+          }
+        </ul>
+      </div>
+    </section>
+
+    <ClosingCta locale={locale} t={t.cta} />
+  </main>
+  <Footer locale={locale} />
+</Base>
+
+
+<style>
+  /* ---------- Intro ---------- */
+  .intro__grid {
+    display: grid;
+    grid-template-columns: 6fr 5fr;
+    gap: clamp(32px, 5vw, 64px);
+    align-items: center;
+  }
+
+  /* 3:2 matches the handshake photo, so it shows the whole frame uncropped */
+  .intro__media {
+    position: relative;
+    aspect-ratio: 3 / 2;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+  }
+
+  .intro__media :global(.intro__photo) {
+    position: absolute;
+    inset: 0;
+  }
+
+  /* A step smaller than other H2s so the copy stays close to the photo's height */
+  .intro__title {
+    margin-top: 16px;
+    font-size: clamp(30px, 3.2vw, 42px);
+  }
+
+  :lang(zh) .intro__title {
+    font-size: clamp(26px, 2.8vw, 36px);
+  }
+
+  .intro__subtitle {
+    margin-top: 12px;
+    font: 700 17px/1.5 var(--sans);
+    color: var(--ink);
+  }
+
+  .intro__p {
+    margin-top: 18px;
+  }
+
+  .intro__subtitle + .intro__p {
+    margin-top: 18px;
+  }
+
+  .intro__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 28px;
+  }
+
+  /* ---------- Team ---------- */
+  .team__title {
+    margin-top: 16px;
+  }
+
+  .team__grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(24px, 3vw, 40px);
+    margin: clamp(36px, 5vw, 56px) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .member {
+    display: flex;
+    flex-direction: column;
+    background: var(--white);
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition:
+      transform 300ms var(--ease-out),
+      box-shadow 300ms var(--ease-out);
+  }
+
+  .member:not(.member--blank):hover {
+    transform: translateY(-2px);
+  }
+
+  .member__portrait {
+    position: relative;
+    aspect-ratio: 4 / 5;
+    overflow: hidden;
+    background: linear-gradient(170deg, #4a5560 0%, #333b43 100%);
+  }
+
+  .member__portrait :global(.member__photo) {
+    position: absolute;
+    inset: 0;
+  }
+
+  .member__portrait :global(.member__photo img) {
+    transition: transform 600ms var(--ease-out);
+  }
+
+  .member:not(.member--blank):hover .member__portrait :global(.member__photo img) {
+    transform: scale(1.03);
+  }
+
+  .member__silhouette {
+    position: absolute;
+    inset: 18% 14% 0;
+    width: 72%;
+    height: 82%;
+    fill: rgba(255, 255, 255, 0.12);
+  }
+
+  .member__body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 28px 24px 30px;
+    text-align: center;
+  }
+
+  .member__name {
+    margin: 0;
+    font: 400 26px/1.25 var(--serif);
+    color: var(--ink);
+  }
+
+  .member__role {
+    margin-top: 8px;
+    font: 700 12px/1.4 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  :lang(zh) .member__role {
+    font-size: 13px;
+    letter-spacing: 0.04em;
+  }
+
+  .member--blank .member__name,
+  .member--blank .member__role {
+    color: #8a96a3;
+  }
+
+  .member__more {
+    margin-top: auto;
+    padding: 16px 4px 2px;
+    font: 700 13px/1.4 var(--sans);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--deep-sky);
+  }
+
+  .member__more span {
+    display: inline-block;
+    transition: transform 200ms var(--ease-out);
+  }
+
+  .member__more:hover {
+    color: var(--deep-sky-hover);
+  }
+
+  .member__more:hover span {
+    transform: translateX(3px);
+  }
+
+  .member__more::after {
+    /* Whole card is the click target */
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .member:has(.member__more) {
+    position: relative;
+  }
+
+  .member__more:focus-visible {
+    outline: none;
+  }
+
+  .member:has(.member__more:focus-visible) {
+    outline: 2px solid var(--deep-sky);
+    outline-offset: 3px;
+  }
+
+  .member:has(.member__more:hover) .member__more span {
+    transform: translateX(3px);
+  }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 1023px) {
+    .team__grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 899px) {
+    .intro__grid {
+      grid-template-columns: 1fr;
+    }
+
+    .intro__media {
+      aspect-ratio: 3 / 2;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .intro__actions {
+      flex-direction: column;
+    }
+
+    .intro__actions .btn {
+      width: 100%;
+    }
+
+    .team__grid {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 420px;
+      margin-inline: auto;
+    }
+
+  }
+</style>

@@ -61,6 +61,10 @@ const photoSlots = {
   // Our Process page: photo beside the "Get started" intro
   processIntro: { src: '/images/advisor-senior-couple-home-consultation.jpg', caption: 'Advisor smiling as he walks an older couple through paperwork at their dining table', position: '50% 40%' },
 
+  // About page: photo beside the intro, and team portraits (public/images/team/<first-last>.jpg)
+  aboutIntro: { src: '/images/business-handshake.jpg', caption: 'Close-up of two people in suits shaking hands', position: '45% 50%' },
+  'team-duncan-li': { src: '/images/team/duncan-li.jpg', caption: 'Portrait of Duncan Li, Managing Partner', position: '50% 20%' },
+
   // Coverage cards on the Services pages: one image per coverage type.
   // The key is `coverage-<card id>` (card ids live in the page's i18n file).
   // Web copies live in public/images/coverage/<card id>.jpg (originals in photo-originals/coverage/).
