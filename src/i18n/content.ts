@@ -197,7 +197,6 @@ const en = {
     servicesHeading: 'Services',
     companyHeading: 'Company',
     company: [
-      { label: 'Insurance & You', href: '/insurance-and-you/' },
       { label: 'Our Process', href: '/our-process/' },
       { label: 'About', href: '/about/' },
       { label: 'Insights', href: '/insights/' },
@@ -329,7 +328,6 @@ const zh: typeof en = {
     servicesHeading: '服务',
     companyHeading: '公司',
     company: [
-      { label: '保险与您', href: '/insurance-and-you/' },
       { label: '我们的流程', href: '/our-process/' },
       { label: '关于我们', href: '/about/' },
       { label: '洞察', href: '/insights/' },
