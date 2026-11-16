@@ -3,7 +3,7 @@
  * /our-process/ — the "How we work" steps for all three services on one
  * page, replacing the separate How we work sections on each Services page.
  *
- * Order follows assetone.com/our-process: a compact dark hero, then a
+ * Order follows assetone.com/our-process: a compact dark photo hero, then a
  * "Get started" intro (photo + short copy + button) so the way to begin
  * comes first, then the step-by-step band with a Life / Health / Annuities
  * slider, then the Let's talk band.
@@ -73,7 +73,7 @@ const tracks: ProcessTrack[] = [
 <Base locale={locale} title={t.meta.title} description={t.meta.description}>
   <Header locale={locale} />
   <main class="service-page process-page" id="main">
-    <BandHero eyebrow={t.hero.eyebrow} title={t.hero.title} lead={t.hero.lead} />
+    <BandHero eyebrow={t.hero.eyebrow} title={t.hero.title} lead={t.hero.lead} photo="processHero" />
 
     <section class="section section--white intro" aria-labelledby="intro-title">
       <div class="container intro__grid">

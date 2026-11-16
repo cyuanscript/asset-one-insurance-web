@@ -55,8 +55,11 @@ const photoSlots = {
   processHealth: { src: '/images/advisor-office-lounge.jpg', caption: 'Advisor reviewing notes with a client in a bright office lounge', position: '50% 40%' },
   annuitiesHero: { src: '/images/retired-couple-beach-picnic.jpg', caption: 'Retired couple sharing a tablet during a beach picnic', position: '50% 40%' },
   processAnnuities: { src: '/images/advisor-client-financial-review.jpg', caption: 'Advisor walking a client through financial charts at a table', position: '50% 35%' },
+  // Our Process page: header background. Wide crop of the homepage Annuities photo
+  // (photo-originals/pexels-shkrabaanthony-5816285.jpg); the portrait web copy is too narrow for a full-width band
+  processHero: { src: '/images/advisor-client-financial-review-wide.jpg', caption: 'Advisor walking a client through financial charts at a table', position: '50% 35%' },
   // Our Process page: photo beside the "Get started" intro
-  processIntro: { src: '/images/grandparents-grandchildren-music.jpg', caption: 'Grandparents playing music with their grandchildren at home', position: '50% 45%' },
+  processIntro: { src: '/images/advisor-senior-couple-home-consultation.jpg', caption: 'Advisor smiling as he walks an older couple through paperwork at their dining table', position: '50% 40%' },
 
   // Coverage cards on the Services pages: one image per coverage type.
   // The key is `coverage-<card id>` (card ids live in the page's i18n file).
