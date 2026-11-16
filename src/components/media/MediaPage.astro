@@ -1,0 +1,70 @@
+---
+/**
+ * /media/ — placeholder. The client hasn't defined this page's content yet
+ * (press mentions, videos, interviews?). For now: band hero plus a short
+ * "coming soon" note pointing to Insights and Contact.
+ */
+import Base from '../../layouts/Base.astro';
+import Header from '../Header.astro';
+import Footer from '../Footer.astro';
+import BandHero from '../news/BandHero.astro';
+import { localePath, type Locale } from '../../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+
+const copy = {
+  en: {
+    title: 'Media · Asset One Insurance',
+    description: 'Media, press and videos from Asset One Insurance in Bellevue, WA.',
+    eyebrow: 'Media',
+    heading: 'Media',
+    lead: 'Press, interviews and videos from the Asset One team.',
+    soon: 'This page is coming soon. In the meantime, read our latest articles or get in touch.',
+    insights: 'Read Insights',
+    contact: 'Contact us',
+  },
+  zh: {
+    title: '媒体 · Asset One Insurance',
+    description: 'Asset One Insurance 的媒体报道、采访与视频。',
+    eyebrow: '媒体',
+    heading: '媒体',
+    lead: 'Asset One 团队的媒体报道、采访与视频。',
+    soon: '本页面即将上线。您可以先阅读我们的最新文章，或与我们联系。',
+    insights: '阅读洞察',
+    contact: '联系我们',
+  },
+}[locale];
+---
+
+<Base locale={locale} title={copy.title} description={copy.description}>
+  <Header locale={locale} />
+  <main class="service-page media-page" id="main">
+    <BandHero eyebrow={copy.eyebrow} title={copy.heading} lead={copy.lead} photo="hero" />
+    <section class="section section--white">
+      <div class="container media-soon">
+        <p>{copy.soon}</p>
+        <p class="media-soon__links">
+          <a href={localePath(locale, '/insights/')}>{copy.insights}</a>
+          <a href={localePath(locale, '/contact/')}>{copy.contact}</a>
+        </p>
+      </div>
+    </section>
+  </main>
+  <Footer locale={locale} />
+</Base>
+
+<style>
+  .media-soon {
+    max-width: 40rem;
+    text-align: center;
+  }
+  .media-soon__links {
+    display: flex;
+    gap: 1.5rem;
+    justify-content: center;
+    margin-top: 1rem;
+  }
+</style>
