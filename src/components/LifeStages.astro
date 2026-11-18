@@ -9,7 +9,6 @@ interface Props {
 const { locale } = Astro.props;
 const t = content[locale].stages;
 const total = String(t.items.length).padStart(2, '0');
-const approachHref = localePath(locale, '/insurance-and-you/');
 ---
 
 <section class="stages" aria-labelledby="stages-title" id="main">
@@ -70,9 +69,6 @@ const approachHref = localePath(locale, '/insurance-and-you/');
                     ))}
                   </ul>
                 </div>
-                <a class="stage__link text-link" href={approachHref}>
-                  {t.approach}
-                </a>
               </div>
             </div>
           ))
@@ -312,12 +308,6 @@ const approachHref = localePath(locale, '/insurance-and-you/');
     outline-offset: 3px;
   }
 
-  .stage__link {
-    margin-top: auto;
-    padding-top: 32px;
-    align-self: flex-start;
-  }
-
   /* Tablet: even split */
   @media (max-width: 1023px) {
     .stage {
@@ -409,10 +399,6 @@ const approachHref = localePath(locale, '/insurance-and-you/');
 
     .stage__fits {
       margin-top: 20px;
-    }
-
-    .stage__link {
-      padding-top: 24px;
     }
   }
 </style>
