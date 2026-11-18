@@ -1,0 +1,211 @@
+---
+/**
+ * Band under the homepage hero: a slow, looping strip of the carriers we're appointed with.
+ * Logos are pre-tinted gray-blue PNGs in /public/images/carriers/.
+ * Each logo's height comes from its aspect ratio so wide wordmarks and square marks
+ * read at a similar visual weight (equal-area sizing, clamped).
+ */
+import { content, type Locale } from '../i18n/content';
+
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const t = content[locale].carriers;
+
+// Alphabetical, so the order implies no ranking. w/h are the source image's pixel size.
+// `scale` nudges logos whose artwork reads unusually light (thin lines) or heavy (solid blocks).
+const carriers = [
+  { slug: 'allianz', name: 'Allianz Life', w: 220, h: 59 },
+  { slug: 'american-equity', name: 'American Equity', w: 170, h: 76, scale: 1.12 },
+  { slug: 'athene', name: 'Athene', w: 268, h: 49 },
+  { slug: 'corebridge', name: 'Corebridge Financial', w: 197, h: 65 },
+  { slug: 'fg', name: 'F&G Annuities & Life', w: 121, h: 104, scale: 0.88 },
+  { slug: 'global-atlantic', name: 'Global Atlantic', w: 294, h: 45 },
+  { slug: 'john-hancock', name: 'John Hancock', w: 197, h: 65 },
+  { slug: 'lincoln-financial', name: 'Lincoln Financial', w: 188, h: 69 },
+  { slug: 'mass-mutual', name: 'MassMutual', w: 343, h: 44 },
+  { slug: 'national-life-group', name: 'National Life Group', w: 191, h: 68 },
+  { slug: 'nationwide', name: 'Nationwide', w: 180, h: 71, scale: 1.1 },
+  { slug: 'new-york-life', name: 'New York Life', w: 103, h: 104, scale: 0.85 },
+  { slug: 'pacific-life', name: 'Pacific Life', w: 266, h: 50 },
+  { slug: 'prudential', name: 'Prudential', w: 95, h: 104 },
+  { slug: 'symetra', name: 'Symetra', w: 271, h: 48 },
+  { slug: 'transamerica', name: 'Transamerica', w: 189, h: 69, scale: 1.2 },
+];
+
+const AREA = 3800; // target logo area in px² at desktop size
+const logos = carriers.map((c) => {
+  const height = Math.min(56, Math.max(24, Math.sqrt(AREA / (c.w / c.h)))) * (c.scale ?? 1);
+  return { ...c, height: Math.round(height), width: Math.round((height * c.w) / c.h) };
+});
+---
+
+<section class="carriers" aria-labelledby="carriers-label">
+  <div class="container carriers__inner">
+    <p class="carriers__label" id="carriers-label">{t.label}</p>
+
+    <div class="carriers__viewport">
+      <div class="carriers__track">
+        {
+          [0, 1].map((copy) => (
+            <ul class="carriers__list" aria-hidden={copy === 1 ? 'true' : undefined} role="list">
+              {logos.map((logo) => (
+                <li class="carriers__item">
+                  <img
+                    src={`/images/carriers/${logo.slug}.png`}
+                    alt={copy === 0 ? logo.name : ''}
+                    width={logo.width}
+                    height={logo.height}
+                    style={`--h:${logo.height}`}
+                    fetchpriority="low"
+                    decoding="async"
+                    draggable="false"
+                  />
+                </li>
+              ))}
+            </ul>
+          ))
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .carriers {
+    --k: 1; /* logo size multiplier, smaller on phones */
+    --space: 28px; /* half the space between logos */
+    background: var(--white);
+    border-bottom: 1px solid var(--hairline);
+    padding-block: 28px;
+  }
+
+  .carriers__inner {
+    display: grid;
+    grid-template-columns: 168px minmax(0, 1fr);
+    align-items: center;
+    column-gap: 40px;
+  }
+
+  .carriers__label {
+    font: 700 12px/1.5 var(--sans);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--slate);
+  }
+
+  :lang(zh) .carriers__label {
+    font-size: 14px;
+    letter-spacing: 0.04em;
+    text-transform: none;
+  }
+
+  /* Logos fade in and out at both edges instead of being cut off */
+  .carriers__viewport {
+    overflow: hidden;
+    -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+    mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  }
+
+  /* Two identical lists side by side; sliding by one list's width loops seamlessly */
+  .carriers__track {
+    display: flex;
+    width: max-content;
+    animation: carriers-scroll 70s linear infinite;
+  }
+
+  .carriers__viewport:hover .carriers__track {
+    animation-play-state: paused;
+  }
+
+  @keyframes carriers-scroll {
+    to {
+      transform: translateX(-50%);
+    }
+  }
+
+  .carriers__list {
+    display: flex;
+    align-items: center;
+    flex: none;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Spacing as padding (not gap) so both lists are exactly the same width */
+  .carriers__item {
+    flex: none;
+    display: flex;
+    align-items: center;
+    height: 64px;
+    padding-inline: var(--space);
+  }
+
+  .carriers__item img {
+    display: block;
+    height: calc(var(--h) * var(--k) * 1px);
+    width: auto;
+    user-select: none;
+  }
+
+  @media (max-width: 1023px) {
+    .carriers__inner {
+      grid-template-columns: minmax(0, 1fr);
+      row-gap: 20px;
+    }
+
+    .carriers__label {
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .carriers {
+      --k: 0.78;
+      --space: 20px;
+      padding-block: 24px;
+    }
+
+    .carriers__item {
+      height: 52px;
+    }
+
+    .carriers__track {
+      animation-duration: 55s;
+    }
+  }
+
+  /* No motion: show every logo once, wrapped and centred */
+  @media (prefers-reduced-motion: reduce) {
+    .carriers {
+      --space: 18px;
+    }
+
+    .carriers__item {
+      height: 56px;
+    }
+
+    .carriers__viewport {
+      -webkit-mask-image: none;
+      mask-image: none;
+    }
+
+    .carriers__track {
+      width: auto;
+      animation: none;
+    }
+
+    .carriers__list {
+      flex: 1;
+      flex-wrap: wrap;
+      justify-content: center;
+      row-gap: 12px;
+    }
+
+    .carriers__list[aria-hidden='true'] {
+      display: none;
+    }
+  }
+</style>

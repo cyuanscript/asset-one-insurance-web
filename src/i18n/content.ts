@@ -133,6 +133,10 @@ const en = {
     secondary: 'Explore Insurance & You',
     scroll: 'Scroll',
   },
+  carriers: {
+    // "Appointed with" rather than "partners": avoids implying the carriers endorse us
+    label: "Carriers we're appointed with",
+  },
   stages: {
     eyebrow: 'How we help',
     title: 'Start with where you are in life',
@@ -274,6 +278,9 @@ const zh: typeof en = {
     primary: '联系我们',
     secondary: '了解保险与您',
     scroll: '向下',
+  },
+  carriers: {
+    label: '我们获授权代理的保险公司',
   },
   stages: {
     eyebrow: '我们如何帮助您',
