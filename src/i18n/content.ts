@@ -130,7 +130,6 @@ const en = {
     title: ['Protect what matters, steadily.'],
     lead: 'Life insurance, health insurance and annuities, chosen with care and explained in plain language.',
     primary: 'Talk with us',
-    secondary: 'Explore Insurance & You',
     scroll: 'Scroll',
   },
   carriers: {
@@ -144,7 +143,6 @@ const en = {
       "Most people come to us with a moment in mind, not a product. Pick yours and we'll explain the options that may fit.",
     tablistLabel: 'Life stages',
     mayFit: 'May fit',
-    approach: 'How we approach this',
     items: [
       {
         name: 'Family Protection',
@@ -276,7 +274,6 @@ const zh: typeof en = {
     title: ['稳健守护您所', '珍视的一切。'],
     lead: '寿险、健康险与年金，用心挑选，清楚讲解。',
     primary: '联系我们',
-    secondary: '了解保险与您',
     scroll: '向下',
   },
   carriers: {
@@ -288,7 +285,6 @@ const zh: typeof en = {
     intro: '大多数人来找我们时，心里想的是人生中的某个时刻，而不是某个产品。选择您所处的阶段，我们会为您讲解可能适合的方案。',
     tablistLabel: '人生阶段',
     mayFit: '可能适合',
-    approach: '了解我们的做法',
     items: [
       {
         name: '家庭保障',
